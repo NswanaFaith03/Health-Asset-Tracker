@@ -1,0 +1,131 @@
+import React from "react";
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, RefreshControl, ActivityIndicator, Alert } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Feather } from "@expo/vector-icons";
+import { router } from "expo-router";
+import { useQueryClient } from "@tanstack/react-query";
+import { useListMentalHealthSessions, useUpdateMentalHealthSession, getListMentalHealthSessionsQueryKey } from "@workspace/api-client-react";
+import { useColors } from "../../hooks/useColors";
+
+const STATUS_COLORS: Record<string, string> = {
+  requested: "#f59e0b", active: "#10b981", completed: "#6b7280", cancelled: "#ef4444",
+};
+
+export default function CounselorSessions() {
+  const insets = useSafeAreaInsets();
+  const colors = useColors();
+  const queryClient = useQueryClient();
+  const { data: sessions, isLoading, refetch } = useListMentalHealthSessions({
+    query: { queryKey: getListMentalHealthSessionsQueryKey() }
+  });
+  const updateSession = useUpdateMentalHealthSession();
+
+  const handleAccept = (id: number) => {
+    Alert.alert("Accept Session", "Accept this counseling session?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Accept",
+        onPress: () => updateSession.mutate(
+          { id, data: { status: "active" } },
+          { onSuccess: () => queryClient.invalidateQueries({ queryKey: getListMentalHealthSessionsQueryKey() }) }
+        )
+      }
+    ]);
+  };
+
+  const handleComplete = (id: number) => {
+    updateSession.mutate(
+      { id, data: { status: "completed" } },
+      { onSuccess: () => queryClient.invalidateQueries({ queryKey: getListMentalHealthSessionsQueryKey() }) }
+    );
+  };
+
+  return (
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
+        <Text style={[styles.title, { color: colors.foreground }]}>Counseling Sessions</Text>
+      </View>
+      {isLoading ? (
+        <View style={styles.center}><ActivityIndicator size="large" color={colors.primary} /></View>
+      ) : (
+        <FlatList
+          data={sessions ?? []}
+          keyExtractor={(item) => String((item as any).id)}
+          contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: insets.bottom + 84, paddingTop: 8 }}
+          refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} />}
+          renderItem={({ item }) => (
+            <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
+              <View style={styles.cardTop}>
+                <View style={[styles.iconWrap, { backgroundColor: "#ec489915" }]}>
+                  <Feather name="heart" size={18} color="#ec4899" />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.studentName, { color: colors.foreground }]}>
+                    {(item as any).isAnonymous ? "Anonymous Student" : (item as any).student?.name ?? "Student"}
+                  </Text>
+                  <Text style={[styles.topic, { color: colors.mutedForeground }]} numberOfLines={1}>{(item as any).topic}</Text>
+                </View>
+                <View style={[styles.badge, { backgroundColor: STATUS_COLORS[(item as any).status] + "20" }]}>
+                  <Text style={[styles.badgeText, { color: STATUS_COLORS[(item as any).status] }]}>{(item as any).status}</Text>
+                </View>
+              </View>
+              <Text style={[styles.date, { color: colors.mutedForeground }]}>{new Date((item as any).createdAt).toLocaleDateString()}</Text>
+              <View style={styles.actions}>
+                {(item as any).status === "requested" && (
+                  <TouchableOpacity
+                    style={[styles.actionBtn, { backgroundColor: colors.primary, borderRadius: colors.radius }]}
+                    onPress={() => handleAccept((item as any).id)}
+                  >
+                    <Text style={[styles.actionBtnText, { color: colors.primaryForeground }]}>Accept</Text>
+                  </TouchableOpacity>
+                )}
+                {(item as any).status === "active" && (
+                  <>
+                    <TouchableOpacity
+                      style={[styles.actionBtn, { backgroundColor: colors.secondary, borderRadius: colors.radius }]}
+                      onPress={() => router.push({ pathname: "/(mental-health)/session-detail", params: { sessionId: (item as any).id } })}
+                    >
+                      <Text style={[styles.actionBtnText, { color: colors.primary }]}>Open Chat</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.actionBtn, { backgroundColor: colors.muted, borderRadius: colors.radius }]}
+                      onPress={() => handleComplete((item as any).id)}
+                    >
+                      <Text style={[styles.actionBtnText, { color: colors.foreground }]}>Complete</Text>
+                    </TouchableOpacity>
+                  </>
+                )}
+              </View>
+            </View>
+          )}
+          ListEmptyComponent={
+            <View style={styles.empty}>
+              <Feather name="users" size={48} color={colors.mutedForeground} />
+              <Text style={[styles.emptyText, { color: colors.mutedForeground }]}>No sessions</Text>
+            </View>
+          }
+        />
+      )}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1 },
+  header: { paddingHorizontal: 16, paddingBottom: 12 },
+  title: { fontSize: 24, fontWeight: "700" },
+  center: { flex: 1, justifyContent: "center", alignItems: "center" },
+  card: { borderRadius: 12, borderWidth: 1, padding: 14, marginBottom: 10, gap: 8 },
+  cardTop: { flexDirection: "row", alignItems: "center", gap: 10 },
+  iconWrap: { width: 38, height: 38, borderRadius: 19, justifyContent: "center", alignItems: "center" },
+  studentName: { fontSize: 15, fontWeight: "700" },
+  topic: { fontSize: 13, marginTop: 2 },
+  badge: { paddingHorizontal: 10, paddingVertical: 3, borderRadius: 20 },
+  badgeText: { fontSize: 11, fontWeight: "700" },
+  date: { fontSize: 12 },
+  actions: { flexDirection: "row", gap: 8 },
+  actionBtn: { paddingHorizontal: 16, paddingVertical: 8 },
+  actionBtnText: { fontSize: 14, fontWeight: "600" },
+  empty: { flex: 1, alignItems: "center", justifyContent: "center", paddingTop: 80, gap: 12 },
+  emptyText: { fontSize: 16 },
+});

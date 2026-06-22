@@ -3,20 +3,42 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: UNZA DigiHealth API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: auth
+    description: Authentication operations
+  - name: users
+    description: User management
+  - name: consultations
+    description: Consultation management
+  - name: queue
+    description: Queue management
+  - name: prescriptions
+    description: Prescription management
+  - name: lab
+    description: Laboratory management
+  - name: notifications
+    description: Notification management
+  - name: mental-health
+    description: Mental health services
+  - name: hiv-support
+    description: HIV/AIDS support services
+  - name: dashboard
+    description: Dashboard summaries
+  - name: admin
+    description: Admin operations
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,13 +46,1638 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  # Auth
+  /auth/register:
+    post:
+      operationId: register
+      tags: [auth]
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+      responses:
+        "201":
+          description: Registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Logged in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      summary: Logout
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Logged out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current user
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/change-password:
+    post:
+      operationId: changePassword
+      tags: [auth]
+      summary: Change password
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChangePasswordRequest"
+      responses:
+        "200":
+          description: Password changed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  # Users
+  /users:
+    get:
+      operationId: listUsers
+      tags: [users]
+      summary: List users (admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: role
+          in: query
+          schema:
+            $ref: "#/components/schemas/UserRole"
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+
+  /users/{id}:
+    get:
+      operationId: getUser
+      tags: [users]
+      summary: Get user by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: User details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+    put:
+      operationId: updateUser
+      tags: [users]
+      summary: Update user profile
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserRequest"
+      responses:
+        "200":
+          description: Updated user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /users/{id}/status:
+    patch:
+      operationId: updateUserStatus
+      tags: [users]
+      summary: Update user status (admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserStatusRequest"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  # Consultations
+  /consultations:
+    get:
+      operationId: listConsultations
+      tags: [consultations]
+      summary: List consultations
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            $ref: "#/components/schemas/ConsultationStatus"
+        - name: studentId
+          in: query
+          schema:
+            type: integer
+        - name: doctorId
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of consultations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Consultation"
+
+    post:
+      operationId: createConsultation
+      tags: [consultations]
+      summary: Create a new consultation request
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateConsultationRequest"
+      responses:
+        "201":
+          description: Created consultation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Consultation"
+
+  /consultations/{id}:
+    get:
+      operationId: getConsultation
+      tags: [consultations]
+      summary: Get consultation by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Consultation details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Consultation"
+
+    put:
+      operationId: updateConsultation
+      tags: [consultations]
+      summary: Update consultation (doctor response/diagnosis)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateConsultationRequest"
+      responses:
+        "200":
+          description: Updated consultation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Consultation"
+
+  /consultations/{id}/status:
+    patch:
+      operationId: updateConsultationStatus
+      tags: [consultations]
+      summary: Update consultation status
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateConsultationStatusRequest"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Consultation"
+
+  # Queue
+  /queue:
+    get:
+      operationId: getQueue
+      tags: [queue]
+      summary: Get current queue
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Queue list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/QueueEntry"
+
+  /queue/my-position:
+    get:
+      operationId: getMyQueuePosition
+      tags: [queue]
+      summary: Get my queue position
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Queue position info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QueuePosition"
+
+  /queue/join:
+    post:
+      operationId: joinQueue
+      tags: [queue]
+      summary: Join the queue
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JoinQueueRequest"
+      responses:
+        "201":
+          description: Joined queue
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QueueEntry"
+
+  /queue/{id}/complete:
+    patch:
+      operationId: completeQueueEntry
+      tags: [queue]
+      summary: Mark queue entry as complete (doctor)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QueueEntry"
+
+  # Prescriptions
+  /prescriptions:
+    get:
+      operationId: listPrescriptions
+      tags: [prescriptions]
+      summary: List prescriptions
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            $ref: "#/components/schemas/PrescriptionStatus"
+        - name: patientId
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of prescriptions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Prescription"
+
+    post:
+      operationId: createPrescription
+      tags: [prescriptions]
+      summary: Create a prescription (doctor)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePrescriptionRequest"
+      responses:
+        "201":
+          description: Created prescription
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Prescription"
+
+  /prescriptions/{id}:
+    get:
+      operationId: getPrescription
+      tags: [prescriptions]
+      summary: Get prescription by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Prescription details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Prescription"
+
+  /prescriptions/{id}/dispense:
+    patch:
+      operationId: dispensePrescription
+      tags: [prescriptions]
+      summary: Dispense prescription (pharmacist)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DispensePrescriptionRequest"
+      responses:
+        "200":
+          description: Dispensed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Prescription"
+
+  # Lab Requests
+  /lab-requests:
+    get:
+      operationId: listLabRequests
+      tags: [lab]
+      summary: List lab requests
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            $ref: "#/components/schemas/LabRequestStatus"
+        - name: patientId
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of lab requests
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LabRequest"
+
+    post:
+      operationId: createLabRequest
+      tags: [lab]
+      summary: Create a lab request (doctor)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateLabRequestRequest"
+      responses:
+        "201":
+          description: Created lab request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LabRequest"
+
+  /lab-requests/{id}:
+    get:
+      operationId: getLabRequest
+      tags: [lab]
+      summary: Get lab request by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Lab request details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LabRequest"
+
+  /lab-requests/{id}/status:
+    patch:
+      operationId: updateLabRequestStatus
+      tags: [lab]
+      summary: Update lab request status (lab tech)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateLabRequestStatusRequest"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LabRequest"
+
+  # Lab Results
+  /lab-results:
+    post:
+      operationId: uploadLabResult
+      tags: [lab]
+      summary: Upload lab result (lab tech)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateLabResultRequest"
+      responses:
+        "201":
+          description: Uploaded lab result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LabResult"
+
+  /lab-results/{requestId}:
+    get:
+      operationId: getLabResult
+      tags: [lab]
+      summary: Get lab result for a request
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: requestId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Lab result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LabResult"
+
+  # Notifications
+  /notifications:
+    get:
+      operationId: listNotifications
+      tags: [notifications]
+      summary: List my notifications
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Notifications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Notification"
+
+  /notifications/{id}/read:
+    patch:
+      operationId: markNotificationRead
+      tags: [notifications]
+      summary: Mark notification as read
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Marked read
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Notification"
+
+  /notifications/read-all:
+    patch:
+      operationId: markAllNotificationsRead
+      tags: [notifications]
+      summary: Mark all notifications as read
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: All marked read
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  # Mental Health
+  /mental-health/sessions:
+    get:
+      operationId: listMentalHealthSessions
+      tags: [mental-health]
+      summary: List mental health sessions
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Sessions list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MentalHealthSession"
+
+    post:
+      operationId: createMentalHealthSession
+      tags: [mental-health]
+      summary: Request a mental health session
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateMentalHealthSessionRequest"
+      responses:
+        "201":
+          description: Created session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MentalHealthSession"
+
+  /mental-health/sessions/{id}:
+    get:
+      operationId: getMentalHealthSession
+      tags: [mental-health]
+      summary: Get mental health session
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Session details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MentalHealthSession"
+
+    put:
+      operationId: updateMentalHealthSession
+      tags: [mental-health]
+      summary: Update session (counselor notes/status)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateMentalHealthSessionRequest"
+      responses:
+        "200":
+          description: Updated session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MentalHealthSession"
+
+  /mental-health/messages/{sessionId}:
+    get:
+      operationId: getMentalHealthMessages
+      tags: [mental-health]
+      summary: Get messages for a session
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Message"
+
+    post:
+      operationId: sendMentalHealthMessage
+      tags: [mental-health]
+      summary: Send a message in a mental health session
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendMessageRequest"
+      responses:
+        "201":
+          description: Sent message
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+
+  # HIV Support
+  /hiv-support/sessions:
+    get:
+      operationId: listHivSupportSessions
+      tags: [hiv-support]
+      summary: List HIV support sessions
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Sessions list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/HivSupportSession"
+
+    post:
+      operationId: createHivSupportSession
+      tags: [hiv-support]
+      summary: Request a HIV support session
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateHivSupportSessionRequest"
+      responses:
+        "201":
+          description: Created session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HivSupportSession"
+
+  /hiv-support/sessions/{id}:
+    put:
+      operationId: updateHivSupportSession
+      tags: [hiv-support]
+      summary: Update HIV support session
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateHivSupportSessionRequest"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HivSupportSession"
+
+  /hiv-support/resources:
+    get:
+      operationId: listHivResources
+      tags: [hiv-support]
+      summary: List HIV/AIDS educational resources
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Resources list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/HivResource"
+
+  # Dashboard
+  /dashboard/student:
+    get:
+      operationId: getStudentDashboard
+      tags: [dashboard]
+      summary: Student dashboard summary
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Student dashboard data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudentDashboard"
+
+  /dashboard/doctor:
+    get:
+      operationId: getDoctorDashboard
+      tags: [dashboard]
+      summary: Doctor dashboard summary
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Doctor dashboard data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DoctorDashboard"
+
+  # Admin
+  /admin/analytics:
+    get:
+      operationId: getAdminAnalytics
+      tags: [admin]
+      summary: Get system analytics
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Analytics data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminAnalytics"
+
+  /admin/audit-logs:
+    get:
+      operationId: listAuditLogs
+      tags: [admin]
+      summary: Get audit logs
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+      responses:
+        "200":
+          description: Audit logs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AuditLog"
+
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   schemas:
     HealthStatus:
       type: object
       properties:
         status:
           type: string
-      required:
-        - status
+      required: [status]
 
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+      required: [error]
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+      required: [success]
+
+    UserRole:
+      type: string
+      enum: [student, doctor, pharmacist, lab_technician, mental_health_counselor, hiv_professional, admin]
+
+    UserStatus:
+      type: string
+      enum: [active, inactive, suspended]
+
+    ConsultationStatus:
+      type: string
+      enum: [submitted, under_review, assigned, responded, closed]
+
+    PrescriptionStatus:
+      type: string
+      enum: [pending, dispensed, cancelled]
+
+    LabRequestStatus:
+      type: string
+      enum: [pending, in_progress, completed, cancelled]
+
+    SessionStatus:
+      type: string
+      enum: [requested, active, completed, cancelled]
+
+    # Auth
+    RegisterRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        studentNumber:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        password:
+          type: string
+          minLength: 6
+        role:
+          $ref: "#/components/schemas/UserRole"
+      required: [name, email, password, role]
+
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+      required: [email, password]
+
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        user:
+          $ref: "#/components/schemas/User"
+      required: [token, user]
+
+    ChangePasswordRequest:
+      type: object
+      properties:
+        currentPassword:
+          type: string
+        newPassword:
+          type: string
+          minLength: 6
+      required: [currentPassword, newPassword]
+
+    # User
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        studentNumber:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        role:
+          $ref: "#/components/schemas/UserRole"
+        status:
+          $ref: "#/components/schemas/UserStatus"
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, name, email, role, status, createdAt]
+
+    UpdateUserRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        phone:
+          type: string
+        studentNumber:
+          type: string
+
+    # Consultation
+    Consultation:
+      type: object
+      properties:
+        id:
+          type: integer
+        studentId:
+          type: integer
+        doctorId:
+          type: integer
+        symptoms:
+          type: string
+        severity:
+          type: string
+          enum: [low, medium, high, critical]
+        attachments:
+          type: array
+          items:
+            type: string
+        status:
+          $ref: "#/components/schemas/ConsultationStatus"
+        diagnosis:
+          type: string
+        notes:
+          type: string
+        student:
+          $ref: "#/components/schemas/User"
+        doctor:
+          $ref: "#/components/schemas/User"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required: [id, studentId, symptoms, severity, status, createdAt, updatedAt]
+
+    CreateConsultationRequest:
+      type: object
+      properties:
+        symptoms:
+          type: string
+        severity:
+          type: string
+          enum: [low, medium, high, critical]
+        attachments:
+          type: array
+          items:
+            type: string
+      required: [symptoms, severity]
+
+    UpdateConsultationRequest:
+      type: object
+      properties:
+        diagnosis:
+          type: string
+        notes:
+          type: string
+        status:
+          $ref: "#/components/schemas/ConsultationStatus"
+
+    # Queue
+    QueueEntry:
+      type: object
+      properties:
+        id:
+          type: integer
+        consultationId:
+          type: integer
+        studentId:
+          type: integer
+        queueNumber:
+          type: integer
+        status:
+          type: string
+          enum: [waiting, in_progress, completed, skipped]
+        estimatedWaitMinutes:
+          type: integer
+        student:
+          $ref: "#/components/schemas/User"
+        consultation:
+          $ref: "#/components/schemas/Consultation"
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, consultationId, studentId, queueNumber, status, createdAt]
+
+    QueuePosition:
+      type: object
+      properties:
+        position:
+          type: integer
+        queueNumber:
+          type: integer
+        estimatedWaitMinutes:
+          type: integer
+        status:
+          type: string
+          enum: [waiting, in_progress, completed, skipped, not_in_queue]
+        totalInQueue:
+          type: integer
+      required: [position, status, totalInQueue]
+
+    # Prescription
+    Prescription:
+      type: object
+      properties:
+        id:
+          type: integer
+        patientId:
+          type: integer
+        doctorId:
+          type: integer
+        consultationId:
+          type: integer
+        medication:
+          type: string
+        dosage:
+          type: string
+        instructions:
+          type: string
+        duration:
+          type: string
+        status:
+          $ref: "#/components/schemas/PrescriptionStatus"
+        dispensedAt:
+          type: string
+          format: date-time
+        dispensedBy:
+          type: integer
+        patient:
+          $ref: "#/components/schemas/User"
+        doctor:
+          $ref: "#/components/schemas/User"
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, patientId, doctorId, medication, dosage, instructions, status, createdAt]
+
+    CreatePrescriptionRequest:
+      type: object
+      properties:
+        patientId:
+          type: integer
+        consultationId:
+          type: integer
+        medication:
+          type: string
+        dosage:
+          type: string
+        instructions:
+          type: string
+        duration:
+          type: string
+      required: [patientId, medication, dosage, instructions]
+
+    # Lab
+    LabRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+        patientId:
+          type: integer
+        doctorId:
+          type: integer
+        consultationId:
+          type: integer
+        testType:
+          type: string
+        notes:
+          type: string
+        status:
+          $ref: "#/components/schemas/LabRequestStatus"
+        patient:
+          $ref: "#/components/schemas/User"
+        doctor:
+          $ref: "#/components/schemas/User"
+        result:
+          $ref: "#/components/schemas/LabResult"
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, patientId, doctorId, testType, status, createdAt]
+
+    CreateLabRequestRequest:
+      type: object
+      properties:
+        patientId:
+          type: integer
+        consultationId:
+          type: integer
+        testType:
+          type: string
+        notes:
+          type: string
+      required: [patientId, testType]
+
+    LabResult:
+      type: object
+      properties:
+        id:
+          type: integer
+        requestId:
+          type: integer
+        results:
+          type: string
+        attachment:
+          type: string
+        uploadedBy:
+          type: integer
+        uploadedAt:
+          type: string
+          format: date-time
+      required: [id, requestId, results, uploadedAt]
+
+    CreateLabResultRequest:
+      type: object
+      properties:
+        requestId:
+          type: integer
+        results:
+          type: string
+        attachment:
+          type: string
+      required: [requestId, results]
+
+    # Notification
+    Notification:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        title:
+          type: string
+        message:
+          type: string
+        type:
+          type: string
+          enum: [consultation, queue, prescription, lab_result, counseling, system]
+        readStatus:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, userId, title, message, type, readStatus, createdAt]
+
+    # Mental Health
+    MentalHealthSession:
+      type: object
+      properties:
+        id:
+          type: integer
+        studentId:
+          type: integer
+        counselorId:
+          type: integer
+        topic:
+          type: string
+        notes:
+          type: string
+        status:
+          $ref: "#/components/schemas/SessionStatus"
+        isAnonymous:
+          type: boolean
+        student:
+          $ref: "#/components/schemas/User"
+        counselor:
+          $ref: "#/components/schemas/User"
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, studentId, topic, status, isAnonymous, createdAt]
+
+    CreateMentalHealthSessionRequest:
+      type: object
+      properties:
+        topic:
+          type: string
+        isAnonymous:
+          type: boolean
+        initialMessage:
+          type: string
+      required: [topic]
+
+    UpdateMentalHealthSessionRequest:
+      type: object
+      properties:
+        notes:
+          type: string
+        status:
+          $ref: "#/components/schemas/SessionStatus"
+
+    Message:
+      type: object
+      properties:
+        id:
+          type: integer
+        sessionId:
+          type: integer
+        senderId:
+          type: integer
+        content:
+          type: string
+        sender:
+          $ref: "#/components/schemas/User"
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, sessionId, senderId, content, createdAt]
+
+    # HIV Support
+    HivSupportSession:
+      type: object
+      properties:
+        id:
+          type: integer
+        studentId:
+          type: integer
+        professionalId:
+          type: integer
+        topic:
+          type: string
+        notes:
+          type: string
+        status:
+          $ref: "#/components/schemas/SessionStatus"
+        appointmentDate:
+          type: string
+          format: date-time
+        student:
+          $ref: "#/components/schemas/User"
+        professional:
+          $ref: "#/components/schemas/User"
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, studentId, topic, status, createdAt]
+
+    CreateHivSupportSessionRequest:
+      type: object
+      properties:
+        topic:
+          type: string
+        appointmentDate:
+          type: string
+          format: date-time
+        notes:
+          type: string
+      required: [topic]
+
+    UpdateHivSupportSessionRequest:
+      type: object
+      properties:
+        notes:
+          type: string
+        status:
+          $ref: "#/components/schemas/SessionStatus"
+        appointmentDate:
+          type: string
+          format: date-time
+
+    HivResource:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        content:
+          type: string
+        category:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, title, content, category, createdAt]
+
+    # Dashboard
+    StudentDashboard:
+      type: object
+      properties:
+        activeConsultations:
+          type: integer
+        pendingPrescriptions:
+          type: integer
+        pendingLabResults:
+          type: integer
+        unreadNotifications:
+          type: integer
+        queuePosition:
+          $ref: "#/components/schemas/QueuePosition"
+        recentConsultations:
+          type: array
+          items:
+            $ref: "#/components/schemas/Consultation"
+      required: [activeConsultations, pendingPrescriptions, pendingLabResults, unreadNotifications]
+
+    DoctorDashboard:
+      type: object
+      properties:
+        todayConsultations:
+          type: integer
+        pendingReviews:
+          type: integer
+        currentQueueSize:
+          type: integer
+        prescriptionsToday:
+          type: integer
+        labRequestsToday:
+          type: integer
+        recentPatients:
+          type: array
+          items:
+            $ref: "#/components/schemas/Consultation"
+      required: [todayConsultations, pendingReviews, currentQueueSize, prescriptionsToday, labRequestsToday]
+
+    # Admin
+    AdminAnalytics:
+      type: object
+      properties:
+        totalUsers:
+          type: integer
+        totalConsultations:
+          type: integer
+        consultationsToday:
+          type: integer
+        averageWaitMinutes:
+          type: number
+        activePatients:
+          type: integer
+        prescriptionsIssued:
+          type: integer
+        labTestsCompleted:
+          type: integer
+        counselingSessions:
+          type: integer
+        usersByRole:
+          type: object
+          additionalProperties:
+            type: integer
+      required: [totalUsers, totalConsultations, consultationsToday, averageWaitMinutes, activePatients, prescriptionsIssued, labTestsCompleted, counselingSessions]
+
+    AuditLog:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        action:
+          type: string
+        resource:
+          type: string
+        resourceId:
+          type: string
+        details:
+          type: string
+        ipAddress:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, action, resource, createdAt]
+
+    # Named request body schemas (avoids inline naming conflicts)
+    UpdateUserStatusRequest:
+      type: object
+      properties:
+        status:
+          $ref: "#/components/schemas/UserStatus"
+      required: [status]
+
+    UpdateConsultationStatusRequest:
+      type: object
+      properties:
+        status:
+          $ref: "#/components/schemas/ConsultationStatus"
+        doctorId:
+          type: integer
+      required: [status]
+
+    JoinQueueRequest:
+      type: object
+      properties:
+        consultationId:
+          type: integer
+      required: [consultationId]
+
+    DispensePrescriptionRequest:
+      type: object
+      properties:
+        dispensedBy:
+          type: integer
+        notes:
+          type: string
+      required: [dispensedBy]
+
+    UpdateLabRequestStatusRequest:
+      type: object
+      properties:
+        status:
+          $ref: "#/components/schemas/LabRequestStatus"
+      required: [status]
+
+    SendMessageRequest:
+      type: object
+      properties:
+        content:
+          type: string
+      required: [content]

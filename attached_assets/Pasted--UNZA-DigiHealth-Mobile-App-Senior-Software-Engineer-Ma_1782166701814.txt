@@ -1,0 +1,586 @@
+# UNZA DigiHealth Mobile App – Senior Software Engineer Master Plan for Replit
+
+Based on the uploaded proposal, the mobile application must digitize the entire UNZA clinic workflow while remaining student-centric and scalable. The app should cover Student, Doctor, Pharmacist, Laboratory, Mental Health, and HIV/AIDS service workflows as defined in the proposal.  
+
+---
+
+# 1. Product Vision
+
+Create a unified mobile healthcare platform that:
+
+* Reduces clinic queues
+* Enables online consultations
+* Digitizes prescriptions
+* Digitizes laboratory requests/results
+* Provides mental health support
+* Provides HIV/AIDS support services
+* Delivers real-time notifications
+* Maintains complete patient history
+* Improves coordination between healthcare personnel
+
+This directly addresses the problems identified in the proposal. 
+
+---
+
+# 2. User Roles
+
+## Student
+
+Functions:
+
+* Register/Login
+* Submit consultation requests
+* Upload images/videos
+* View queue position
+* View consultation history
+* View prescriptions
+* View laboratory requests
+* View laboratory results
+* Receive notifications
+* Access Mental Buddy
+* Access HIV/AIDS Centre
+* Update profile
+
+---
+
+## Doctor
+
+Functions:
+
+* View patient queue
+* View patient history
+* Accept consultations
+* Diagnose patients
+* Issue prescriptions
+* Create lab requests
+* Refer patients
+* Consultation notes
+* Patient search
+
+---
+
+## Pharmacist
+
+Functions:
+
+* View prescriptions
+* Dispense medication
+* Update drug status
+* View patient medication history
+* Stock alerts
+
+---
+
+## Laboratory Technician
+
+Functions:
+
+* View pending lab requests
+* Upload lab results
+* Mark tests complete
+* View patient records
+
+---
+
+## Mental Health Counselor
+
+Functions:
+
+* Receive counseling requests
+* Secure messaging
+* Session notes
+* Follow-up scheduling
+
+---
+
+## HIV/AIDS Professional
+
+Functions:
+
+* Consultation management
+* Secure messaging
+* Appointment scheduling
+* Educational resources
+
+---
+
+## System Administrator
+
+Functions:
+
+* User management
+* Role management
+* Analytics
+* Audit logs
+* Notification management
+* Content management
+
+---
+
+# 3. Mobile App Navigation Structure
+
+```text
+Splash Screen
+
+Authentication
+ ├── Login
+ ├── Register
+ ├── Forgot Password
+
+Student Dashboard
+ ├── Home
+ ├── Consultations
+ ├── Prescriptions
+ ├── Laboratory
+ ├── Notifications
+ ├── Mental Buddy
+ ├── HIV/AIDS Centre
+ ├── Profile
+
+Doctor Dashboard
+ ├── Queue
+ ├── Patients
+ ├── Consultations
+ ├── Prescriptions
+ ├── Lab Requests
+ ├── Reports
+
+Pharmacy Dashboard
+ ├── Prescriptions
+ ├── Dispensing
+ ├── History
+
+Laboratory Dashboard
+ ├── Requests
+ ├── Results
+ ├── History
+
+Mental Buddy Dashboard
+ ├── Inbox
+ ├── Sessions
+ ├── Notes
+
+HIV/AIDS Dashboard
+ ├── Requests
+ ├── Sessions
+ ├── Resources
+
+Admin Dashboard
+ ├── Users
+ ├── Roles
+ ├── Analytics
+ ├── Audit Logs
+```
+
+---
+
+# 4. Core Modules
+
+## Module 1: Authentication & Access Control
+
+Features:
+
+* Login
+* Registration
+* OTP verification
+* Password reset
+* Multi-role support
+* Session management
+* Biometric login
+
+---
+
+## Module 2: Student Consultation System
+
+Features:
+
+* New consultation
+* Symptom description
+* Severity level
+* Image uploads
+* Video uploads
+* Consultation status tracking
+
+Statuses:
+
+```text
+Submitted
+Under Review
+Assigned
+Responded
+Closed
+```
+
+---
+
+## Module 3: Queue Management
+
+Features:
+
+* Virtual queue
+* Queue number
+* Estimated waiting time
+* Queue notifications
+
+---
+
+## Module 4: Patient Medical Records
+
+Features:
+
+* Consultation history
+* Prescriptions
+* Lab history
+* Diagnoses
+* Referrals
+
+---
+
+## Module 5: Doctor Management System
+
+Features:
+
+* Patient review
+* Consultation responses
+* E-prescriptions
+* Lab requests
+* Referrals
+
+---
+
+## Module 6: Digital Prescription System
+
+Features:
+
+* Create prescription
+* Approve prescription
+* Dispense medication
+* Medication history
+
+Workflow:
+
+```text
+Doctor
+   ↓
+Prescription
+   ↓
+Pharmacy
+   ↓
+Dispensed
+   ↓
+Student Notified
+```
+
+---
+
+## Module 7: Laboratory Management
+
+Features:
+
+* Lab request creation
+* Test tracking
+* Result upload
+* Result approval
+
+Workflow:
+
+```text
+Doctor
+   ↓
+Lab Request
+   ↓
+Lab Technician
+   ↓
+Results Uploaded
+   ↓
+Student Notified
+```
+
+---
+
+## Module 8: Notification Centre
+
+Push notifications for:
+
+* Consultation updates
+* Queue updates
+* Prescription ready
+* Lab results ready
+* Counseling updates
+
+---
+
+## Module 9: Mental Buddy
+
+Proposal requirement. 
+
+Features:
+
+* Anonymous support option
+* Chat counseling
+* Personal journal
+* Mood tracking
+* Relationship support
+
+---
+
+## Module 10: HIV/AIDS Response Centre
+
+Proposal requirement. 
+
+Features:
+
+* Confidential consultations
+* Appointment requests
+* Educational resources
+* Follow-up reminders
+
+---
+
+## Module 11: Analytics Dashboard
+
+Metrics:
+
+* Daily consultations
+* Average waiting time
+* Active patients
+* Prescriptions issued
+* Lab tests completed
+* Counseling sessions
+
+---
+
+# 5. Database Architecture
+
+## Users
+
+```text
+id
+name
+student_number
+email
+phone
+role
+password_hash
+status
+created_at
+```
+
+---
+
+## Consultations
+
+```text
+id
+student_id
+doctor_id
+symptoms
+attachments
+status
+created_at
+```
+
+---
+
+## Medical Records
+
+```text
+id
+patient_id
+consultation_id
+diagnosis
+notes
+```
+
+---
+
+## Prescriptions
+
+```text
+id
+patient_id
+doctor_id
+medication
+dosage
+instructions
+status
+```
+
+---
+
+## Lab Requests
+
+```text
+id
+patient_id
+doctor_id
+test_type
+status
+```
+
+---
+
+## Lab Results
+
+```text
+id
+request_id
+results
+attachment
+uploaded_at
+```
+
+---
+
+## Mental Health Sessions
+
+```text
+id
+student_id
+counselor_id
+notes
+status
+```
+
+---
+
+## HIV Support Sessions
+
+```text
+id
+student_id
+professional_id
+notes
+status
+```
+
+---
+
+## Notifications
+
+```text
+id
+user_id
+title
+message
+read_status
+created_at
+```
+
+---
+
+# 6. Security Requirements
+
+Mandatory because healthcare data is highly sensitive. 
+
+### Authentication
+
+* JWT authentication
+* Refresh tokens
+* Role-based access
+
+### Data Protection
+
+* Encryption at rest
+* Encryption in transit
+* Secure file storage
+
+### Auditing
+
+* Login logs
+* Medical record access logs
+* Prescription logs
+
+### Compliance
+
+* Privacy consent
+* Data retention policies
+* Access tracking
+
+---
+
+# 7. Replit Development Roadmap
+
+## Phase 1 – Foundation
+
+Deliverables:
+
+* Authentication
+* User management
+* Student dashboard
+* Doctor dashboard
+* Consultation system
+
+Target:
+
+MVP Version 1
+
+---
+
+## Phase 2 – Clinical Workflow
+
+Deliverables:
+
+* Prescriptions
+* Laboratory module
+* Notifications
+* Queue management
+
+Target:
+
+MVP Version 2
+
+---
+
+## Phase 3 – Specialized Services
+
+Deliverables:
+
+* Mental Buddy
+* HIV/AIDS Centre
+* Advanced notifications
+* Reporting
+
+Target:
+
+Beta Release
+
+---
+
+## Phase 4 – Production Readiness
+
+Deliverables:
+
+* Security hardening
+* Analytics
+* Audit logs
+* Performance optimization
+* Deployment
+
+Target:
+
+Release Candidate
+
+---
+
+# 8. Future Versions (Beyond Final Year Scope)
+
+The proposal explicitly excludes these for the current version. 
+
+Future upgrades:
+
+* Live doctor video consultations
+* AI triage assistant
+* AI symptom analysis
+* Integration with UNZA SIS
+* Smart appointment scheduling
+* Wearable device integration
+* SMS gateway integration
+* Insurance integration
+* National health system integration
+
+---
+
+# Final Replit Instruction
+
+**Build UNZA DigiHealth as a production-grade multi-role mobile healthcare platform with six independent dashboards (Student, Doctor, Pharmacist, Laboratory, Mental Buddy, HIV/AIDS Centre), centralized medical records, consultation workflows, digital prescriptions, laboratory workflows, notification systems, role-based security, and healthcare-grade audit logging. The system must prioritize queue reduction, healthcare accessibility, confidentiality, and coordination among all healthcare units while remaining optimized for Android mobile devices.**
