@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, ActivityIndicator, Alert } from "react-native";
-import { Link, router } from "expo-router";
+import { router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLogin } from "@workspace/api-client-react";
 import { useAuth } from "../../contexts/AuthContext";
@@ -102,11 +102,9 @@ export default function LoginScreen() {
         
         <View style={styles.footer}>
           <Text style={{ color: colors.mutedForeground }}>Don't have an account? </Text>
-          <Link href="/(auth)/register" asChild>
-            <TouchableOpacity>
-              <Text style={{ color: colors.primary, fontWeight: "600" }}>Register</Text>
-            </TouchableOpacity>
-          </Link>
+          <TouchableOpacity onPress={() => router.push("/(auth)/register")}>
+            <Text style={{ color: colors.primary, fontWeight: "600" }}>Register</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </KeyboardAwareScrollViewCompat>
