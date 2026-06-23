@@ -41,14 +41,14 @@ export default function RegisterScreen() {
           login(data.token, data.user);
           const r = data.user.role;
           switch (r) {
-            case "student": router.replace("/(student)"); break;
-            case "doctor": router.replace("/(doctor)"); break;
-            case "pharmacist": router.replace("/(pharmacist)"); break;
-            case "lab_technician": router.replace("/(lab)"); break;
-            case "mental_health_counselor": router.replace("/(mental-health)"); break;
-            case "hiv_professional": router.replace("/(hiv-support)"); break;
-            case "admin": router.replace("/(admin)"); break;
-            default: router.replace("/"); break;
+            case "student": router.replace("/(student)/home"); break;
+            case "doctor": router.replace("/(doctor)/queue"); break;
+            case "pharmacist": router.replace("/(pharmacist)/prescriptions"); break;
+            case "lab_technician": router.replace("/(lab)/requests"); break;
+            case "mental_health_counselor": router.replace("/(mental-health)/sessions"); break;
+            case "hiv_professional": router.replace("/(hiv-support)/sessions"); break;
+            case "admin": router.replace("/(admin)/analytics"); break;
+            default: router.replace("/(auth)/login"); break;
           }
         },
         onError: (err: any) => {
