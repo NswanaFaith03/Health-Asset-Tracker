@@ -1,80 +1,44 @@
-import { BlurView } from "expo-blur";
-import { isLiquidGlassAvailable } from "expo-glass-effect";
 import { Tabs } from "expo-router";
-import { Icon, Label, NativeTabs } from "expo-router/unstable-native-tabs";
-import { SymbolView } from "expo-symbols";
 import { Feather } from "@expo/vector-icons";
 import React from "react";
-import { Platform, StyleSheet, View, useColorScheme } from "react-native";
+import { Platform, View, StyleSheet } from "react-native";
 import { useColors } from "@/hooks/useColors";
+import { BlurView } from "expo-blur";
+import { useColorScheme } from "react-native";
 
-function NativeTabLayout() {
-  return (
-    <NativeTabs>
-      <NativeTabs.Trigger name="prescriptions">
-        <Icon sf={{ default: "pills", selected: "pills.fill" }} />
-        <Label>Pending</Label>
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="history">
-        <Icon sf={{ default: "clock", selected: "clock.fill" }} />
-        <Label>History</Label>
-      </NativeTabs.Trigger>
-    </NativeTabs>
-  );
-}
-
-function ClassicTabLayout() {
+export default function PharmacistTabLayout() {
   const colors = useColors();
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
+  const isDark = useColorScheme() === "dark";
   const isIOS = Platform.OS === "ios";
   const isWeb = Platform.OS === "web";
 
   return (
     <Tabs
       screenOptions={{
+        headerShown: false,
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.mutedForeground,
-        headerShown: false,
+        tabBarLabelStyle: { fontSize: 11, fontWeight: "600", marginBottom: isWeb ? 8 : 2 },
+        tabBarIconStyle: { marginTop: isWeb ? 8 : 2 },
         tabBarStyle: {
           position: "absolute",
           backgroundColor: isIOS ? "transparent" : colors.background,
-          borderTopWidth: isWeb ? 1 : 0,
+          borderTopWidth: 1,
           borderTopColor: colors.border,
           elevation: 0,
-          ...(isWeb ? { height: 84 } : {}),
+          height: isWeb ? 72 : 60,
+          paddingBottom: isWeb ? 0 : 6,
         },
         tabBarBackground: () =>
           isIOS ? (
-            <BlurView intensity={100} tint={isDark ? "dark" : "light"} style={StyleSheet.absoluteFill} />
-          ) : isWeb ? (
+            <BlurView intensity={80} tint={isDark ? "dark" : "light"} style={StyleSheet.absoluteFill} />
+          ) : (
             <View style={[StyleSheet.absoluteFill, { backgroundColor: colors.background }]} />
-          ) : null,
+          ),
       }}
     >
-      <Tabs.Screen
-        name="prescriptions"
-        options={{
-          title: "Pending",
-          tabBarIcon: ({ color }) =>
-            isIOS ? <SymbolView name="pills" tintColor={color} size={24} /> : <Feather name="plus-square" size={22} color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="history"
-        options={{
-          title: "History",
-          tabBarIcon: ({ color }) =>
-            isIOS ? <SymbolView name="clock" tintColor={color} size={24} /> : <Feather name="clock" size={22} color={color} />,
-        }}
-      />
+      <Tabs.Screen name="prescriptions" options={{ title: "Pending", tabBarIcon: ({ color, size }) => <Feather name="package" size={size} color={color} /> }} />
+      <Tabs.Screen name="history" options={{ title: "History", tabBarIcon: ({ color, size }) => <Feather name="clock" size={size} color={color} /> }} />
     </Tabs>
   );
-}
-
-export default function PharmacistTabLayout() {
-  if (isLiquidGlassAvailable()) {
-    return <NativeTabLayout />;
-  }
-  return <ClassicTabLayout />;
 }
