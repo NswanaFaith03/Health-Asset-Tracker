@@ -1,0 +1,1 @@
+- [Expo Router routing pitfalls](expo-router-routing.md) — group-only paths crash after login; always use full screen paths; delete scaffold (tabs) remnants that conflict with app/index.tsx
