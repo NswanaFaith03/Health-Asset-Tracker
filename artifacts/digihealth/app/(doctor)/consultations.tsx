@@ -1,64 +1,131 @@
-import React from "react";
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, RefreshControl, ActivityIndicator } from "react-native";
+import React, { useState } from "react";
+import {
+  View, Text, StyleSheet, FlatList, TouchableOpacity,
+  RefreshControl, ActivityIndicator, StatusBar, TextInput,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useListConsultations, getListConsultationsQueryKey } from "@workspace/api-client-react";
 import { useColors } from "../../hooks/useColors";
 
-const STATUS_COLORS: Record<string, string> = {
-  submitted: "#f59e0b", under_review: "#3b82f6", assigned: "#8b5cf6", responded: "#10b981", closed: "#6b7280",
+type FeatherName = React.ComponentProps<typeof Feather>["name"];
+
+const STATUS: Record<string, { bg: string; text: string; label: string; icon: FeatherName }> = {
+  submitted:    { bg: "#fef9c3", text: "#ca8a04", label: "Submitted",    icon: "send" },
+  under_review: { bg: "#dbeafe", text: "#1d4ed8", label: "Under Review", icon: "eye" },
+  assigned:     { bg: "#ede9fe", text: "#6d28d9", label: "Assigned",     icon: "user-check" },
+  responded:    { bg: "#dcfce7", text: "#16a34a", label: "Responded",    icon: "check-circle" },
+  closed:       { bg: "#f1f5f9", text: "#64748b", label: "Closed",       icon: "archive" },
 };
-const SEVERITY_COLORS: Record<string, string> = {
-  low: "#10b981", medium: "#f59e0b", high: "#f97316", critical: "#ef4444",
+
+const SEVERITY: Record<string, { color: string; label: string }> = {
+  low:      { color: "#16a34a", label: "Low" },
+  medium:   { color: "#ca8a04", label: "Medium" },
+  high:     { color: "#ea580c", label: "High" },
+  critical: { color: "#dc2626", label: "Critical" },
 };
 
 export default function DoctorConsultations() {
   const insets = useSafeAreaInsets();
   const colors = useColors();
-  const { data: consultations, isLoading, refetch } = useListConsultations(undefined, {
-    query: { queryKey: getListConsultationsQueryKey() }
+  const [search, setSearch] = useState("");
+  const { data: consultations = [], isLoading, refetch } = useListConsultations(undefined, {
+    query: { queryKey: getListConsultationsQueryKey() },
+  });
+
+  const filtered = (consultations as any[]).filter((c) => {
+    if (!search) return true;
+    const q = search.toLowerCase();
+    return (
+      (c.student?.name ?? "").toLowerCase().includes(q) ||
+      (c.symptoms ?? "").toLowerCase().includes(q)
+    );
   });
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
+      <StatusBar barStyle="dark-content" />
+
+      {/* ── Header ── */}
+      <View style={[styles.header, { paddingTop: insets.top + 16, backgroundColor: colors.background }]}>
         <Text style={[styles.title, { color: colors.foreground }]}>Consultations</Text>
+        <Text style={[styles.subtitle, { color: colors.mutedForeground }]}>
+          {(consultations as any[]).length} total · {(consultations as any[]).filter((c: any) => c.status === "submitted" || c.status === "under_review").length} pending
+        </Text>
+
+        {/* Search */}
+        <View style={[styles.searchBar, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <Feather name="search" size={16} color={colors.mutedForeground} />
+          <TextInput
+            style={[styles.searchInput, { color: colors.foreground }]}
+            placeholder="Search patients or symptoms…"
+            placeholderTextColor={colors.mutedForeground}
+            value={search}
+            onChangeText={setSearch}
+          />
+          {search.length > 0 && (
+            <TouchableOpacity onPress={() => setSearch("")}>
+              <Feather name="x" size={14} color={colors.mutedForeground} />
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
+
       {isLoading ? (
         <View style={styles.center}><ActivityIndicator size="large" color={colors.primary} /></View>
       ) : (
         <FlatList
-          data={consultations ?? []}
+          data={filtered}
           keyExtractor={(item) => String((item as any).id)}
-          contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: insets.bottom + 84, paddingTop: 8 }}
-          refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} />}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}
-              onPress={() => router.push({ pathname: "/(doctor)/consultation-detail", params: { id: (item as any).id } })}
-            >
-              <View style={styles.cardTop}>
-                <View style={[styles.severityDot, { backgroundColor: SEVERITY_COLORS[(item as any).severity] }]} />
-                <View style={{ flex: 1 }}>
-                  <Text style={[styles.patientName, { color: colors.foreground }]}>{(item as any).student?.name ?? "Patient"}</Text>
-                  <Text style={[styles.symptoms, { color: colors.mutedForeground }]} numberOfLines={2}>{(item as any).symptoms}</Text>
+          contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: insets.bottom + 90, paddingTop: 8 }}
+          refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} tintColor={colors.primary} />}
+          renderItem={({ item }) => {
+            const st = STATUS[(item as any).status] ?? STATUS.submitted;
+            const sev = SEVERITY[(item as any).severity];
+            return (
+              <TouchableOpacity
+                style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border, borderLeftColor: sev?.color ?? colors.border, borderLeftWidth: 3 }]}
+                onPress={() => router.push({ pathname: "/(doctor)/consultation-detail", params: { id: (item as any).id } })}
+                activeOpacity={0.75}
+              >
+                <View style={styles.cardRow}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={[styles.patientName, { color: colors.foreground }]}>
+                      {(item as any).student?.name ?? "Patient"}
+                    </Text>
+                    <Text style={[styles.symptoms, { color: colors.mutedForeground }]} numberOfLines={2}>
+                      {(item as any).symptoms}
+                    </Text>
+                  </View>
+                  <View style={[styles.statusBadge, { backgroundColor: st.bg }]}>
+                    <Feather name={st.icon} size={11} color={st.text} />
+                    <Text style={[styles.statusText, { color: st.text }]}>{st.label}</Text>
+                  </View>
                 </View>
-                <View style={[styles.badge, { backgroundColor: STATUS_COLORS[(item as any).status] + "20" }]}>
-                  <Text style={[styles.badgeText, { color: STATUS_COLORS[(item as any).status] }]}>
-                    {(item as any).status?.replace(/_/g, " ")}
+
+                <View style={styles.cardFooter}>
+                  {sev && (
+                    <View style={[styles.sevPill, { backgroundColor: sev.color + "18" }]}>
+                      <Text style={[styles.sevPillText, { color: sev.color }]}>{sev.label} severity</Text>
+                    </View>
+                  )}
+                  <Text style={[styles.dateText, { color: colors.mutedForeground }]}>
+                    {new Date((item as any).createdAt).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
                   </Text>
                 </View>
-              </View>
-              <Text style={[styles.date, { color: colors.mutedForeground }]}>
-                {new Date((item as any).createdAt).toLocaleDateString()}
-              </Text>
-            </TouchableOpacity>
-          )}
+              </TouchableOpacity>
+            );
+          }}
           ListEmptyComponent={
             <View style={styles.empty}>
-              <Feather name="clipboard" size={48} color={colors.mutedForeground} />
-              <Text style={[styles.emptyText, { color: colors.mutedForeground }]}>No consultations</Text>
+              <View style={[styles.emptyIcon, { backgroundColor: colors.muted }]}>
+                <Feather name="clipboard" size={32} color={colors.mutedForeground} />
+              </View>
+              <Text style={[styles.emptyTitle, { color: colors.foreground }]}>No consultations</Text>
+              <Text style={[styles.emptyDesc, { color: colors.mutedForeground }]}>
+                {search ? "No results for your search" : "Patient consultations will appear here"}
+              </Text>
             </View>
           }
         />
@@ -69,17 +136,24 @@ export default function DoctorConsultations() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  header: { paddingHorizontal: 16, paddingBottom: 12 },
-  title: { fontSize: 24, fontWeight: "700" },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
-  card: { borderRadius: 12, borderWidth: 1, padding: 14, marginBottom: 10, gap: 8 },
-  cardTop: { flexDirection: "row", alignItems: "flex-start", gap: 10 },
-  severityDot: { width: 10, height: 10, borderRadius: 5, marginTop: 5 },
-  patientName: { fontSize: 15, fontWeight: "700" },
-  symptoms: { fontSize: 13, marginTop: 2 },
-  badge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 20 },
-  badgeText: { fontSize: 11, fontWeight: "700" },
-  date: { fontSize: 12 },
-  empty: { flex: 1, alignItems: "center", justifyContent: "center", paddingTop: 80, gap: 12 },
-  emptyText: { fontSize: 16 },
+  header: { paddingHorizontal: 16, paddingBottom: 12 },
+  title: { fontSize: 26, fontWeight: "800", marginBottom: 2 },
+  subtitle: { fontSize: 13, marginBottom: 14 },
+  searchBar: { flexDirection: "row", alignItems: "center", gap: 8, borderWidth: 1, borderRadius: 10, paddingHorizontal: 12, height: 42 },
+  searchInput: { flex: 1, fontSize: 14 },
+  card: { borderRadius: 12, borderWidth: 1, padding: 14, marginBottom: 10, gap: 10 },
+  cardRow: { flexDirection: "row", alignItems: "flex-start", gap: 10 },
+  patientName: { fontSize: 15, fontWeight: "700", marginBottom: 3 },
+  symptoms: { fontSize: 13, lineHeight: 18 },
+  statusBadge: { flexDirection: "row", alignItems: "center", gap: 4, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 20 },
+  statusText: { fontSize: 11, fontWeight: "700" },
+  cardFooter: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  sevPill: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 20 },
+  sevPillText: { fontSize: 11, fontWeight: "600" },
+  dateText: { fontSize: 12 },
+  empty: { paddingTop: 60, alignItems: "center", gap: 10 },
+  emptyIcon: { width: 68, height: 68, borderRadius: 34, justifyContent: "center", alignItems: "center", marginBottom: 4 },
+  emptyTitle: { fontSize: 17, fontWeight: "700" },
+  emptyDesc: { fontSize: 13, textAlign: "center", lineHeight: 18 },
 });
