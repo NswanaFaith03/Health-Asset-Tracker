@@ -10,36 +10,34 @@ export default function AdminTabLayout() {
   const colors = useColors();
   const isDark = useColorScheme() === "dark";
   const isIOS = Platform.OS === "ios";
-  const isWeb = Platform.OS === "web";
 
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.mutedForeground,
-        tabBarLabelStyle: { fontSize: 11, fontWeight: "600", marginBottom: isWeb ? 8 : 2 },
-        tabBarIconStyle: { marginTop: isWeb ? 8 : 2 },
+        tabBarInactiveTintColor: "#94a3b8",
+        tabBarLabelStyle: { fontSize: 11, fontWeight: "600", marginTop: 2 },
         tabBarStyle: {
           position: "absolute",
-          backgroundColor: isIOS ? "transparent" : colors.background,
+          backgroundColor: isIOS ? "transparent" : colors.card,
           borderTopWidth: 1,
           borderTopColor: colors.border,
           elevation: 0,
-          height: isWeb ? 72 : 60,
-          paddingBottom: isWeb ? 0 : 6,
+          height: 64,
+          paddingBottom: 10,
         },
         tabBarBackground: () =>
           isIOS ? (
             <BlurView intensity={80} tint={isDark ? "dark" : "light"} style={StyleSheet.absoluteFill} />
           ) : (
-            <View style={[StyleSheet.absoluteFill, { backgroundColor: colors.background }]} />
+            <View style={[StyleSheet.absoluteFill, { backgroundColor: colors.card }]} />
           ),
       }}
     >
-      <Tabs.Screen name="analytics" options={{ title: "Analytics", tabBarIcon: ({ color, size }) => <Feather name="bar-chart-2" size={size} color={color} /> }} />
-      <Tabs.Screen name="users" options={{ title: "Users", tabBarIcon: ({ color, size }) => <Feather name="users" size={size} color={color} /> }} />
-      <Tabs.Screen name="audit" options={{ title: "Audit", tabBarIcon: ({ color, size }) => <Feather name="list" size={size} color={color} /> }} />
+      <Tabs.Screen name="analytics" options={{ title: "Analytics", tabBarIcon: ({ color, size }) => <Feather name="bar-chart-2" size={22} color={color} /> }} />
+      <Tabs.Screen name="users" options={{ title: "Users", tabBarIcon: ({ color, size }) => <Feather name="users" size={22} color={color} /> }} />
+      <Tabs.Screen name="audit" options={{ title: "Audit", tabBarIcon: ({ color, size }) => <Feather name="list" size={22} color={color} /> }} />
     </Tabs>
   );
 }
