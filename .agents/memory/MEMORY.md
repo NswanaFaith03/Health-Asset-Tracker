@@ -1,1 +1,1 @@
-- [Expo Router routing pitfalls](expo-router-routing.md) — group-only paths crash after login; always use full screen paths; delete scaffold (tabs) remnants that conflict with app/index.tsx
+- [Expo tab bar icon size](expo-tab-icon-size.md) — tabBarIcon size prop is undefined on web; always use size={22} hardcoded
