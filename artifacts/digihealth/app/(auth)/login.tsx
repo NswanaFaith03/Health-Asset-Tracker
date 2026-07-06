@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import {
   View, Text, TextInput, StyleSheet, TouchableOpacity,
   ActivityIndicator, Alert, StatusBar, KeyboardAvoidingView, Platform, ScrollView,
+  Image, ImageBackground,
 } from "react-native";
 import { router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -10,11 +11,6 @@ import { useLogin } from "@workspace/api-client-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useColors } from "../../hooks/useColors";
 
-const QUICK_LOGINS = [
-  { label: "Student", email: "student@unza.zm", icon: "book-open" },
-  { label: "Doctor", email: "doctor@unza.zm", icon: "activity" },
-  { label: "Admin", email: "admin@unza.zm", icon: "settings" },
-];
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
@@ -30,8 +26,13 @@ export default function LoginScreen() {
     loginMutation.mutate(
       { data: { email: e, password: p } },
       {
-        onSuccess: (data) => {
-          login(data.token, data.user);
+        onSuccess: async (data) => {
+          await login(data.token, data.user);
+          const requiresPasswordReset = (data.user as any)?.requiresPasswordReset;
+          if (requiresPasswordReset) {
+            router.replace("/(auth)/reset-password" as any);
+            return;
+          }
           const role = data.user.role;
           switch (role) {
             case "student":                 router.replace("/(student)/home"); break;
@@ -63,33 +64,27 @@ export default function LoginScreen() {
         bounces={false}
       >
         {/* ── Hero ── */}
-        <View style={[styles.hero, { paddingTop: insets.top + 40, backgroundColor: colors.primary }]}>
-          <View style={styles.logoCircle}>
-            <Feather name="heart" size={32} color={colors.primary} />
+        <ImageBackground
+          source={require("../../assets/images/unzaclinic.jpeg")}
+          style={[styles.hero, { paddingTop: insets.top + 40 }]}
+          imageStyle={styles.heroImage}
+        >
+          <View style={styles.heroOverlay} />
+          <View style={styles.heroContent}>
+            <View style={styles.logoCircle}>
+              <Image source={require("../../assets/images/uzamainlogo.jpg")} style={styles.logoImage} resizeMode="contain" />
+            </View>
+            <Text style={styles.heroTitle}>UNZA DigiHealth</Text>
+            <Text style={styles.heroSub}>University of Zambia Campus Clinic</Text>
           </View>
-          <Text style={styles.heroTitle}>UNZA DigiHealth</Text>
-          <Text style={styles.heroSub}>University of Zambia Campus Clinic</Text>
-        </View>
+        </ImageBackground>
 
         {/* ── Card ── */}
         <View style={[styles.card, { backgroundColor: colors.background, borderTopLeftRadius: 28, borderTopRightRadius: 28, paddingBottom: insets.bottom + 32 }]}>
           <Text style={[styles.cardTitle, { color: colors.foreground }]}>Welcome back</Text>
           <Text style={[styles.cardSub, { color: colors.mutedForeground }]}>Sign in to access your health services</Text>
 
-          {/* Quick-login chips */}
-          <View style={styles.chipRow}>
-            {QUICK_LOGINS.map((q) => (
-              <TouchableOpacity
-                key={q.email}
-                style={[styles.chip, { borderColor: colors.primary, backgroundColor: colors.muted }]}
-                onPress={() => { setEmail(q.email); setPassword("password123"); }}
-                activeOpacity={0.7}
-              >
-                <Feather name={q.icon as any} size={12} color={colors.primary} />
-                <Text style={[styles.chipText, { color: colors.primary }]}>{q.label}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+          {/* Quick-login removed for security */}
 
           {/* Email */}
           <Text style={[styles.label, { color: colors.foreground }]}>Email Address</Text>
@@ -154,12 +149,19 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-  hero: { alignItems: "center", paddingBottom: 40, paddingHorizontal: 24 },
+  hero: { alignItems: "center", paddingBottom: 40, paddingHorizontal: 24, position: "relative" },
+  heroImage: { opacity: 0.22 },
+  heroOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(15, 118, 110, 0.88)",
+  },
+  heroContent: { alignItems: "center", position: "relative", zIndex: 1 },
   logoCircle: {
-    width: 68, height: 68, borderRadius: 34,
+    width: 76, height: 76, borderRadius: 38,
     backgroundColor: "#fff", alignItems: "center", justifyContent: "center",
     marginBottom: 16, shadowColor: "#000", shadowOpacity: 0.12, shadowRadius: 12, shadowOffset: { width: 0, height: 4 },
   },
+  logoImage: { width: 54, height: 54 },
   heroTitle: { fontSize: 26, fontWeight: "800", color: "#fff", marginBottom: 6 },
   heroSub: { fontSize: 13, color: "rgba(255,255,255,0.75)", textAlign: "center" },
   card: { paddingHorizontal: 24, paddingTop: 32 },

@@ -22,7 +22,7 @@ export default function StudentNotifications() {
   const markRead = useMarkNotificationRead();
 
   const handleMarkAllRead = () => {
-    markAllRead.mutate({}, {
+    markAllRead.mutate(undefined, {
       onSuccess: () => queryClient.invalidateQueries({ queryKey: getListNotificationsQueryKey() })
     });
   };

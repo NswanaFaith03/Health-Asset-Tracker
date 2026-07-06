@@ -3,6 +3,8 @@ import { db, usersTable } from "@workspace/db";
 import { eq, ilike, or } from "drizzle-orm";
 import { requireAuth, requireRole } from "../middlewares/auth";
 import { logAudit } from "../lib/audit";
+import fs from "fs/promises";
+import path from "path";
 
 const router = Router();
 
@@ -72,6 +74,43 @@ router.patch("/users/:id/status", requireAuth, requireRole("admin"), async (req,
   }
   await logAudit(req, "update_user_status", "user", id, `status=${status}`);
   res.json(safeUser(updated));
+});
+
+// Upload avatar as base64 image { filename, data }
+router.post("/users/me/avatar", requireAuth, async (req, res) => {
+  const userId = req.user!.id;
+  const { filename, data } = req.body as { filename?: string; data?: string };
+  if (!data || !filename) {
+    res.status(400).json({ error: "validation", message: "filename and data (base64) are required" });
+    return;
+  }
+
+  try {
+    const uploadsDir = path.join(process.cwd(), "uploads");
+    await fs.mkdir(uploadsDir, { recursive: true });
+
+    const ext = path.extname(filename) || ".jpg";
+    const outName = `${userId}-${Date.now()}${ext}`;
+    const outPath = path.join(uploadsDir, outName);
+
+    const buffer = Buffer.from(data, "base64");
+    await fs.writeFile(outPath, buffer);
+
+    const publicUrl = `/uploads/${outName}`;
+
+    const [updated] = await db.update(usersTable).set({ avatarUrl: publicUrl }).where(eq(usersTable.id, userId)).returning();
+    if (!updated) {
+      res.status(404).json({ error: "not_found" });
+      return;
+    }
+
+    await logAudit(req, "upload_avatar", "user", userId);
+    const { passwordHash: _, ...safe } = updated;
+    res.json({ user: safe, url: publicUrl });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "server_error" });
+  }
 });
 
 export default router;

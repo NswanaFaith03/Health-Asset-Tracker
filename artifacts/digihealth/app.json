@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "UNZA DigiHealth",
-    "slug": "digihealth",
+    "slug": "dee",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -16,7 +16,10 @@
     "ios": {
       "supportsTablet": false
     },
-    "android": {},
+    "android": {
+      "package": "com.deezulusteam.dee",
+      "usesCleartextTraffic": true
+    },
     "web": {
       "favicon": "./assets/images/icon.png"
     },
@@ -24,7 +27,7 @@
       [
         "expo-router",
         {
-          "origin": "https://replit.com/"
+          "origin": "https://health-asset-tracker.vercel.app/"
         }
       ],
       "expo-font",
@@ -33,6 +36,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "ffa3b219-b3cb-4dc3-8b1c-5eb513dbf901"
+      }
+    },
+    "owner": "deezulus-team"
   }
 }

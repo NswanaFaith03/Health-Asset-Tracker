@@ -2,8 +2,10 @@ import React from "react";
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, RefreshControl, ActivityIndicator, Alert } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
+import { router } from "expo-router";
 import { useQueryClient } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
+import { FeatureActionGrid } from "@/components/FeatureActionGrid";
 import { useListPrescriptions, useDispensePrescription, getListPrescriptionsQueryKey } from "@workspace/api-client-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useColors } from "../../hooks/useColors";
@@ -17,6 +19,11 @@ export default function PharmacistPrescriptions() {
     query: { queryKey: getListPrescriptionsQueryKey({ status: "pending" }) }
   });
   const dispense = useDispensePrescription();
+
+  const actions = [
+    { label: "History", icon: "clock" as any, color: "#6d28d9", onPress: () => router.push("/(pharmacist)/history") },
+    { label: "Refresh", icon: "refresh-cw" as any, color: colors.primary, onPress: () => refetch() },
+  ];
 
   const handleDispense = (id: number) => {
     Alert.alert("Dispense", "Confirm dispensing this medication?", [
@@ -39,6 +46,7 @@ export default function PharmacistPrescriptions() {
       <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
         <Text style={[styles.title, { color: colors.foreground }]}>Pending Prescriptions</Text>
       </View>
+      <FeatureActionGrid actions={actions} />
       {isLoading ? (
         <View style={styles.center}><ActivityIndicator size="large" color={colors.primary} /></View>
       ) : (

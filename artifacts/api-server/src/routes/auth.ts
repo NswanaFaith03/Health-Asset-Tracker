@@ -13,6 +13,13 @@ router.post("/auth/register", async (req, res) => {
     res.status(400).json({ error: "validation", message: "name, email, password, and role are required" });
     return;
   }
+  if (role !== "student") {
+    res.status(403).json({
+      error: "forbidden",
+      message: "Only student accounts can be registered directly. Staff accounts must be created by an admin.",
+    });
+    return;
+  }
   const existing = await db.select().from(usersTable).where(eq(usersTable.email, email)).limit(1);
   if (existing.length > 0) {
     res.status(400).json({ error: "conflict", message: "Email already registered" });
@@ -20,15 +27,56 @@ router.post("/auth/register", async (req, res) => {
   }
   const passwordHash = await bcrypt.hash(password, 10);
   const [user] = await db.insert(usersTable).values({
-    name, email, passwordHash, role,
+    name,
+    email,
+    passwordHash,
+    role,
     studentNumber: studentNumber ?? null,
     phone: phone ?? null,
-    status: "active",
+    status: "pending",
+    requiresPasswordReset: false,
   }).returning();
-  const token = signToken({ id: user.id, email: user.email, role: user.role });
   const { passwordHash: _, ...safeUser } = user;
   await logAudit(req, "register", "user", user.id);
-  res.status(201).json({ token, user: safeUser });
+  res.status(201).json({
+    message: "Account created. Your student account is pending admin approval.",
+    user: safeUser,
+  });
+});
+
+router.post("/admin/users", requireAuth, async (req, res) => {
+  if (req.user?.role !== "admin") {
+    res.status(403).json({ error: "forbidden", message: "Only admins can create staff accounts" });
+    return;
+  }
+
+  const { name, email, password, role, studentNumber, phone } = req.body;
+  if (!name || !email || !password || !role) {
+    res.status(400).json({ error: "validation", message: "name, email, password, and role are required" });
+    return;
+  }
+
+  const existing = await db.select().from(usersTable).where(eq(usersTable.email, email)).limit(1);
+  if (existing.length > 0) {
+    res.status(400).json({ error: "conflict", message: "Email already registered" });
+    return;
+  }
+
+  const passwordHash = await bcrypt.hash(password, 10);
+  const [user] = await db.insert(usersTable).values({
+    name,
+    email,
+    passwordHash,
+    role,
+    studentNumber: role === "student" ? (studentNumber ?? null) : null,
+    phone: phone ?? null,
+    status: "active",
+    requiresPasswordReset: true,
+  }).returning();
+
+  const { passwordHash: _, ...safeUser } = user;
+  await logAudit(req, "admin_create_user", "user", user.id);
+  res.status(201).json({ user: safeUser });
 });
 
 router.post("/auth/login", async (req, res) => {
@@ -45,6 +93,10 @@ router.post("/auth/login", async (req, res) => {
   const valid = await bcrypt.compare(password, user.passwordHash);
   if (!valid) {
     res.status(401).json({ error: "unauthorized", message: "Invalid credentials" });
+    return;
+  }
+  if (user.status === "pending") {
+    res.status(401).json({ error: "pending", message: "Your account is awaiting admin approval. Please check back later." });
     return;
   }
   if (user.status !== "active") {
@@ -85,7 +137,7 @@ router.post("/auth/change-password", requireAuth, async (req, res) => {
     return;
   }
   const newHash = await bcrypt.hash(newPassword, 10);
-  await db.update(usersTable).set({ passwordHash: newHash }).where(eq(usersTable.id, user.id));
+  await db.update(usersTable).set({ passwordHash: newHash, requiresPasswordReset: false }).where(eq(usersTable.id, user.id));
   await logAudit(req, "change_password", "user", user.id);
   res.json({ success: true, message: "Password changed" });
 });

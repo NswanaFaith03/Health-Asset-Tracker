@@ -349,6 +349,11 @@ export async function customFetch<T = unknown>(
     headers.set("accept", DEFAULT_JSON_ACCEPT);
   }
 
+  // Standard header for XHR/fetch calls
+  if (!headers.has("x-requested-with")) {
+    headers.set("X-Requested-With", "XMLHttpRequest");
+  }
+
   // Attach bearer token when an auth getter is configured and no
   // Authorization header has been explicitly provided.
   if (_authTokenGetter && !headers.has("authorization")) {

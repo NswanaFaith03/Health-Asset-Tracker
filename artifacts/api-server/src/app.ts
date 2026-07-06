@@ -2,6 +2,7 @@ import express, { type Express } from "express";
 import cors from "cors";
 import pinoHttp from "pino-http";
 import router from "./routes";
+import { seedDefaultAdmin } from "./seed";
 import { logger } from "./lib/logger";
 
 const app: Express = express();
@@ -30,5 +31,16 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api", router);
+
+// Serve uploaded files
+import path from "path";
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+
+// Optionally seed default admin on startup when SEED_DEFAULT_ADMIN=true
+if (process.env.SEED_DEFAULT_ADMIN === "true") {
+  seedDefaultAdmin().catch((err) => {
+    logger.error({ err }, "Failed to seed default admin");
+  });
+}
 
 export default app;

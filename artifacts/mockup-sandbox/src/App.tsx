@@ -1,4 +1,8 @@
 import { useEffect, useState, type ComponentType } from "react";
+import { HealthcareDashboard } from "./components/HealthcareDashboard";
+import { PatientForm } from "./components/PatientForm";
+import { PatientsTable } from "./components/PatientsTable";
+import { AlertsDemo } from "./components/AlertsDemo";
 
 import { modules as discoveredModules } from "./.generated/mockup-components";
 
@@ -97,22 +101,63 @@ function getPreviewExamplePath(): string {
 }
 
 function Gallery() {
+  const [selectedPage, setSelectedPage] = useState<'dashboard' | 'form' | 'table' | 'alerts'>('dashboard');
+
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-8">
-      <div className="text-center max-w-md">
-        <h1 className="text-2xl font-semibold text-gray-900 mb-3">
-          Component Preview Server
-        </h1>
-        <p className="text-gray-500 mb-4">
-          This server renders individual components for the workspace canvas.
-        </p>
-        <p className="text-sm text-gray-400">
-          Access component previews at{" "}
-          <code className="bg-gray-100 px-1.5 py-0.5 rounded text-gray-600">
-            {getPreviewExamplePath()}
-          </code>
-        </p>
+    <div style={{ minHeight: '100vh', backgroundColor: '#f8f9fa' }}>
+      {/* Navigation Tabs */}
+      <div className="sticky-top bg-white border-bottom shadow-sm py-3 z-3">
+        <div className="container-fluid">
+          <div className="btn-group" role="group">
+            <button
+              type="button"
+              className={`btn ${selectedPage === 'dashboard' ? 'btn-primary' : 'btn-outline-primary'}`}
+              onClick={() => setSelectedPage('dashboard')}
+            >
+              <i className="fas fa-chart-line me-2"></i>Dashboard
+            </button>
+            <button
+              type="button"
+              className={`btn ${selectedPage === 'form' ? 'btn-primary' : 'btn-outline-primary'}`}
+              onClick={() => setSelectedPage('form')}
+            >
+              <i className="fas fa-user-plus me-2"></i>Patient Form
+            </button>
+            <button
+              type="button"
+              className={`btn ${selectedPage === 'table' ? 'btn-primary' : 'btn-outline-primary'}`}
+              onClick={() => setSelectedPage('table')}
+            >
+              <i className="fas fa-table me-2"></i>Patients Directory
+            </button>
+            <button
+              type="button"
+              className={`btn ${selectedPage === 'alerts' ? 'btn-primary' : 'btn-outline-primary'}`}
+              onClick={() => setSelectedPage('alerts')}
+            >
+              <i className="fas fa-bell me-2"></i>Alerts
+            </button>
+          </div>
+        </div>
       </div>
+
+      {/* Content Area */}
+      {selectedPage === 'dashboard' && <HealthcareDashboard />}
+      {selectedPage === 'form' && <PatientForm />}
+      {selectedPage === 'table' && <PatientsTable />}
+      {selectedPage === 'alerts' && <AlertsDemo />}
+
+      <style>{`
+        .btn-group .btn {
+          border-radius: 8px;
+          margin-right: 0.5rem;
+          font-weight: 600;
+        }
+
+        .z-3 {
+          z-index: 1030;
+        }
+      `}</style>
     </div>
   );
 }

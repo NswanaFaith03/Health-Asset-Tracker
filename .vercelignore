@@ -1,0 +1,27 @@
+# Exclude non-API directories and build artifacts from Vercel deployment
+artifacts/digihealth/
+artifacts/mockup-sandbox/
+attached_assets/
+scripts/
+.git/
+.idea/
+.agents/
+.local/
+.junie/
+*.jpeg
+*.jpg
+*.png
+*.apk
+*.log
+vercel-deploy.log
+
+# Exclude dependencies and build folders
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+tmp/
+out-tsc/
+*.tsbuildinfo
+.expo/
+.expo-shared/

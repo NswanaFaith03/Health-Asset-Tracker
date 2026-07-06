@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, TextInput, Alert, Modal } from "react-native";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, TextInput, Alert, Modal, Image } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
@@ -110,6 +110,16 @@ export default function DoctorConsultationDetail() {
             </View>
             <Text style={[styles.label, { color: colors.mutedForeground }]}>Symptoms</Text>
             <Text style={[styles.value, { color: colors.foreground }]}>{(consultation as any).symptoms}</Text>
+            {((consultation as any).attachments ?? []).length > 0 && (
+              <View style={[styles.attachmentsSection, { borderColor: colors.border }]}> 
+                <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Attached Photos</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.attachmentsRow}>
+                  {((consultation as any).attachments ?? []).map((uri: string) => (
+                    <Image key={uri} source={{ uri }} style={styles.attachmentPreview} />
+                  ))}
+                </ScrollView>
+              </View>
+            )}
           </View>
 
           {(consultation as any).status === "submitted" && (
@@ -232,6 +242,9 @@ const styles = StyleSheet.create({
   badgeText: { fontSize: 12, fontWeight: "700" },
   label: { fontSize: 12, fontWeight: "500", marginBottom: 4 },
   value: { fontSize: 15, lineHeight: 22 },
+  attachmentsSection: { borderRadius: 12, borderWidth: 1, padding: 12, marginTop: 12 },
+  attachmentsRow: { marginTop: 8 },
+  attachmentPreview: { width: 120, height: 120, borderRadius: 14, marginRight: 10 },
   input: { borderWidth: 1, borderRadius: 10, padding: 12, fontSize: 14, minHeight: 44 },
   btn: { height: 48, justifyContent: "center", alignItems: "center" },
   btnText: { fontSize: 15, fontWeight: "700" },

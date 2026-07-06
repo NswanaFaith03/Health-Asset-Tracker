@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, RefreshControl, ActivityIndicator, Modal, TextInput, Alert } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
+import { router } from "expo-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useListLabRequests, useUpdateLabRequestStatus, useUploadLabResult, getListLabRequestsQueryKey } from "@workspace/api-client-react";
+import { FeatureActionGrid } from "@/components/FeatureActionGrid";
 import { useColors } from "../../hooks/useColors";
 
 const STATUS_COLORS: Record<string, string> = {
@@ -22,6 +24,11 @@ export default function LabRequests() {
     query: { queryKey: getListLabRequestsQueryKey() }
   });
   const updateStatus = useUpdateLabRequestStatus();
+
+  const actions = [
+    { label: "Results", icon: "file-text" as any, color: "#7c3aed", onPress: () => router.push("/(lab)/results") },
+    { label: "Refresh", icon: "refresh-cw" as any, color: colors.primary, onPress: () => refetch() },
+  ];
   const uploadResult = useUploadLabResult();
 
   const handleStartTest = (id: number) => {
@@ -50,6 +57,7 @@ export default function LabRequests() {
       <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
         <Text style={[styles.title, { color: colors.foreground }]}>Lab Requests</Text>
       </View>
+      <FeatureActionGrid actions={actions} />
       {isLoading ? (
         <View style={styles.center}><ActivityIndicator size="large" color={colors.primary} /></View>
       ) : (

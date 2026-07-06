@@ -1,0 +1,31 @@
+{
+  "cli": {
+    "version": ">= 5.0.0"
+  },
+  "build": {
+    "preview": {
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "http://10.53.205.232:5000"
+      }
+    },
+    "preview2": {
+      "android": {
+        "gradleCommand": ":app:assembleRelease"
+      }
+    },
+    "preview3": {
+      "developmentClient": true
+    },
+    "production": {
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://health-asset-tracker.vercel.app"
+      }
+    }
+  }
+}

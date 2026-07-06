@@ -7,6 +7,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useListConsultations, getListConsultationsQueryKey } from "@workspace/api-client-react";
+import { FeatureActionGrid } from "@/components/FeatureActionGrid";
 import { useColors } from "../../hooks/useColors";
 
 type FeatherName = React.ComponentProps<typeof Feather>["name"];
@@ -33,6 +34,12 @@ export default function DoctorConsultations() {
   const { data: consultations = [], isLoading, refetch } = useListConsultations(undefined, {
     query: { queryKey: getListConsultationsQueryKey() },
   });
+
+  const actions = [
+    { label: "Queue", icon: "users" as FeatherName, color: "#0d9488", onPress: () => router.push("/(doctor)/queue") },
+    { label: "Prescriptions", icon: "clipboard" as FeatherName, color: "#0369a1", onPress: () => router.push("/(doctor)/prescriptions") },
+    { label: "Lab Requests", icon: "thermometer" as FeatherName, color: "#7c3aed", onPress: () => router.push("/(doctor)/lab-requests") },
+  ];
 
   const filtered = (consultations as any[]).filter((c) => {
     if (!search) return true;
@@ -71,6 +78,8 @@ export default function DoctorConsultations() {
           )}
         </View>
       </View>
+
+      <FeatureActionGrid actions={actions} />
 
       {isLoading ? (
         <View style={styles.center}><ActivityIndicator size="large" color={colors.primary} /></View>

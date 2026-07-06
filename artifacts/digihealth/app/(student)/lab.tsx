@@ -33,7 +33,7 @@ export default function StudentLab() {
           renderItem={({ item }) => (
             <TouchableOpacity
               style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}
-              onPress={() => (item as any).result && router.push({ pathname: "/(student)/lab-result", params: { requestId: (item as any).id } })}
+              onPress={() => router.push({ pathname: "/(student)/lab-result", params: { requestId: (item as any).id } })}
             >
               <View style={styles.cardTop}>
                 <Feather name="activity" size={20} color={colors.primary} />
@@ -47,12 +47,10 @@ export default function StudentLab() {
                   </Text>
                 </View>
               </View>
-              {(item as any).result && (
-                <View style={[styles.resultBar, { backgroundColor: colors.accent + "15" }]}>
-                  <Feather name="file-text" size={14} color={colors.accent} />
-                  <Text style={[styles.resultText, { color: colors.accent }]}>Results available — tap to view</Text>
-                </View>
-              )}
+              <View style={[styles.resultBar, { backgroundColor: colors.accent + "15" }]}> 
+                <Feather name="file-text" size={14} color={colors.accent} />
+                <Text style={[styles.resultText, { color: colors.accent }]}>Tap to open lab request details</Text>
+              </View>
               <Text style={[styles.date, { color: colors.mutedForeground }]}>
                 {new Date((item as any).createdAt).toLocaleDateString()}
               </Text>

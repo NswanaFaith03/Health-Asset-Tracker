@@ -2,7 +2,9 @@ import React from "react";
 import { View, Text, StyleSheet, ScrollView, RefreshControl, ActivityIndicator } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
+import { router } from "expo-router";
 import { useGetAdminAnalytics, getGetAdminAnalyticsQueryKey } from "@workspace/api-client-react";
+import { FeatureActionGrid } from "@/components/FeatureActionGrid";
 import { useColors } from "../../hooks/useColors";
 
 const STAT_CARDS = [
@@ -21,6 +23,11 @@ export default function AdminAnalytics() {
     query: { queryKey: getGetAdminAnalyticsQueryKey() }
   });
 
+  const actions = [
+    { label: "Users", icon: "users" as any, color: "#0d9488", onPress: () => router.push("/(admin)/users" as any) },
+    { label: "Audit", icon: "list" as any, color: "#7c3aed", onPress: () => router.push("/(admin)/audit" as any) },
+  ];
+
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: colors.background }]}
@@ -28,6 +35,7 @@ export default function AdminAnalytics() {
       refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} />}
     >
       <Text style={[styles.title, { color: colors.foreground }]}>Analytics</Text>
+      <FeatureActionGrid actions={actions} />
 
       {isLoading ? (
         <View style={styles.center}><ActivityIndicator size="large" color={colors.primary} /></View>

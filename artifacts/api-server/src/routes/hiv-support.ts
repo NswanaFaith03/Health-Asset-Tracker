@@ -95,4 +95,20 @@ router.get("/hiv-support/resources", requireAuth, async (req, res) => {
   res.json(rows);
 });
 
+router.post("/hiv-support/resources", requireAuth, async (req, res) => {
+  const { title, content, category } = req.body;
+  if (!title || !content || !category) {
+    res.status(400).json({ error: "validation", message: "title, content, and category are required" });
+    return;
+  }
+  const [resource] = await db.insert(hivResourcesTable).values({
+    title,
+    content,
+    category,
+    createdBy: req.user!.id,
+  }).returning();
+  await logAudit(req, "create_hiv_resource", "hiv_resource", resource.id);
+  res.status(201).json(resource);
+});
+
 export default router;

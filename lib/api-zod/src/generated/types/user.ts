@@ -16,5 +16,7 @@ export interface User {
   phone?: string;
   role: UserRole;
   status: UserStatus;
+  avatarUrl?: string;
+  requiresPasswordReset?: boolean;
   createdAt: Date;
 }

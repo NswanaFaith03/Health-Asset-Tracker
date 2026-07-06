@@ -9,6 +9,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (token: string, user: User) => Promise<void>;
   logout: () => Promise<void>;
+  updateCurrentUser: (user: User) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -55,12 +56,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (newToken: string, user: User) => {
     try {
-      await AsyncStorage.setItem("auth_token", newToken);
-      await AsyncStorage.setItem("auth_user", JSON.stringify(user));
       setToken(newToken);
       setCurrentUser(user);
+      await AsyncStorage.setItem("auth_token", newToken);
+      await AsyncStorage.setItem("auth_user", JSON.stringify(user));
     } catch (e) {
       console.error("Failed to save auth state", e);
+    }
+  };
+
+  const updateCurrentUser = async (user: User) => {
+    try {
+      setCurrentUser(user);
+      await AsyncStorage.setItem("auth_user", JSON.stringify(user));
+    } catch (e) {
+      console.error("Failed to update auth user state", e);
     }
   };
 
@@ -77,7 +87,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ currentUser, token, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ currentUser, token, isLoading, login, logout, updateCurrentUser }}>
       {children}
     </AuthContext.Provider>
   );

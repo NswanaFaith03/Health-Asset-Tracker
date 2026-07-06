@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, RefreshControl, ActivityIndicator, Alert } from "react-native";
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, RefreshControl, ActivityIndicator, Alert, ImageBackground } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -42,9 +42,17 @@ export default function CounselorSessions() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
-        <Text style={[styles.title, { color: colors.foreground }]}>Counseling Sessions</Text>
-      </View>
+      <ImageBackground
+        source={require("../../assets/images/unzaclinic.jpeg")}
+        style={[styles.header, { paddingTop: insets.top + 16 }]}
+        imageStyle={styles.headerImage}
+      >
+        <View style={styles.headerOverlay} />
+        <View style={styles.headerContent}>
+          <Text style={styles.kicker}>Mental Health Support</Text>
+          <Text style={styles.title}>Counseling Sessions</Text>
+        </View>
+      </ImageBackground>
       {isLoading ? (
         <View style={styles.center}><ActivityIndicator size="large" color={colors.primary} /></View>
       ) : (
@@ -112,8 +120,12 @@ export default function CounselorSessions() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  header: { paddingHorizontal: 16, paddingBottom: 12 },
-  title: { fontSize: 24, fontWeight: "700" },
+  header: { paddingHorizontal: 16, paddingBottom: 18, minHeight: 140, justifyContent: "flex-end" },
+  headerImage: { opacity: 0.2 },
+  headerOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: "rgba(236, 72, 153, 0.82)" },
+  headerContent: { position: "relative", zIndex: 1 },
+  kicker: { color: "rgba(255,255,255,0.85)", fontSize: 12, fontWeight: "700", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 4 },
+  title: { fontSize: 24, fontWeight: "800", color: "#fff" },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
   card: { borderRadius: 12, borderWidth: 1, padding: 14, marginBottom: 10, gap: 8 },
   cardTop: { flexDirection: "row", alignItems: "center", gap: 10 },

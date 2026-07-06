@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, FlatList, RefreshControl, ActivityIndicator, Al
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { useQueryClient } from "@tanstack/react-query";
-import { useListHivResources, getListHivResourcesQueryKey } from "@workspace/api-client-react";
+import { useListHivResources, getListHivResourcesQueryKey, customFetch } from "@workspace/api-client-react";
 import { useColors } from "../../hooks/useColors";
 import { useAuth } from "../../contexts/AuthContext";
 
@@ -26,16 +26,18 @@ export default function HivResources() {
   const handleCreate = async () => {
     if (!title.trim() || !content.trim()) { Alert.alert("Required", "Fill all fields"); return; }
     try {
-      const res = await fetch(`/api/hiv-support/resources`, {
+      await customFetch(`/api/hiv-support/resources`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: title.trim(), content: content.trim(), category })
+        body: JSON.stringify({ title: title.trim(), content: content.trim(), category }),
       });
-      if (res.ok) {
-        queryClient.invalidateQueries({ queryKey: getListHivResourcesQueryKey() });
-        setShowModal(false); setTitle(""); setContent(""); setCategory("Education");
-      }
-    } catch { Alert.alert("Error", "Failed to create resource"); }
+      queryClient.invalidateQueries({ queryKey: getListHivResourcesQueryKey() });
+      setShowModal(false);
+      setTitle("");
+      setContent("");
+      setCategory("Education");
+    } catch {
+      Alert.alert("Error", "Failed to create resource");
+    }
   };
 
   return (

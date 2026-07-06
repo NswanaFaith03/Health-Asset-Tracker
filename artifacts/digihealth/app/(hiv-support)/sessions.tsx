@@ -3,7 +3,9 @@ import { View, Text, StyleSheet, FlatList, TouchableOpacity, RefreshControl, Act
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { useQueryClient } from "@tanstack/react-query";
+import { router } from "expo-router";
 import { useListHivSupportSessions, useUpdateHivSupportSession, getListHivSupportSessionsQueryKey } from "@workspace/api-client-react";
+import { FeatureActionGrid } from "@/components/FeatureActionGrid";
 import { useColors } from "../../hooks/useColors";
 
 const STATUS_COLORS: Record<string, string> = {
@@ -18,6 +20,11 @@ export default function HivSessions() {
     query: { queryKey: getListHivSupportSessionsQueryKey() }
   });
   const updateSession = useUpdateHivSupportSession();
+
+  const actions = [
+    { label: "Resources", icon: "book-open" as any, color: "#db2777", onPress: () => router.push("/(hiv-support)/resources") },
+    { label: "Refresh", icon: "refresh-cw" as any, color: colors.primary, onPress: () => refetch() },
+  ];
 
   const handleAccept = (id: number) => {
     Alert.alert("Accept", "Accept this HIV/AIDS support session?", [
@@ -44,6 +51,7 @@ export default function HivSessions() {
       <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
         <Text style={[styles.title, { color: colors.foreground }]}>Support Sessions</Text>
       </View>
+      <FeatureActionGrid actions={actions} />
       {isLoading ? (
         <View style={styles.center}><ActivityIndicator size="large" color={colors.primary} /></View>
       ) : (
