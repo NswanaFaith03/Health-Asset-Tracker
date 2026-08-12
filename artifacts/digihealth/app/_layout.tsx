@@ -20,6 +20,7 @@ import { useQueryClient } from "@tanstack/react-query";
 
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -27,7 +28,7 @@ const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, staleTime: 30_000 } },
 });
 
-/** In-app notification toast — polls every 30s and shows banner for new notifications */
+// Polls and shows banner for new notifications
 function NotificationToast() {
   const { currentUser } = useAuth();
   const qc = useQueryClient();
@@ -151,10 +152,12 @@ export default function RootLayout() {
           <GestureHandlerRootView style={{ flex: 1 }}>
             <KeyboardProvider>
               <AuthProvider>
-                <View style={{ flex: 1 }}>
-                  <RootLayoutNav />
-                  <NotificationToast />
-                </View>
+                <ThemeProvider>
+                  <View style={{ flex: 1 }}>
+                    <RootLayoutNav />
+                    <NotificationToast />
+                  </View>
+                </ThemeProvider>
               </AuthProvider>
             </KeyboardProvider>
           </GestureHandlerRootView>

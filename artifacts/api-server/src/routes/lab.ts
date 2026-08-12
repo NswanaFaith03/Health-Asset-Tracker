@@ -73,6 +73,14 @@ router.get("/lab-requests/:id", requireAuth, async (req, res) => {
 router.patch("/lab-requests/:id/status", requireAuth, async (req, res) => {
   const id = Number(req.params.id);
   const { status } = req.body;
+  const user = req.user!;
+
+  // Only nurses, lab_technicians, and admins can update lab request status
+  if (!["nurse", "lab_technician", "admin"].includes(user.role)) {
+    res.status(403).json({ error: "forbidden", message: "Only nurses, lab technicians, and admins can update lab request status" });
+    return;
+  }
+
   const [updated] = await db.update(labRequestsTable)
     .set({ status })
     .where(eq(labRequestsTable.id, id))
@@ -87,6 +95,14 @@ router.patch("/lab-requests/:id/status", requireAuth, async (req, res) => {
 
 router.post("/lab-results", requireAuth, async (req, res) => {
   const { requestId, results, attachment } = req.body;
+  const user = req.user!;
+
+  // Only nurses, lab_technicians, and admins can upload lab results
+  if (!["nurse", "lab_technician", "admin"].includes(user.role)) {
+    res.status(403).json({ error: "forbidden", message: "Only nurses, lab technicians, and admins can upload lab results" });
+    return;
+  }
+
   if (!requestId || !results) {
     res.status(400).json({ error: "validation", message: "requestId and results are required" });
     return;
@@ -95,7 +111,7 @@ router.post("/lab-results", requireAuth, async (req, res) => {
     requestId,
     results,
     attachment: attachment ?? null,
-    uploadedBy: req.user!.id,
+    uploadedBy: user.id,
   }).returning();
 
   const [request] = await db.select().from(labRequestsTable).where(eq(labRequestsTable.id, requestId)).limit(1);

@@ -11,6 +11,7 @@ import mentalHealthRouter from "./mental-health";
 import hivSupportRouter from "./hiv-support";
 import dashboardRouter from "./dashboard";
 import adminRouter from "./admin";
+import emergencyRouter from "./emergency";
 
 const router: IRouter = Router();
 
@@ -26,5 +27,6 @@ router.use(mentalHealthRouter);
 router.use(hivSupportRouter);
 router.use(dashboardRouter);
 router.use(adminRouter);
+router.use(emergencyRouter);
 
 export default router;

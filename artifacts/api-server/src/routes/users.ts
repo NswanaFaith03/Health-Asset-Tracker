@@ -86,27 +86,32 @@ router.post("/users/me/avatar", requireAuth, async (req, res) => {
   }
 
   try {
-    const uploadsDir = path.join(process.cwd(), "uploads");
-    await fs.mkdir(uploadsDir, { recursive: true });
+    const ext = (path.extname(filename) || ".jpg").replace(".", "");
+    const mimeType = ext === "png" ? "image/png" : "image/jpeg";
+    const dataUri = `data:${mimeType};base64,${data}`;
 
-    const ext = path.extname(filename) || ".jpg";
-    const outName = `${userId}-${Date.now()}${ext}`;
-    const outPath = path.join(uploadsDir, outName);
-
-    const buffer = Buffer.from(data, "base64");
-    await fs.writeFile(outPath, buffer);
-
-    const publicUrl = `/uploads/${outName}`;
-
-    const [updated] = await db.update(usersTable).set({ avatarUrl: publicUrl }).where(eq(usersTable.id, userId)).returning();
+    // Update in database directly
+    const [updated] = await db.update(usersTable).set({ avatarUrl: dataUri }).where(eq(usersTable.id, userId)).returning();
     if (!updated) {
       res.status(404).json({ error: "not_found" });
       return;
     }
 
+    // Try to write to local filesystem as a fallback for local servers
+    try {
+      const uploadsDir = path.join(process.cwd(), "uploads");
+      await fs.mkdir(uploadsDir, { recursive: true });
+      const outName = `${userId}-${Date.now()}.${ext}`;
+      const outPath = path.join(uploadsDir, outName);
+      const buffer = Buffer.from(data, "base64");
+      await fs.writeFile(outPath, buffer);
+    } catch (fsErr) {
+      console.warn("Failed to write avatar to local filesystem (expected on serverless environments like Vercel):", fsErr);
+    }
+
     await logAudit(req, "upload_avatar", "user", userId);
     const { passwordHash: _, ...safe } = updated;
-    res.json({ user: safe, url: publicUrl });
+    res.json({ user: safe, url: dataUri });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "server_error" });

@@ -42,21 +42,22 @@ export default function ResetPassword() {
           }
           Alert.alert("Success", "Your password has been updated.", [
             { text: "Continue", onPress: () => {
-              switch (currentUser?.role) {
-                case "student":                 router.replace("/(student)/home"); break;
-                case "doctor":                  router.replace("/(doctor)/queue"); break;
-                case "pharmacist":              router.replace("/(pharmacist)/prescriptions"); break;
-                case "lab_technician":          router.replace("/(lab)/requests"); break;
-                case "mental_health_counselor": router.replace("/(mental-health)/sessions"); break;
-                case "hiv_professional":        router.replace("/(hiv-support)/sessions"); break;
-                case "admin":                   router.replace("/(admin)/analytics"); break;
-                default:                        router.replace("/(auth)/login"); break;
+              switch (currentUser?.role as string) {
+                case "student":                 router.replace("/(student)/home" as any); break;
+                case "doctor":                  router.replace("/(doctor)/queue" as any); break;
+                case "pharmacist":              router.replace("/(pharmacist)/prescriptions" as any); break;
+                case "lab_technician":          router.replace("/(lab)/requests" as any); break;
+                case "nurse":                   router.replace("/(nurse)/lab-requests" as any); break;
+                case "mental_health_counselor": router.replace("/(mental-health)/sessions" as any); break;
+                case "hiv_professional":        router.replace("/(hiv-support)/sessions" as any); break;
+                case "admin":                   router.replace("/(admin)/analytics" as any); break;
+                default:                        router.replace("/(auth)/login" as any); break;
               }
             } }
           ]);
         },
         onError: (err: any) => {
-          Alert.alert("Error", err?.response?.data?.message || err?.message || "Unable to change password.");
+          Alert.alert("Error", err?.data?.message || err?.data?.error || err?.message || "Unable to change password.");
         },
       }
     );

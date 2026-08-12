@@ -1,14 +1,9 @@
-/**
- * Professional Mobile Healthcare Components with Expo Vector Icons
- * Enhanced with Material Design and Better UX
- */
 import React from 'react';
-import { View, Text, StyleSheet, Pressable, Image, ScrollView } from 'react-native';
-import { MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 type MaterialIconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 
-// Color scheme matching the web app
 const COLORS = {
   primary: '#667eea',
   success: '#198754',
@@ -21,9 +16,6 @@ const COLORS = {
   gray: '#6c757d',
 };
 
-/**
- * Header Component with professional styling
- */
 export function MobileHeader() {
   return (
     <View style={styles.header}>
@@ -43,9 +35,6 @@ export function MobileHeader() {
   );
 }
 
-/**
- * Dashboard Card Component
- */
 export function MobileDashboardCard({
   title,
   value,
@@ -73,9 +62,6 @@ export function MobileDashboardCard({
   );
 }
 
-/**
- * Action Button Component
- */
 export function MobileActionButton({
   title,
   icon,
@@ -101,9 +87,6 @@ export function MobileActionButton({
   );
 }
 
-/**
- * List Item Component
- */
 export function MobileListItem({
   title,
   subtitle,
@@ -142,9 +125,6 @@ export function MobileListItem({
   );
 }
 
-/**
- * Badge Component
- */
 export function MobileBadge({
   label,
   color = COLORS.primary,
@@ -159,9 +139,6 @@ export function MobileBadge({
   );
 }
 
-/**
- * Alert Component
- */
 export function MobileAlert({
   type = 'info',
   title,
@@ -208,9 +185,6 @@ export function MobileAlert({
   );
 }
 
-/**
- * Tab Navigation Component
- */
 export function MobileTabNavigation({
   tabs,
   activeTab,
@@ -251,7 +225,6 @@ export function MobileTabNavigation({
   );
 }
 
-// Styles
 const styles = StyleSheet.create({
   header: {
     backgroundColor: COLORS.white,

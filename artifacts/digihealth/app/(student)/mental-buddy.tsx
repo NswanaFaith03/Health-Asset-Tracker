@@ -1,11 +1,13 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, RefreshControl, ActivityIndicator, Alert, TextInput, Modal } from "react-native";
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, RefreshControl, ActivityIndicator, Alert, TextInput, Modal, ImageBackground } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useListMentalHealthSessions, useCreateMentalHealthSession, getListMentalHealthSessionsQueryKey } from "@workspace/api-client-react";
 import { useColors } from "../../hooks/useColors";
+
+const COUNSELING_BG = require("../../assets/images/happystudents.jpg");
 
 const STATUS_COLORS: Record<string, string> = {
   requested: "#f59e0b", active: "#10b981", completed: "#6b7280", cancelled: "#ef4444",
@@ -42,16 +44,24 @@ export default function MentalBuddy() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
-        <Text style={[styles.title, { color: colors.foreground }]}>Mental Buddy</Text>
-        <TouchableOpacity
-          style={[styles.newBtn, { backgroundColor: colors.primary, borderRadius: colors.radius }]}
-          onPress={() => setShowModal(true)}
-        >
-          <Feather name="plus" size={20} color={colors.primaryForeground} />
-        </TouchableOpacity>
-      </View>
-      <Text style={[styles.subtitle, { color: colors.mutedForeground }]}>Confidential mental health support</Text>
+      <ImageBackground
+        source={COUNSELING_BG}
+        style={[styles.heroBg, { paddingTop: insets.top }]}
+        imageStyle={styles.heroImg}
+      >
+        <View style={styles.heroOverlay}>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.heroTitle}>Mental Buddy</Text>
+            <Text style={styles.heroSub}>Confidential mental health support</Text>
+          </View>
+          <TouchableOpacity
+            style={styles.newBtn}
+            onPress={() => setShowModal(true)}
+          >
+            <Feather name="plus" size={20} color="#fff" />
+          </TouchableOpacity>
+        </View>
+      </ImageBackground>
 
       {isLoading ? (
         <View style={styles.center}><ActivityIndicator size="large" color={colors.primary} /></View>
@@ -146,10 +156,16 @@ export default function MentalBuddy() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 16, paddingBottom: 4 },
-  subtitle: { fontSize: 14, paddingHorizontal: 16, marginBottom: 4 },
-  title: { fontSize: 24, fontWeight: "700" },
-  newBtn: { width: 40, height: 40, justifyContent: "center", alignItems: "center" },
+  heroBg: { height: 160, justifyContent: "flex-end" },
+  heroImg: { resizeMode: "cover" },
+  heroOverlay: {
+    flexDirection: "row", alignItems: "flex-end", gap: 12,
+    paddingHorizontal: 16, paddingBottom: 16, paddingTop: 12,
+    backgroundColor: "rgba(0,0,0,0.48)",
+  },
+  heroTitle: { fontSize: 24, fontWeight: "800", color: "#fff" },
+  heroSub: { fontSize: 13, color: "rgba(255,255,255,0.80)", marginTop: 3 },
+  newBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: "rgba(255,255,255,0.20)", justifyContent: "center", alignItems: "center" },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
   card: { borderRadius: 12, borderWidth: 1, padding: 14, marginBottom: 10, gap: 8 },
   cardTop: { flexDirection: "row", alignItems: "center", gap: 10 },

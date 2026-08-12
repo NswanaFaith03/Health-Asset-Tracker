@@ -27,6 +27,7 @@ export const UserRole = {
   doctor: 'doctor',
   pharmacist: 'pharmacist',
   lab_technician: 'lab_technician',
+  nurse: 'nurse',
   mental_health_counselor: 'mental_health_counselor',
   hiv_professional: 'hiv_professional',
   admin: 'admin',

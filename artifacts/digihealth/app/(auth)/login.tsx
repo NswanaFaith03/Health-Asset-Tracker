@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import {
   View, Text, TextInput, StyleSheet, TouchableOpacity,
-  ActivityIndicator, Alert, StatusBar, KeyboardAvoidingView, Platform, ScrollView,
+  StatusBar, KeyboardAvoidingView, Platform, ScrollView,
   Image, ImageBackground,
 } from "react-native";
 import { router } from "expo-router";
@@ -10,6 +10,8 @@ import { Feather } from "@expo/vector-icons";
 import { useLogin } from "@workspace/api-client-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useColors } from "../../hooks/useColors";
+import { Toast, ToastContainer } from "../../components/Toast";
+import { AnimatedButton } from "../../components/AnimatedButton";
 
 
 export default function LoginScreen() {
@@ -22,41 +24,44 @@ export default function LoginScreen() {
   const loginMutation = useLogin();
 
   const doLogin = (e: string, p: string) => {
-    if (!e || !p) { Alert.alert("Required", "Enter email and password"); return; }
+    const normalizedEmail = e.trim().toLowerCase();
+    if (!normalizedEmail || !p) { Toast.warning("Enter email and password"); return; }
     loginMutation.mutate(
-      { data: { email: e, password: p } },
+      { data: { email: normalizedEmail, password: p } },
       {
         onSuccess: async (data) => {
+          Toast.success("Login successful!");
           await login(data.token, data.user);
           const requiresPasswordReset = (data.user as any)?.requiresPasswordReset;
           if (requiresPasswordReset) {
             router.replace("/(auth)/reset-password" as any);
             return;
           }
-          const role = data.user.role;
-          switch (role) {
-            case "student":                 router.replace("/(student)/home"); break;
-            case "doctor":                  router.replace("/(doctor)/queue"); break;
-            case "pharmacist":              router.replace("/(pharmacist)/prescriptions"); break;
-            case "lab_technician":          router.replace("/(lab)/requests"); break;
-            case "mental_health_counselor": router.replace("/(mental-health)/sessions"); break;
-            case "hiv_professional":        router.replace("/(hiv-support)/sessions"); break;
-            case "admin":                   router.replace("/(admin)/analytics"); break;
-            default:                        router.replace("/(auth)/login"); break;
+          switch (data.user.role as string) {
+            case "student":                 router.replace("/(student)/home" as any); break;
+            case "doctor":                  router.replace("/(doctor)/queue" as any); break;
+            case "pharmacist":              router.replace("/(pharmacist)/prescriptions" as any); break;
+            case "lab_technician":          router.replace("/(lab)/requests" as any); break;
+            case "nurse":                   router.replace("/(nurse)/lab-requests" as any); break;
+            case "mental_health_counselor": router.replace("/(mental-health)/sessions" as any); break;
+            case "hiv_professional":        router.replace("/(hiv-support)/sessions" as any); break;
+            case "admin":                   router.replace("/(admin)/analytics" as any); break;
+            default:                        router.replace("/(auth)/login" as any); break;
           }
         },
         onError: (err: any) => {
-          Alert.alert("Login Failed", err?.response?.data?.error || err?.message || "Invalid credentials");
+          Toast.error(err?.data?.message || err?.data?.error || err?.message || "Invalid credentials");
         },
       }
     );
   };
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: colors.primary }}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-    >
+    <>
+      <KeyboardAvoidingView
+        style={{ flex: 1, backgroundColor: colors.primary }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
       <StatusBar barStyle="light-content" backgroundColor={colors.primary} />
       <ScrollView
         contentContainerStyle={{ flexGrow: 1 }}
@@ -65,7 +70,7 @@ export default function LoginScreen() {
       >
         {/* ── Hero ── */}
         <ImageBackground
-          source={require("../../assets/images/unzaclinic.jpeg")}
+          source={require("../../assets/images/happystudents.jpg")}
           style={[styles.hero, { paddingTop: insets.top + 40 }]}
           imageStyle={styles.heroImage}
         >
@@ -119,22 +124,14 @@ export default function LoginScreen() {
           </View>
 
           {/* Submit */}
-          <TouchableOpacity
-            style={[styles.btn, { backgroundColor: colors.primary, opacity: loginMutation.isPending ? 0.75 : 1 }]}
+          <AnimatedButton
+            label="Sign In"
             onPress={() => doLogin(email, password)}
-            disabled={loginMutation.isPending}
-            activeOpacity={0.85}
-          >
-            {loginMutation.isPending
-              ? <ActivityIndicator color="#fff" />
-              : (
-                <View style={styles.btnInner}>
-                  <Text style={styles.btnText}>Sign In</Text>
-                  <Feather name="arrow-right" size={18} color="#fff" />
-                </View>
-              )
-            }
-          </TouchableOpacity>
+            isLoading={loginMutation.isPending}
+            disabled={!email || !password}
+            style={[styles.btn, { backgroundColor: colors.primary }]}
+            textStyle={styles.btnText}
+          />
 
           <View style={styles.footer}>
             <Text style={{ color: colors.mutedForeground, fontSize: 14 }}>Don't have an account? </Text>
@@ -145,6 +142,8 @@ export default function LoginScreen() {
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
+    <ToastContainer position="top" />
+    </>
   );
 }
 

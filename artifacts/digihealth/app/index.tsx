@@ -18,23 +18,25 @@ export default function IndexScreen() {
   }
 
   // Route based on role
-  switch (currentUser.role) {
+  switch (currentUser.role as string) {
     case "student":
-      return <Redirect href="/(student)/home" />;
+      return <Redirect href={"/(student)/home" as any} />;
     case "doctor":
-      return <Redirect href="/(doctor)/queue" />;
+      return <Redirect href={"/(doctor)/queue" as any} />;
     case "pharmacist":
-      return <Redirect href="/(pharmacist)/prescriptions" />;
+      return <Redirect href={"/(pharmacist)/prescriptions" as any} />;
     case "lab_technician":
-      return <Redirect href="/(lab)/requests" />;
+      return <Redirect href={"/(lab)/requests" as any} />;
+    case "nurse":
+      return <Redirect href={"/(nurse)/lab-requests" as any} />;
     case "mental_health_counselor":
-      return <Redirect href="/(mental-health)/sessions" />;
+      return <Redirect href={"/(mental-health)/sessions" as any} />;
     case "hiv_professional":
-      return <Redirect href="/(hiv-support)/sessions" />;
+      return <Redirect href={"/(hiv-support)/sessions" as any} />;
     case "admin":
-      return <Redirect href="/(admin)/analytics" />;
+      return <Redirect href={"/(admin)/analytics" as any} />;
     default:
-      return <Redirect href="/(auth)/login" />;
+      return <Redirect href={"/(auth)/login" as any} />;
   }
 }
 

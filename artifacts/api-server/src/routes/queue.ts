@@ -53,14 +53,19 @@ router.get("/queue/my-position", requireAuth, async (req, res) => {
 });
 
 router.post("/queue/join", requireAuth, async (req, res) => {
-  const { consultationId } = req.body;
+  const { consultationId, studentId } = req.body;
+  const user = req.user!;
+
+  // Only nurses and admins can add students to queue on behalf
+  const targetStudentId = studentId && ["nurse", "admin"].includes(user.role) ? studentId : user.id;
+
   if (!consultationId) {
     res.status(400).json({ error: "validation", message: "consultationId is required" });
     return;
   }
 
   const existing = await db.select().from(queueTable)
-    .where(and(eq(queueTable.studentId, req.user!.id), eq(queueTable.status, "waiting")))
+    .where(and(eq(queueTable.studentId, targetStudentId), eq(queueTable.status, "waiting")))
     .limit(1);
 
   if (existing.length > 0) {
@@ -73,7 +78,7 @@ router.post("/queue/join", requireAuth, async (req, res) => {
 
   const [entry] = await db.insert(queueTable).values({
     consultationId,
-    studentId: req.user!.id,
+    studentId: targetStudentId,
     queueNumber: maxQueue + 1,
     status: "waiting",
     estimatedWaitMinutes: (allWaiting.length + 1) * 15,
@@ -83,6 +88,12 @@ router.post("/queue/join", requireAuth, async (req, res) => {
 });
 
 router.patch("/queue/:id/complete", requireAuth, async (req, res) => {
+  const user = req.user!;
+  if (!["doctor", "admin"].includes(user.role)) {
+    res.status(403).json({ error: "forbidden", message: "Only doctors or admins can complete queue entries" });
+    return;
+  }
+
   const id = Number(req.params.id);
   const [entry] = await db.select().from(queueTable).where(eq(queueTable.id, id)).limit(1);
   if (!entry) {
@@ -93,7 +104,16 @@ router.patch("/queue/:id/complete", requireAuth, async (req, res) => {
     .set({ status: "completed" })
     .where(eq(queueTable.id, id))
     .returning();
-  await createNotification(entry.studentId, "Queue Complete", "Your turn is complete", "queue");
+
+  const updateData: Partial<typeof consultationsTable.$inferSelect> = { status: "closed" };
+  if (user.role === "doctor") {
+    updateData.doctorId = user.id;
+  }
+  await db.update(consultationsTable)
+    .set(updateData)
+    .where(eq(consultationsTable.id, entry.consultationId));
+
+  await createNotification(entry.studentId, "Queue Complete", "Your consultation has been closed by the doctor", "queue");
   res.json(await enrichEntry(updated));
 });
 

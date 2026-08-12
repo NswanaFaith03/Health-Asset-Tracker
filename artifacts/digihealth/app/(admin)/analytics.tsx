@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, ScrollView, RefreshControl, ActivityIndicator } from "react-native";
+import { View, Text, StyleSheet, ScrollView, RefreshControl, ActivityIndicator, ImageBackground } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -31,16 +31,26 @@ export default function AdminAnalytics() {
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: colors.background }]}
-      contentContainerStyle={{ paddingTop: insets.top + 16, paddingBottom: insets.bottom + 84, paddingHorizontal: 16 }}
+      contentContainerStyle={{ paddingBottom: insets.bottom + 84 }}
       refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} />}
     >
-      <Text style={[styles.title, { color: colors.foreground }]}>Analytics</Text>
-      <FeatureActionGrid actions={actions} />
+      <ImageBackground
+        source={require("../../assets/images/school.jpg")}
+        style={[styles.header, { paddingTop: insets.top + 20 }]}
+        imageStyle={styles.headerImage}
+      >
+        <View style={styles.headerOverlay} />
+        <Text style={styles.title}>System Analytics</Text>
+        <Text style={styles.subTitle}>UNZA Campus Health Overview</Text>
+      </ImageBackground>
 
-      {isLoading ? (
-        <View style={styles.center}><ActivityIndicator size="large" color={colors.primary} /></View>
-      ) : analytics ? (
-        <>
+      <View style={{ paddingHorizontal: 16, paddingTop: 16 }}>
+        <FeatureActionGrid actions={actions} />
+
+        {isLoading ? (
+          <View style={styles.center}><ActivityIndicator size="large" color={colors.primary} /></View>
+        ) : analytics ? (
+          <>
           <View style={[styles.highlight, { backgroundColor: colors.primary }]}>
             <Text style={[styles.highlightLabel, { color: colors.primaryForeground }]}>Avg Wait Time</Text>
             <Text style={[styles.highlightValue, { color: colors.primaryForeground }]}>{(analytics as any).averageWaitMinutes} min</Text>
@@ -67,7 +77,7 @@ export default function AdminAnalytics() {
               ))}
             </View>
           )}
-        </>
+        </View>
       ) : null}
     </ScrollView>
   );
@@ -75,7 +85,14 @@ export default function AdminAnalytics() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  title: { fontSize: 24, fontWeight: "700", marginBottom: 16 },
+  header: { paddingHorizontal: 20, paddingBottom: 24, position: "relative", backgroundColor: "#0f766e" },
+  headerImage: { opacity: 0.32, resizeMode: "cover" },
+  headerOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(15, 118, 110, 0.78)",
+  },
+  title: { fontSize: 24, fontWeight: "800", color: "#fff", zIndex: 2 },
+  subTitle: { fontSize: 13, color: "rgba(255,255,255,0.85)", marginTop: 2, zIndex: 2 },
   center: { flex: 1, justifyContent: "center", alignItems: "center", paddingTop: 60 },
   highlight: { borderRadius: 16, padding: 20, marginBottom: 16 },
   highlightLabel: { fontSize: 14, fontWeight: "500", opacity: 0.8 },

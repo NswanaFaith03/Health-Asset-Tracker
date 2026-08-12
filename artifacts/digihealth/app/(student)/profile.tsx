@@ -21,6 +21,9 @@ export default function Profile() {
   const [isUploading, setIsUploading] = useState(false);
 
   const getApiBaseUrl = () => {
+    if (process.env.EXPO_PUBLIC_API_URL) {
+      return process.env.EXPO_PUBLIC_API_URL.replace(/\/+$/, "");
+    }
     const hostUri =
       Constants.expoConfig?.hostUri ??
       ((Constants as any).manifest2?.extra?.expoGo?.debuggerHost as string | undefined) ??
@@ -36,7 +39,11 @@ export default function Profile() {
   };
 
   const avatarUrl = (currentUser as any)?.avatarUrl as string | undefined;
-  const avatarUri = avatarUrl ? (avatarUrl.startsWith("http") ? avatarUrl : `${getApiBaseUrl()}${avatarUrl}`) : null;
+  const avatarUri = avatarUrl 
+    ? (avatarUrl.startsWith("http") || avatarUrl.startsWith("data:") 
+       ? avatarUrl 
+       : `${getApiBaseUrl()}${avatarUrl}`) 
+    : null;
 
   const handleUploadPhoto = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -47,7 +54,8 @@ export default function Profile() {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      quality: 0.7,
+      aspect: [1, 1],
+      quality: 0.5,
       base64: true,
     });
     const canceled = (result as any).cancelled ?? (result as any).canceled;
@@ -68,7 +76,7 @@ export default function Profile() {
       await updateCurrentUser(response.user);
       Alert.alert("Profile photo saved", "Your profile photo has been uploaded.");
     } catch (err: any) {
-      Alert.alert("Upload failed", err?.message || "Unable to upload photo. Please try again.");
+      Alert.alert("Upload failed", err?.data?.message || err?.message || "Unable to upload photo. Please try again.");
     } finally {
       setIsUploading(false);
     }

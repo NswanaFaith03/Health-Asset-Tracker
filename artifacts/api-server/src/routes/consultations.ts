@@ -1,11 +1,16 @@
 import { Router } from "express";
-import { db, consultationsTable, usersTable } from "@workspace/db";
+import { db, consultationsTable, usersTable, queueTable } from "@workspace/db";
 import { eq, and } from "drizzle-orm";
 import { requireAuth } from "../middlewares/auth";
 import { logAudit } from "../lib/audit";
 import { createNotification } from "../lib/notify";
 
 const router = Router();
+
+async function getNextQueueNumber() {
+  const allWaiting = await db.select().from(queueTable).where(eq(queueTable.status, "waiting"));
+  return allWaiting.length > 0 ? Math.max(...allWaiting.map((entry) => entry.queueNumber)) + 1 : 1;
+}
 
 async function enrichConsultation(c: typeof consultationsTable.$inferSelect) {
   const [student] = await db.select().from(usersTable).where(eq(usersTable.id, c.studentId)).limit(1);
@@ -66,6 +71,22 @@ router.post("/consultations", requireAuth, async (req, res) => {
     attachments: attachments ?? [],
     status: "submitted",
   }).returning();
+
+  const existingQueueEntry = await db.select().from(queueTable)
+    .where(and(eq(queueTable.consultationId, row.id), eq(queueTable.status, "waiting")))
+    .limit(1);
+
+  if (existingQueueEntry.length === 0) {
+    const queueNumber = await getNextQueueNumber();
+    await db.insert(queueTable).values({
+      consultationId: row.id,
+      studentId: req.user!.id,
+      queueNumber,
+      status: "waiting",
+      estimatedWaitMinutes: queueNumber * 15,
+    });
+  }
+
   await logAudit(req, "create_consultation", "consultation", row.id);
   res.status(201).json(await enrichConsultation(row));
 });
@@ -82,14 +103,43 @@ router.get("/consultations/:id", requireAuth, async (req, res) => {
 
 router.put("/consultations/:id", requireAuth, async (req, res) => {
   const id = Number(req.params.id);
-  const { diagnosis, notes, status } = req.body;
+  const {
+    diagnosis,
+    notes,
+    status,
+    temperature,
+    bloodPressure,
+    heartRate,
+    respiratoryRate,
+    oxygenSaturation,
+    weight,
+  } = req.body;
+
   const [existing] = await db.select().from(consultationsTable).where(eq(consultationsTable.id, id)).limit(1);
   if (!existing) {
     res.status(404).json({ error: "not_found" });
     return;
   }
+
+  const vitalsProvided = [temperature, bloodPressure, heartRate, respiratoryRate, oxygenSaturation, weight].some((value) => value !== undefined);
+  if (vitalsProvided && !["nurse", "admin"].includes(req.user!.role)) {
+    res.status(403).json({ error: "forbidden", message: "Only nurses or admins can record vitals" });
+    return;
+  }
+
+  const updateData: Partial<typeof consultationsTable.$inferSelect> = {};
+  if (diagnosis !== undefined) updateData.diagnosis = diagnosis;
+  if (notes !== undefined) updateData.notes = notes;
+  if (status !== undefined) updateData.status = status;
+  if (temperature !== undefined) updateData.temperature = temperature;
+  if (bloodPressure !== undefined) updateData.bloodPressure = bloodPressure;
+  if (heartRate !== undefined) updateData.heartRate = heartRate;
+  if (respiratoryRate !== undefined) updateData.respiratoryRate = respiratoryRate;
+  if (oxygenSaturation !== undefined) updateData.oxygenSaturation = oxygenSaturation;
+  if (weight !== undefined) updateData.weight = weight;
+
   const [updated] = await db.update(consultationsTable)
-    .set({ diagnosis, notes, status: status ?? existing.status })
+    .set({ ...updateData, status: status ?? existing.status })
     .where(eq(consultationsTable.id, id))
     .returning();
   await logAudit(req, "update_consultation", "consultation", id);

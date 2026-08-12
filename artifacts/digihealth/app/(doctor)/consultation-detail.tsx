@@ -1,19 +1,31 @@
+/**
+ * Doctor Consultation Detail — Sprint 4 thin wrapper.
+ *
+ * Inline prescription and lab modals replaced with PrescriptionModal / LabRequestModal
+ * from features/prescription and features/lab.
+ * STATUS_COLORS / SEVERITY_COLORS imported from features/consultation/constants.
+ */
 import React, { useState } from "react";
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, TextInput, Alert, Modal, Image } from "react-native";
+import {
+  View, Text, StyleSheet, ScrollView, TouchableOpacity,
+  ActivityIndicator, TextInput, Alert, Image,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { useGetConsultation, useUpdateConsultation, useUpdateConsultationStatus, useCreatePrescription, useCreateLabRequest, getGetConsultationQueryKey, getListConsultationsQueryKey } from "@workspace/api-client-react";
+import {
+  useGetConsultation, useUpdateConsultation, useUpdateConsultationStatus,
+  getGetConsultationQueryKey, getListConsultationsQueryKey,
+} from "@workspace/api-client-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useColors } from "../../hooks/useColors";
-
-const STATUS_COLORS: Record<string, string> = {
-  submitted: "#f59e0b", under_review: "#3b82f6", assigned: "#8b5cf6", responded: "#10b981", closed: "#6b7280",
-};
-const SEVERITY_COLORS: Record<string, string> = {
-  low: "#10b981", medium: "#f59e0b", high: "#f97316", critical: "#ef4444",
-};
+import { Badge } from "../../components/ui/Badge";
+import { PrescriptionModal } from "../../features/prescription/components/PrescriptionModal";
+import { LabRequestModal } from "../../features/lab/components/LabRequestModal";
+import {
+  STATUS_COLORS, SEVERITY_COLORS,
+} from "../../features/consultation/constants";
 
 export default function DoctorConsultationDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -27,18 +39,12 @@ export default function DoctorConsultationDetail() {
   const [notes, setNotes] = useState("");
   const [showPrescriptionModal, setShowPrescriptionModal] = useState(false);
   const [showLabModal, setShowLabModal] = useState(false);
-  const [medication, setMedication] = useState("");
-  const [dosage, setDosage] = useState("");
-  const [instructions, setInstructions] = useState("");
-  const [testType, setTestType] = useState("");
 
   const { data: consultation, isLoading } = useGetConsultation(consultationId, {
-    query: { enabled: !!consultationId, queryKey: getGetConsultationQueryKey(consultationId) }
+    query: { enabled: !!consultationId, queryKey: getGetConsultationQueryKey(consultationId) },
   });
   const updateConsultation = useUpdateConsultation();
   const updateStatus = useUpdateConsultationStatus();
-  const createPrescription = useCreatePrescription();
-  const createLabRequest = useCreateLabRequest();
 
   const handleRespond = () => {
     if (!diagnosis.trim()) { Alert.alert("Required", "Enter a diagnosis"); return; }
@@ -49,7 +55,7 @@ export default function DoctorConsultationDetail() {
           queryClient.invalidateQueries({ queryKey: getGetConsultationQueryKey(consultationId) });
           queryClient.invalidateQueries({ queryKey: getListConsultationsQueryKey() });
           Alert.alert("Done", "Response submitted");
-        }
+        },
       }
     );
   };
@@ -61,27 +67,7 @@ export default function DoctorConsultationDetail() {
     );
   };
 
-  const handlePrescription = () => {
-    if (!medication || !dosage || !instructions) { Alert.alert("Required", "Fill all fields"); return; }
-    createPrescription.mutate(
-      { data: { patientId: (consultation as any)?.studentId, consultationId, medication, dosage, instructions } },
-      {
-        onSuccess: () => { setShowPrescriptionModal(false); Alert.alert("Done", "Prescription issued"); },
-        onError: () => Alert.alert("Error", "Failed to create prescription")
-      }
-    );
-  };
-
-  const handleLabRequest = () => {
-    if (!testType) { Alert.alert("Required", "Enter test type"); return; }
-    createLabRequest.mutate(
-      { data: { patientId: (consultation as any)?.studentId, consultationId, testType } },
-      {
-        onSuccess: () => { setShowLabModal(false); Alert.alert("Done", "Lab request created"); },
-        onError: () => Alert.alert("Error", "Failed to create lab request")
-      }
-    );
-  };
+  const c = consultation as any;
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -92,29 +78,27 @@ export default function DoctorConsultationDetail() {
         <Text style={[styles.title, { color: colors.foreground }]}>Consultation</Text>
         <View style={{ width: 40 }} />
       </View>
+
       {isLoading ? (
         <View style={styles.center}><ActivityIndicator size="large" color={colors.primary} /></View>
-      ) : !consultation ? (
+      ) : !c ? (
         <View style={styles.center}><Text style={{ color: colors.mutedForeground }}>Not found</Text></View>
       ) : (
         <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: insets.bottom + 40 }}>
+          {/* Patient summary card */}
           <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            <Text style={[styles.patientName, { color: colors.foreground }]}>{(consultation as any).student?.name ?? "Patient"}</Text>
+            <Text style={[styles.patientName, { color: colors.foreground }]}>{c.student?.name ?? "Patient"}</Text>
             <View style={styles.row}>
-              <View style={[styles.badge, { backgroundColor: STATUS_COLORS[(consultation as any).status] + "20" }]}>
-                <Text style={[styles.badgeText, { color: STATUS_COLORS[(consultation as any).status] }]}>{(consultation as any).status?.replace(/_/g, " ")}</Text>
-              </View>
-              <View style={[styles.badge, { backgroundColor: SEVERITY_COLORS[(consultation as any).severity] + "20" }]}>
-                <Text style={[styles.badgeText, { color: SEVERITY_COLORS[(consultation as any).severity] }]}>{(consultation as any).severity?.toUpperCase()}</Text>
-              </View>
+              <Badge status={c.status ?? ""} colorMap={STATUS_COLORS} />
+              <Badge status={c.severity ?? ""} colorMap={SEVERITY_COLORS} />
             </View>
             <Text style={[styles.label, { color: colors.mutedForeground }]}>Symptoms</Text>
-            <Text style={[styles.value, { color: colors.foreground }]}>{(consultation as any).symptoms}</Text>
-            {((consultation as any).attachments ?? []).length > 0 && (
-              <View style={[styles.attachmentsSection, { borderColor: colors.border }]}> 
+            <Text style={[styles.value, { color: colors.foreground }]}>{c.symptoms}</Text>
+            {(c.attachments ?? []).length > 0 && (
+              <View style={[styles.attachmentsSection, { borderColor: colors.border }]}>
                 <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Attached Photos</Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.attachmentsRow}>
-                  {((consultation as any).attachments ?? []).map((uri: string) => (
+                  {(c.attachments ?? []).map((uri: string) => (
                     <Image key={uri} source={{ uri }} style={styles.attachmentPreview} />
                   ))}
                 </ScrollView>
@@ -122,12 +106,16 @@ export default function DoctorConsultationDetail() {
             )}
           </View>
 
-          {(consultation as any).status === "submitted" && (
-            <TouchableOpacity style={[styles.btn, { backgroundColor: colors.primary, borderRadius: colors.radius }]} onPress={handleAssign}>
+          {c.status === "submitted" && (
+            <TouchableOpacity
+              style={[styles.btn, { backgroundColor: colors.primary, borderRadius: colors.radius }]}
+              onPress={handleAssign}
+            >
               <Text style={[styles.btnText, { color: colors.primaryForeground }]}>Accept & Assign to Me</Text>
             </TouchableOpacity>
           )}
 
+          {/* Response card */}
           <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border, marginTop: 16 }]}>
             <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Response</Text>
             <Text style={[styles.label, { color: colors.mutedForeground }]}>Diagnosis</Text>
@@ -135,7 +123,7 @@ export default function DoctorConsultationDetail() {
               style={[styles.input, { borderColor: colors.border, color: colors.foreground, backgroundColor: colors.background }]}
               placeholder="Enter diagnosis..."
               placeholderTextColor={colors.mutedForeground}
-              value={diagnosis || ((consultation as any).diagnosis ?? "")}
+              value={diagnosis || (c.diagnosis ?? "")}
               onChangeText={setDiagnosis}
               multiline
             />
@@ -144,7 +132,7 @@ export default function DoctorConsultationDetail() {
               style={[styles.input, { borderColor: colors.border, color: colors.foreground, backgroundColor: colors.background }]}
               placeholder="Additional notes..."
               placeholderTextColor={colors.mutedForeground}
-              value={notes || ((consultation as any).notes ?? "")}
+              value={notes || (c.notes ?? "")}
               onChangeText={setNotes}
               multiline
             />
@@ -156,12 +144,19 @@ export default function DoctorConsultationDetail() {
             </TouchableOpacity>
           </View>
 
+          {/* Action buttons → open feature modals */}
           <View style={styles.actions}>
-            <TouchableOpacity style={[styles.actionBtn, { backgroundColor: colors.secondary, borderRadius: colors.radius }]} onPress={() => setShowPrescriptionModal(true)}>
+            <TouchableOpacity
+              style={[styles.actionBtn, { backgroundColor: colors.secondary, borderRadius: colors.radius }]}
+              onPress={() => setShowPrescriptionModal(true)}
+            >
               <Feather name="package" size={18} color={colors.primary} />
               <Text style={[styles.actionText, { color: colors.primary }]}>Prescribe</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.actionBtn, { backgroundColor: colors.secondary, borderRadius: colors.radius }]} onPress={() => setShowLabModal(true)}>
+            <TouchableOpacity
+              style={[styles.actionBtn, { backgroundColor: colors.secondary, borderRadius: colors.radius }]}
+              onPress={() => setShowLabModal(true)}
+            >
               <Feather name="activity" size={18} color={colors.primary} />
               <Text style={[styles.actionText, { color: colors.primary }]}>Lab Request</Text>
             </TouchableOpacity>
@@ -169,13 +164,6 @@ export default function DoctorConsultationDetail() {
         </ScrollView>
       )}
 
-      <Modal visible={showPrescriptionModal} animationType="slide" presentationStyle="pageSheet">
-        <View style={[styles.modal, { backgroundColor: colors.background, paddingTop: insets.top + 20 }]}>
-          <View style={styles.modalHeader}>
-            <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Issue Prescription</Text>
-            <TouchableOpacity onPress={() => setShowPrescriptionModal(false)}>
-              <Feather name="x" size={24} color={colors.foreground} />
-            </TouchableOpacity>
           </View>
           {[
             { label: "Medication", value: medication, setter: setMedication, placeholder: "e.g. Amoxicillin 500mg" },

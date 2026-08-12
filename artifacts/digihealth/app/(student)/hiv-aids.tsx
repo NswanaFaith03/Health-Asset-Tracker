@@ -1,10 +1,12 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl, Alert, TextInput, Modal } from "react-native";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl, Alert, TextInput, Modal, ImageBackground } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { useQueryClient } from "@tanstack/react-query";
 import { useListHivSupportSessions, useListHivResources, useCreateHivSupportSession, getListHivSupportSessionsQueryKey, getListHivResourcesQueryKey } from "@workspace/api-client-react";
 import { useColors } from "../../hooks/useColors";
+
+const COUNSELING_BG = require("../../assets/images/zambia_graduate_nurses.jpg");
 
 const STATUS_COLORS: Record<string, string> = {
   requested: "#f59e0b", active: "#10b981", completed: "#6b7280", cancelled: "#ef4444",
@@ -42,15 +44,24 @@ export default function HivAids() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
-        <Text style={[styles.title, { color: colors.foreground }]}>HIV/AIDS Centre</Text>
-        <TouchableOpacity
-          style={[styles.newBtn, { backgroundColor: colors.primary, borderRadius: colors.radius }]}
-          onPress={() => setShowModal(true)}
-        >
-          <Feather name="plus" size={20} color={colors.primaryForeground} />
-        </TouchableOpacity>
-      </View>
+      <ImageBackground
+        source={COUNSELING_BG}
+        style={[styles.heroBg, { paddingTop: insets.top }]}
+        imageStyle={styles.heroImg}
+      >
+        <View style={styles.heroOverlay}>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.heroTitle}>HIV/AIDS Centre</Text>
+            <Text style={styles.heroSub}>Confidential support & resources</Text>
+          </View>
+          <TouchableOpacity
+            style={styles.newBtn}
+            onPress={() => setShowModal(true)}
+          >
+            <Feather name="plus" size={20} color="#fff" />
+          </TouchableOpacity>
+        </View>
+      </ImageBackground>
 
       <View style={[styles.tabs, { borderBottomColor: colors.border }]}>
         {(["sessions", "resources"] as const).map((tab) => (
@@ -157,9 +168,16 @@ export default function HivAids() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 16, paddingBottom: 12 },
-  title: { fontSize: 24, fontWeight: "700" },
-  newBtn: { width: 40, height: 40, justifyContent: "center", alignItems: "center" },
+  heroBg: { height: 160, justifyContent: "flex-end" },
+  heroImg: { resizeMode: "cover" },
+  heroOverlay: {
+    flexDirection: "row", alignItems: "flex-end", gap: 12,
+    paddingHorizontal: 16, paddingBottom: 16, paddingTop: 12,
+    backgroundColor: "rgba(0,0,0,0.48)",
+  },
+  heroTitle: { fontSize: 24, fontWeight: "800", color: "#fff" },
+  heroSub: { fontSize: 13, color: "rgba(255,255,255,0.80)", marginTop: 3 },
+  newBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: "rgba(255,255,255,0.20)", justifyContent: "center", alignItems: "center" },
   tabs: { flexDirection: "row", borderBottomWidth: 1 },
   tab: { flex: 1, paddingVertical: 12, alignItems: "center" },
   tabText: { fontSize: 15, fontWeight: "600" },

@@ -1,14 +1,20 @@
-import React from "react";
+/**
+ * Student Home screen — Sprint 7 thin wrapper.
+ *
+ * Emergency call logic delegated to `useEmergency`.
+ */
+import React, { useEffect } from "react";
 import {
   View, Text, StyleSheet, ScrollView, RefreshControl,
-  TouchableOpacity, StatusBar,
-  ImageBackground,
+  TouchableOpacity, StatusBar, ImageBackground, ActivityIndicator,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { useGetStudentDashboard, getGetStudentDashboardQueryKey } from "@workspace/api-client-react";
 import { useColors } from "../../hooks/useColors";
+import { useTheme } from "../../contexts/ThemeContext";
 import { useAuth } from "../../contexts/AuthContext";
+import { useEmergency } from "../../features/emergency/useEmergency";
 import { router } from "expo-router";
 
 type FeatherName = React.ComponentProps<typeof Feather>["name"];
@@ -22,10 +28,18 @@ const FEATURES: { label: string; icon: FeatherName; route: string; color: string
   { label: "HIV/AIDS Support",  icon: "shield",      route: "/(student)/hiv-aids",         color: "#d97706" },
 ];
 
+const THEME_OPTIONS = [
+  { key: "zaot", label: "Zambian", color: "#006b3f" },
+  { key: "ocean", label: "Ocean", color: "#0f766e" },
+  { key: "sunrise", label: "Sunrise", color: "#c2410c" },
+] as const;
+
 export default function StudentHome() {
   const insets = useSafeAreaInsets();
   const colors = useColors();
+  const { themeKey, setThemeKey } = useTheme();
   const { currentUser } = useAuth();
+  const { isLoadingNumber, isCalling, handleEmergencyCall } = useEmergency();
 
   const { data: dashboard, isLoading, refetch } = useGetStudentDashboard({
     query: { queryKey: getGetStudentDashboardQueryKey() },
@@ -49,7 +63,7 @@ export default function StudentHome() {
 
       {/* ── Header ── */}
       <ImageBackground
-        source={require("../../assets/images/unzaclinic.jpeg")}
+        source={require("../../assets/images/school.jpg")}
         style={[styles.header, { paddingTop: insets.top + 20 }]}
         imageStyle={styles.headerImage}
       >
@@ -122,6 +136,45 @@ export default function StudentHome() {
             </TouchableOpacity>
           ))}
         </View>
+
+        <View style={[styles.emergencySection, { backgroundColor: colors.secondary, borderColor: colors.border }]}> 
+          <View style={styles.emergencyHeader}>
+            <Feather name="phone-call" size={20} color={colors.accent} />
+            <Text style={[styles.emergencyTitle, { color: colors.foreground }]}>Emergency Help</Text>
+          </View>
+          <Text style={[styles.emergencyText, { color: colors.mutedForeground }]}>If you are in danger or need urgent clinic help, the app will submit your current location before dialing.</Text>
+          <TouchableOpacity
+            style={[styles.emergencyButton, { backgroundColor: colors.accent }]}
+            onPress={handleEmergencyCall}
+            disabled={isCalling || isLoadingNumber}
+          >
+            {isCalling ? (
+              <ActivityIndicator color={colors.accentForeground} />
+            ) : (
+              <Text style={[styles.emergencyButtonText, { color: colors.accentForeground }]}>Call Emergency</Text>
+            )}
+          </TouchableOpacity>
+          <Text style={[styles.emergencyNote, { color: colors.mutedForeground }]}>Number loaded from admin settings.</Text>
+        </View>
+
+        <Text style={[styles.sectionTitle, { color: colors.foreground, marginTop: 18 }]}>Theme</Text>
+        <View style={styles.themeRow}>
+          {THEME_OPTIONS.map((option) => (
+            <TouchableOpacity
+              key={option.key}
+              style={[
+                styles.themeChip,
+                {
+                  backgroundColor: option.color,
+                  borderColor: themeKey === option.key ? colors.primary : colors.border,
+                },
+              ]}
+              onPress={() => setThemeKey(option.key)}
+            >
+              <Text style={[styles.themeLabel, { color: "#fff" }]}>{option.label}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
       </View>
     </ScrollView>
   );
@@ -158,4 +211,14 @@ const styles = StyleSheet.create({
   featureButton: { width: "48%", minHeight: 120, paddingVertical: 18, borderRadius: 18, borderWidth: 1, alignItems: "center", justifyContent: "center", gap: 10 },
   featureLabel: { fontSize: 13, fontWeight: "700", textAlign: "center", lineHeight: 18 },
   featureDesc: { fontSize: 11, lineHeight: 15 },
+  emergencySection: { borderWidth: 1, borderRadius: 18, padding: 18, marginTop: 18 },
+  emergencyHeader: { flexDirection: "row", alignItems: "center", gap: 10, marginBottom: 12 },
+  emergencyTitle: { fontSize: 16, fontWeight: "800" },
+  emergencyText: { fontSize: 13, lineHeight: 20, marginBottom: 16 },
+  emergencyButton: { alignItems: "center", justifyContent: "center", borderRadius: 14, paddingVertical: 14, marginBottom: 10 },
+  emergencyButtonText: { fontSize: 15, fontWeight: "700" },
+  emergencyNote: { fontSize: 12, lineHeight: 16 },
+  themeRow: { flexDirection: "row", alignItems: "center", gap: 10, flexWrap: "wrap" },
+  themeChip: { paddingVertical: 12, paddingHorizontal: 14, borderRadius: 16, borderWidth: 2 },
+  themeLabel: { fontSize: 13, fontWeight: "700" },
 });

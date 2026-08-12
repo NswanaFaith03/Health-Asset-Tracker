@@ -7,3 +7,4 @@ export * from "./notifications";
 export * from "./mental-health";
 export * from "./hiv-support";
 export * from "./audit-logs";
+export * from "./app-settings";

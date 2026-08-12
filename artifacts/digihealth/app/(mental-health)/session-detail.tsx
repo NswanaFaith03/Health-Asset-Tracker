@@ -1,12 +1,22 @@
+/**
+ * Counselor / Mental Health Session Detail — Sprint 5 thin wrapper.
+ *
+ * Uses the shared `ChatView` component from `features/support/components/ChatView`.
+ */
 import React, { useState } from "react";
-import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, ActivityIndicator, KeyboardAvoidingView, Platform } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { useGetMentalHealthMessages, useSendMentalHealthMessage, getGetMentalHealthMessagesQueryKey } from "@workspace/api-client-react";
+import {
+  useGetMentalHealthMessages,
+  useSendMentalHealthMessage,
+  getGetMentalHealthMessagesQueryKey,
+} from "@workspace/api-client-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useColors } from "../../hooks/useColors";
+import { ChatView } from "../../features/support/components/ChatView";
 
 export default function CounselorSessionDetail() {
   const { sessionId } = useLocalSearchParams<{ sessionId: string }>();
@@ -18,7 +28,7 @@ export default function CounselorSessionDetail() {
   const id = Number(sessionId);
 
   const { data: messages, isLoading } = useGetMentalHealthMessages(id, {
-    query: { enabled: !!id, queryKey: getGetMentalHealthMessagesQueryKey(id) }
+    query: { enabled: !!id, queryKey: getGetMentalHealthMessagesQueryKey(id) },
   });
   const sendMessage = useSendMentalHealthMessage();
 
@@ -32,8 +42,6 @@ export default function CounselorSessionDetail() {
     );
   };
 
-  const reversed = [...(messages ?? [])].reverse();
-
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={[styles.header, { paddingTop: insets.top + 16, backgroundColor: colors.card, borderBottomColor: colors.border }]}>
@@ -44,56 +52,16 @@ export default function CounselorSessionDetail() {
         <View style={{ width: 40 }} />
       </View>
 
-      {isLoading ? (
-        <View style={styles.center}><ActivityIndicator size="large" color={colors.primary} /></View>
-      ) : (
-        <FlatList
-          data={reversed}
-          keyExtractor={(item) => String((item as any).id)}
-          inverted
-          contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: 16 }}
-          renderItem={({ item }) => {
-            const isMe = (item as any).senderId === currentUser?.id;
-            return (
-              <View style={[styles.msgRow, { justifyContent: isMe ? "flex-end" : "flex-start" }]}>
-                <View style={[styles.bubble, { backgroundColor: isMe ? colors.primary : colors.card, borderColor: isMe ? "transparent" : colors.border }]}>
-                  {!isMe && <Text style={[styles.senderName, { color: colors.mutedForeground }]}>{(item as any).sender?.name ?? "Student"}</Text>}
-                  <Text style={{ color: isMe ? colors.primaryForeground : colors.foreground, fontSize: 15 }}>{(item as any).content}</Text>
-                  <Text style={{ color: isMe ? colors.primaryForeground + "99" : colors.mutedForeground, fontSize: 11, marginTop: 4 }}>
-                    {new Date((item as any).createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                  </Text>
-                </View>
-              </View>
-            );
-          }}
-          ListEmptyComponent={
-            <View style={styles.emptyChat}>
-              <Feather name="message-circle" size={40} color={colors.mutedForeground} />
-              <Text style={[styles.emptyText, { color: colors.mutedForeground }]}>No messages yet.</Text>
-            </View>
-          }
-        />
-      )}
-
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined}>
-        <View style={[styles.inputBar, { borderTopColor: colors.border, backgroundColor: colors.card, paddingBottom: insets.bottom + 8 }]}>
-          <TextInput
-            style={[styles.input, { borderColor: colors.border, color: colors.foreground, backgroundColor: colors.background }]}
-            placeholder="Type a message..."
-            placeholderTextColor={colors.mutedForeground}
-            value={text}
-            onChangeText={setText}
-            multiline
-          />
-          <TouchableOpacity
-            style={[styles.sendBtn, { backgroundColor: colors.primary }]}
-            onPress={handleSend}
-            disabled={!text.trim()}
-          >
-            <Feather name="send" size={18} color={colors.primaryForeground} />
-          </TouchableOpacity>
-        </View>
-      </KeyboardAvoidingView>
+      <ChatView
+        messages={(messages ?? []) as any}
+        loading={isLoading}
+        currentUserId={currentUser?.id}
+        text={text}
+        onChangeText={setText}
+        onSend={handleSend}
+        sending={sendMessage.isPending}
+        paddingBottom={insets.bottom + 8}
+      />
     </View>
   );
 }
@@ -103,13 +71,4 @@ const styles = StyleSheet.create({
   header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 16, paddingBottom: 12, borderBottomWidth: 1 },
   backBtn: { width: 40, height: 40, justifyContent: "center", alignItems: "center" },
   title: { fontSize: 18, fontWeight: "700" },
-  center: { flex: 1, justifyContent: "center", alignItems: "center" },
-  msgRow: { flexDirection: "row", marginBottom: 10 },
-  bubble: { maxWidth: "75%", borderRadius: 16, borderWidth: 1, padding: 12, gap: 2 },
-  senderName: { fontSize: 11, fontWeight: "600" },
-  emptyChat: { flex: 1, alignItems: "center", justifyContent: "center", paddingTop: 60, gap: 12 },
-  emptyText: { fontSize: 14, textAlign: "center" },
-  inputBar: { flexDirection: "row", gap: 10, paddingHorizontal: 16, paddingTop: 10, borderTopWidth: 1, alignItems: "flex-end" },
-  input: { flex: 1, borderWidth: 1, borderRadius: 20, paddingHorizontal: 14, paddingVertical: 10, fontSize: 15, maxHeight: 120 },
-  sendBtn: { width: 40, height: 40, borderRadius: 20, justifyContent: "center", alignItems: "center" },
 });

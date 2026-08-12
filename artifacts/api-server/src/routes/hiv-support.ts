@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { db, hivSupportSessionsTable, hivResourcesTable, usersTable } from "@workspace/db";
+import { db, hivSupportSessionsTable, hivResourcesTable, usersTable, messagesTable } from "@workspace/db";
 import { eq, or } from "drizzle-orm";
 import { requireAuth } from "../middlewares/auth";
 import { logAudit } from "../lib/audit";
@@ -87,7 +87,55 @@ router.put("/hiv-support/sessions/:id", requireAuth, async (req, res) => {
   if (status === "active" && existing.studentId) {
     await createNotification(existing.studentId, "HIV Support Session Accepted", "Your session request has been accepted", "counseling");
   }
+  if (status === "completed" && existing.studentId) {
+    await createNotification(existing.studentId, "Session Completed", "Your HIV support session has been completed.", "counseling");
+  }
   res.json(await enrichSession(updated));
+});
+
+// Messages for HIV support sessions (reuses messagesTable with sessionId)
+router.get("/hiv-support/sessions/:id/messages", requireAuth, async (req, res) => {
+  const sessionId = Number(req.params.id);
+  const rows = await db.select().from(messagesTable)
+    .where(eq(messagesTable.sessionId, sessionId))
+    .orderBy(messagesTable.createdAt);
+
+  const fallback = (id: number) => ({ passwordHash: "", id, name: "Unknown", email: "", role: "student", status: "active", createdAt: new Date(), updatedAt: new Date(), studentNumber: null, phone: null, avatarUrl: null, requiresPasswordReset: false });
+  const enriched = await Promise.all(rows.map(async (m) => {
+    const [sender] = await db.select().from(usersTable).where(eq(usersTable.id, m.senderId)).limit(1);
+    const { passwordHash: _, ...safeSender } = sender ?? fallback(m.senderId);
+    return { ...m, sender: safeSender };
+  }));
+
+  res.json(enriched);
+});
+
+router.post("/hiv-support/sessions/:id/messages", requireAuth, async (req, res) => {
+  const sessionId = Number(req.params.id);
+  const { content } = req.body;
+  if (!content) {
+    res.status(400).json({ error: "validation", message: "content is required" });
+    return;
+  }
+  const [msg] = await db.insert(messagesTable).values({
+    sessionId,
+    senderId: req.user!.id,
+    content,
+  }).returning();
+
+  // Notify the other party
+  const [session] = await db.select().from(hivSupportSessionsTable).where(eq(hivSupportSessionsTable.id, sessionId)).limit(1);
+  if (session) {
+    const targetId = req.user!.id === session.studentId ? session.professionalId : session.studentId;
+    if (targetId) {
+      await createNotification(targetId, "New Message", "You have a new message in your HIV support session", "counseling");
+    }
+  }
+
+  const fallback = (id: number) => ({ passwordHash: "", id, name: "Unknown", email: "", role: "student", status: "active", createdAt: new Date(), updatedAt: new Date(), studentNumber: null, phone: null, avatarUrl: null, requiresPasswordReset: false });
+  const [sender] = await db.select().from(usersTable).where(eq(usersTable.id, msg.senderId)).limit(1);
+  const { passwordHash: _, ...safeSender } = sender ?? fallback(msg.senderId);
+  res.status(201).json({ ...msg, sender: safeSender });
 });
 
 router.get("/hiv-support/resources", requireAuth, async (req, res) => {

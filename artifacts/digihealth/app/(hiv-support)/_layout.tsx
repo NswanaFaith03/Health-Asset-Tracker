@@ -5,9 +5,10 @@ import { TabLayout } from "@/components/TabLayout";
 
 export default function HivSupportTabLayout() {
   return (
-    <TabLayout allowedRoles={["hiv_support"]}>
+    <TabLayout allowedRoles={["hiv_professional"]}>
       <Tabs.Screen name="sessions" options={{ title: "Sessions", tabBarIcon: ({ color }) => <Feather name="shield" size={22} color={color} /> }} />
       <Tabs.Screen name="resources" options={{ title: "Resources", tabBarIcon: ({ color }) => <Feather name="book-open" size={22} color={color} /> }} />
+      <Tabs.Screen name="session-detail" options={{ href: null }} />
     </TabLayout>
   );
 }

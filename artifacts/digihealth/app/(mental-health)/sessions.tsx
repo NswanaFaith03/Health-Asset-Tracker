@@ -1,11 +1,13 @@
 import React from "react";
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, RefreshControl, ActivityIndicator, Alert, ImageBackground } from "react-native";
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, RefreshControl, ActivityIndicator, ImageBackground } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useListMentalHealthSessions, useUpdateMentalHealthSession, getListMentalHealthSessionsQueryKey } from "@workspace/api-client-react";
 import { useColors } from "../../hooks/useColors";
+import { Toast, ToastContainer } from "../../components/Toast";
+import { AnimatedButton } from "../../components/AnimatedButton";
 
 const STATUS_COLORS: Record<string, string> = {
   requested: "#f59e0b", active: "#10b981", completed: "#6b7280", cancelled: "#ef4444",
@@ -21,29 +23,38 @@ export default function CounselorSessions() {
   const updateSession = useUpdateMentalHealthSession();
 
   const handleAccept = (id: number) => {
-    Alert.alert("Accept Session", "Accept this counseling session?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Accept",
-        onPress: () => updateSession.mutate(
-          { id, data: { status: "active" } },
-          { onSuccess: () => queryClient.invalidateQueries({ queryKey: getListMentalHealthSessionsQueryKey() }) }
-        )
+    Toast.info("Accepting session...");
+    updateSession.mutate(
+      { id, data: { status: "active" } },
+      { 
+        onSuccess: () => {
+          Toast.success("Session accepted");
+          queryClient.invalidateQueries({ queryKey: getListMentalHealthSessionsQueryKey() });
+        },
+        onError: (err: any) => Toast.error(err?.message || "Failed to accept session")
       }
-    ]);
+    );
   };
 
   const handleComplete = (id: number) => {
+    Toast.info("Completing session...");
     updateSession.mutate(
       { id, data: { status: "completed" } },
-      { onSuccess: () => queryClient.invalidateQueries({ queryKey: getListMentalHealthSessionsQueryKey() }) }
+      { 
+        onSuccess: () => {
+          Toast.success("Session completed");
+          queryClient.invalidateQueries({ queryKey: getListMentalHealthSessionsQueryKey() });
+        },
+        onError: (err: any) => Toast.error(err?.message || "Failed to complete session")
+      }
     );
   };
 
   return (
+    <>
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <ImageBackground
-        source={require("../../assets/images/unzaclinic.jpeg")}
+        source={require("../../assets/images/Couseling background.jpeg")}
         style={[styles.header, { paddingTop: insets.top + 16 }]}
         imageStyle={styles.headerImage}
       >
@@ -80,27 +91,29 @@ export default function CounselorSessions() {
               <Text style={[styles.date, { color: colors.mutedForeground }]}>{new Date((item as any).createdAt).toLocaleDateString()}</Text>
               <View style={styles.actions}>
                 {(item as any).status === "requested" && (
-                  <TouchableOpacity
-                    style={[styles.actionBtn, { backgroundColor: colors.primary, borderRadius: colors.radius }]}
+                  <AnimatedButton
+                    label="Accept"
                     onPress={() => handleAccept((item as any).id)}
-                  >
-                    <Text style={[styles.actionBtnText, { color: colors.primaryForeground }]}>Accept</Text>
-                  </TouchableOpacity>
+                    isLoading={updateSession.isPending}
+                    style={[styles.actionBtn, { backgroundColor: colors.primary, borderRadius: colors.radius }]}
+                    textColor={colors.primaryForeground}
+                  />
                 )}
                 {(item as any).status === "active" && (
                   <>
                     <TouchableOpacity
                       style={[styles.actionBtn, { backgroundColor: colors.secondary, borderRadius: colors.radius }]}
-                      onPress={() => router.push({ pathname: "/(mental-health)/session-detail", params: { sessionId: (item as any).id } })}
+                      onPress={() => router.push({ pathname: "/(mental-health)/session-detail" as any, params: { sessionId: (item as any).id } })}
                     >
                       <Text style={[styles.actionBtnText, { color: colors.primary }]}>Open Chat</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[styles.actionBtn, { backgroundColor: colors.muted, borderRadius: colors.radius }]}
+                    <AnimatedButton
+                      label="Complete"
                       onPress={() => handleComplete((item as any).id)}
-                    >
-                      <Text style={[styles.actionBtnText, { color: colors.foreground }]}>Complete</Text>
-                    </TouchableOpacity>
+                      isLoading={updateSession.isPending}
+                      style={[styles.actionBtn, { backgroundColor: colors.muted, borderRadius: colors.radius }]}
+                      textColor={colors.foreground}
+                    />
                   </>
                 )}
               </View>
@@ -114,7 +127,9 @@ export default function CounselorSessions() {
           }
         />
       )}
+      <ToastContainer position="top" />
     </View>
+    </>
   );
 }
 

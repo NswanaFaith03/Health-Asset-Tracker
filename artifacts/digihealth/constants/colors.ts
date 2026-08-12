@@ -1,29 +1,68 @@
-/**
- * Semantic design tokens for the mobile app.
- */
-
-const colors = {
-  light: {
+export const themePalettes = {
+  zaot: {
     text: "#0f172a",
-    tint: "#0f766e",
-    background: "#f8fafc",
+    tint: "#006b3f",
+    background: "#f0fdf4",
     foreground: "#0f172a",
     card: "#ffffff",
     cardForeground: "#0f172a",
-    primary: "#0f766e",
+    primary: "#006b3f",
     primaryForeground: "#ffffff",
-    secondary: "#f1f5f9",
-    secondaryForeground: "#334155",
-    muted: "#f1f5f9",
-    mutedForeground: "#64748b",
-    accent: "#0d9488",
+    secondary: "#d9f7e6",
+    secondaryForeground: "#065f46",
+    muted: "#d9f7e6",
+    mutedForeground: "#4b5563",
+    accent: "#f59e0b",
     accentForeground: "#ffffff",
     destructive: "#ef4444",
     destructiveForeground: "#ffffff",
-    border: "#e2e8f0",
-    input: "#e2e8f0",
+    border: "#c6f6d5",
+    input: "#d1fae5",
   },
-  radius: 12,
+  ocean: {
+    text: "#0f172a",
+    tint: "#125f7f",
+    background: "#eff6ff",
+    foreground: "#111827",
+    card: "#ffffff",
+    cardForeground: "#111827",
+    primary: "#0f766e",
+    primaryForeground: "#ffffff",
+    secondary: "#dbeafe",
+    secondaryForeground: "#1e3a8a",
+    muted: "#dbeafe",
+    mutedForeground: "#64748b",
+    accent: "#2563eb",
+    accentForeground: "#ffffff",
+    destructive: "#ef4444",
+    destructiveForeground: "#ffffff",
+    border: "#c7d2fe",
+    input: "#e0effe",
+  },
+  sunrise: {
+    text: "#0f172a",
+    tint: "#b45309",
+    background: "#fff7ed",
+    foreground: "#111827",
+    card: "#ffffff",
+    cardForeground: "#111827",
+    primary: "#c2410c",
+    primaryForeground: "#ffffff",
+    secondary: "#fef3c7",
+    secondaryForeground: "#92400e",
+    muted: "#fef3c7",
+    mutedForeground: "#6b7280",
+    accent: "#ea580c",
+    accentForeground: "#ffffff",
+    destructive: "#dc2626",
+    destructiveForeground: "#ffffff",
+    border: "#fde68a",
+    input: "#feedd8",
+  },
 };
 
-export default colors;
+export const defaultThemeKey = "zaot";
+export type ThemeKey = keyof typeof themePalettes;
+export const radius = 12;
+
+export default themePalettes[defaultThemeKey];

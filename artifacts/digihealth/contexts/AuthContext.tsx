@@ -19,19 +19,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Provide the auth token to the API client
   useEffect(() => {
-    // Set token getter for API client
-    setAuthTokenGetter(() => {
-      let currentToken = null;
-      // We can't await inside the getter, so we return the token in state
-      // but ideally we should fetch from storage synchronously or rely on state.
-      // Since it's a sync getter, we'll capture a ref or use the closure.
-      return token; 
-    });
-  }, []);
-
-  useEffect(() => {
-    // Update getter when token changes
     setAuthTokenGetter(() => token);
   }, [token]);
 

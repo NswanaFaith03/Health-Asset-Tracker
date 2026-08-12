@@ -1064,7 +1064,7 @@ components:
 
     UserRole:
       type: string
-      enum: [student, doctor, pharmacist, lab_technician, mental_health_counselor, hiv_professional, admin]
+      enum: [student, doctor, pharmacist, lab_technician, nurse, mental_health_counselor, hiv_professional, admin]
 
     UserStatus:
       type: string

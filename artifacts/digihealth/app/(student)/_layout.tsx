@@ -22,7 +22,7 @@ export default function StudentTabLayout() {
       />
       <Tabs.Screen
         name="prescriptions"
-        options={{ title: "Rx", tabBarIcon: ({ color }) => <Feather name="clipboard" size={ICON_SIZE} color={color} /> }}
+        options={{ title: "Meds", tabBarIcon: ({ color }) => <Feather name="clipboard" size={ICON_SIZE} color={color} /> }}
       />
       <Tabs.Screen
         name="lab"

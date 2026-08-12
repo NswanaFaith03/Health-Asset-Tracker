@@ -1,15 +1,15 @@
 import React from "react";
 import {
   View, Text, StyleSheet, FlatList, TouchableOpacity,
-  RefreshControl, ActivityIndicator, Alert, StatusBar,
+  RefreshControl, ActivityIndicator, Alert, StatusBar, ImageBackground,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { useQueryClient } from "@tanstack/react-query";
-import * as Haptics from "expo-haptics";
-import { useGetQueue, useCompleteQueueEntry, getGetQueueQueryKey } from "@workspace/api-client-react";
+import { useGetQueue, getGetQueueQueryKey } from "@workspace/api-client-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useColors } from "../../hooks/useColors";
+import { router } from "expo-router";
 
 type FeatherName = React.ComponentProps<typeof Feather>["name"];
 
@@ -26,38 +26,22 @@ export default function DoctorQueue() {
   const queryClient = useQueryClient();
   const { currentUser } = useAuth();
   const { data: queue = [], isLoading, refetch } = useGetQueue({ query: { queryKey: getGetQueueQueryKey() } });
-  const completeEntry = useCompleteQueueEntry();
 
   const firstName = currentUser?.name?.split(" ")[0] ?? "Doctor";
   const nextPatient = (queue as any[])[0];
   const waitingList = (queue as any[]).slice(1);
-
-  const handleComplete = (id: number, name: string) => {
-    Alert.alert(
-      "Complete Visit",
-      `Mark ${name}'s visit as complete?`,
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Complete",
-          style: "default",
-          onPress: async () => {
-            await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-            completeEntry.mutate({ id }, {
-              onSuccess: () => queryClient.invalidateQueries({ queryKey: getGetQueueQueryKey() }),
-            });
-          },
-        },
-      ]
-    );
-  };
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <StatusBar barStyle="light-content" backgroundColor={colors.primary} />
 
       {/* ── Header ── */}
-      <View style={[styles.header, { backgroundColor: colors.primary, paddingTop: insets.top + 20 }]}>
+      <ImageBackground
+        source={require("../../assets/images/doctor.jpg")}
+        style={[styles.header, { paddingTop: insets.top + 20 }]}
+        imageStyle={styles.headerImage}
+      >
+        <View style={styles.headerOverlay} />
         <View style={styles.headerRow}>
           <View>
             <Text style={styles.headerGreeting}>Welcome back</Text>
@@ -79,7 +63,7 @@ export default function DoctorQueue() {
             <Text style={styles.summaryLabel}>Next Wait</Text>
           </View>
         </View>
-      </View>
+      </ImageBackground>
 
       {isLoading ? (
         <View style={styles.center}><ActivityIndicator size="large" color={colors.primary} /></View>
@@ -119,11 +103,11 @@ export default function DoctorQueue() {
                   </View>
                   <TouchableOpacity
                     style={[styles.callBtn, { backgroundColor: colors.primary }]}
-                    onPress={() => handleComplete((nextPatient as any).id, (nextPatient as any).student?.name ?? "Patient")}
+                    onPress={() => router.push({ pathname: "/(doctor)/consultation-detail", params: { id: String((nextPatient as any).consultation?.id) } })}
                     activeOpacity={0.85}
                   >
-                    <Feather name="check-circle" size={18} color="#fff" />
-                    <Text style={styles.callBtnText}>Complete Visit</Text>
+                    <Feather name="eye" size={18} color="#fff" />
+                    <Text style={styles.callBtnText}>View Consultation</Text>
                   </TouchableOpacity>
                 </View>
 
@@ -181,7 +165,12 @@ export default function DoctorQueue() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
-  header: { paddingHorizontal: 20, paddingBottom: 20 },
+  header: { paddingHorizontal: 20, paddingBottom: 20, position: "relative", backgroundColor: "#0f766e" },
+  headerImage: { opacity: 0.28, resizeMode: "cover" },
+  headerOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(15, 118, 110, 0.82)",
+  },
   headerRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 },
   headerGreeting: { color: "rgba(255,255,255,0.72)", fontSize: 13, marginBottom: 2 },
   headerName: { color: "#fff", fontSize: 22, fontWeight: "800" },

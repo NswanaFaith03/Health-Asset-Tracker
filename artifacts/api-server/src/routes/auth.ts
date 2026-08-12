@@ -1,7 +1,7 @@
 import { Router } from "express";
 import bcrypt from "bcryptjs";
 import { db, usersTable } from "@workspace/db";
-import { eq } from "drizzle-orm";
+import { eq, ilike } from "drizzle-orm";
 import { requireAuth, signToken } from "../middlewares/auth";
 import { logAudit } from "../lib/audit";
 
@@ -20,7 +20,8 @@ router.post("/auth/register", async (req, res) => {
     });
     return;
   }
-  const existing = await db.select().from(usersTable).where(eq(usersTable.email, email)).limit(1);
+  const normalizedEmail = email.toLowerCase().trim();
+  const existing = await db.select().from(usersTable).where(ilike(usersTable.email, normalizedEmail)).limit(1);
   if (existing.length > 0) {
     res.status(400).json({ error: "conflict", message: "Email already registered" });
     return;
@@ -28,7 +29,7 @@ router.post("/auth/register", async (req, res) => {
   const passwordHash = await bcrypt.hash(password, 10);
   const [user] = await db.insert(usersTable).values({
     name,
-    email,
+    email: normalizedEmail,
     passwordHash,
     role,
     studentNumber: studentNumber ?? null,
@@ -56,7 +57,8 @@ router.post("/admin/users", requireAuth, async (req, res) => {
     return;
   }
 
-  const existing = await db.select().from(usersTable).where(eq(usersTable.email, email)).limit(1);
+  const normalizedEmail = email.toLowerCase().trim();
+  const existing = await db.select().from(usersTable).where(ilike(usersTable.email, normalizedEmail)).limit(1);
   if (existing.length > 0) {
     res.status(400).json({ error: "conflict", message: "Email already registered" });
     return;
@@ -65,7 +67,7 @@ router.post("/admin/users", requireAuth, async (req, res) => {
   const passwordHash = await bcrypt.hash(password, 10);
   const [user] = await db.insert(usersTable).values({
     name,
-    email,
+    email: normalizedEmail,
     passwordHash,
     role,
     studentNumber: role === "student" ? (studentNumber ?? null) : null,
@@ -85,7 +87,8 @@ router.post("/auth/login", async (req, res) => {
     res.status(400).json({ error: "validation", message: "email and password are required" });
     return;
   }
-  const [user] = await db.select().from(usersTable).where(eq(usersTable.email, email)).limit(1);
+  const normalizedEmail = email.toLowerCase().trim();
+  const [user] = await db.select().from(usersTable).where(ilike(usersTable.email, normalizedEmail)).limit(1);
   if (!user) {
     res.status(401).json({ error: "unauthorized", message: "Invalid credentials" });
     return;

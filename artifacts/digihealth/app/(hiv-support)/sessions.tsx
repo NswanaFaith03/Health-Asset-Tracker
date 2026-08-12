@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, RefreshControl, ActivityIndicator, Alert } from "react-native";
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, RefreshControl, ActivityIndicator, ImageBackground } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { useQueryClient } from "@tanstack/react-query";
@@ -7,6 +7,7 @@ import { router } from "expo-router";
 import { useListHivSupportSessions, useUpdateHivSupportSession, getListHivSupportSessionsQueryKey } from "@workspace/api-client-react";
 import { FeatureActionGrid } from "@/components/FeatureActionGrid";
 import { useColors } from "../../hooks/useColors";
+import { Toast, ToastContainer } from "../../components/Toast";
 
 const STATUS_COLORS: Record<string, string> = {
   requested: "#f59e0b", active: "#10b981", completed: "#6b7280", cancelled: "#ef4444",
@@ -27,30 +28,45 @@ export default function HivSessions() {
   ];
 
   const handleAccept = (id: number) => {
-    Alert.alert("Accept", "Accept this HIV/AIDS support session?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Accept",
-        onPress: () => updateSession.mutate(
-          { id, data: { status: "active" } },
-          { onSuccess: () => queryClient.invalidateQueries({ queryKey: getListHivSupportSessionsQueryKey() }) }
-        )
+    Toast.info("Accepting session...");
+    updateSession.mutate(
+      { id, data: { status: "active" } },
+      { 
+        onSuccess: () => {
+          Toast.success("Session accepted");
+          queryClient.invalidateQueries({ queryKey: getListHivSupportSessionsQueryKey() });
+        },
+        onError: (err: any) => Toast.error(err?.message || "Failed to accept session")
       }
-    ]);
+    );
   };
 
   const handleComplete = (id: number) => {
+    Toast.info("Completing session...");
     updateSession.mutate(
       { id, data: { status: "completed" } },
-      { onSuccess: () => queryClient.invalidateQueries({ queryKey: getListHivSupportSessionsQueryKey() }) }
+      { 
+        onSuccess: () => {
+          Toast.success("Session completed");
+          queryClient.invalidateQueries({ queryKey: getListHivSupportSessionsQueryKey() });
+        },
+        onError: (err: any) => Toast.error(err?.message || "Failed to complete session")
+      }
     );
   };
 
   return (
+    <>
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
-        <Text style={[styles.title, { color: colors.foreground }]}>Support Sessions</Text>
-      </View>
+      <ImageBackground
+        source={require("../../assets/images/Couseling background.jpeg")}
+        style={[styles.header, { paddingTop: insets.top + 16 }]}
+        imageStyle={styles.headerImage}
+      >
+        <View style={styles.headerOverlay} />
+        <Text style={styles.title}>Support Sessions</Text>
+        <Text style={styles.subTitle}>HIV & AIDS Counseling Center</Text>
+      </ImageBackground>
       <FeatureActionGrid actions={actions} />
       {isLoading ? (
         <View style={styles.center}><ActivityIndicator size="large" color={colors.primary} /></View>
@@ -92,12 +108,20 @@ export default function HivSessions() {
                   </TouchableOpacity>
                 )}
                 {(item as any).status === "active" && (
-                  <TouchableOpacity
-                    style={[styles.actionBtn, { backgroundColor: colors.muted, borderRadius: colors.radius }]}
-                    onPress={() => handleComplete((item as any).id)}
-                  >
-                    <Text style={[styles.actionBtnText, { color: colors.foreground }]}>Complete</Text>
-                  </TouchableOpacity>
+                  <>
+                    <TouchableOpacity
+                      style={[styles.actionBtn, { backgroundColor: colors.secondary, borderRadius: colors.radius }]}
+                      onPress={() => router.push({ pathname: "/(hiv-support)/session-detail" as any, params: { sessionId: (item as any).id, studentName: (item as any).student?.name ?? "Patient", topic: (item as any).topic, status: (item as any).status } })}
+                    >
+                      <Text style={[styles.actionBtnText, { color: colors.primary }]}>Open Chat</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.actionBtn, { backgroundColor: colors.muted, borderRadius: colors.radius }]}
+                      onPress={() => handleComplete((item as any).id)}
+                    >
+                      <Text style={[styles.actionBtnText, { color: colors.foreground }]}>Complete</Text>
+                    </TouchableOpacity>
+                  </>
                 )}
               </View>
             </View>
@@ -110,14 +134,22 @@ export default function HivSessions() {
           }
         />
       )}
+      <ToastContainer position="top" />
     </View>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  header: { paddingHorizontal: 16, paddingBottom: 12 },
-  title: { fontSize: 24, fontWeight: "700" },
+  header: { paddingHorizontal: 16, paddingBottom: 20, position: "relative", backgroundColor: "#0f766e" },
+  headerImage: { opacity: 0.35, resizeMode: "cover" },
+  headerOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(15, 118, 110, 0.78)",
+  },
+  title: { fontSize: 24, fontWeight: "800", color: "#fff", zIndex: 2 },
+  subTitle: { fontSize: 13, color: "rgba(255,255,255,0.85)", marginTop: 2, zIndex: 2 },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
   card: { borderRadius: 12, borderWidth: 1, padding: 14, marginBottom: 10, gap: 8 },
   cardTop: { flexDirection: "row", alignItems: "center", gap: 10 },
