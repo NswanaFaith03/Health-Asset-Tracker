@@ -10,6 +10,7 @@ import { useListConsultations, getListConsultationsQueryKey } from "@workspace/a
 import { FeatureActionGrid } from "@/components/FeatureActionGrid";
 import { useColors } from "../../hooks/useColors";
 import { SCREEN_IMAGES } from "@/constants/hospitalImages";
+import ScreenHeader from "@/components/ScreenHeader";
 
 type FeatherName = React.ComponentProps<typeof Feather>["name"];
 
@@ -55,18 +56,11 @@ export default function DoctorConsultations() {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <StatusBar barStyle="dark-content" />
 
-      {/* ── Header ── */}
-      <ImageBackground
-        source={{ uri: SCREEN_IMAGES.doctor.consultations }}
-        style={[styles.heroHeader, { paddingTop: insets.top + 16 }]}
-        imageStyle={styles.headerImage}
-      >
-        <View style={styles.headerOverlay} />
-        <Text style={[styles.title, { color: "#000000" }]}>Doctor Consultations</Text>
-        <Text style={[styles.subtitle, { color: \"#666666\" }]}>
-          {(consultations as any[]).length} total · {(consultations as any[]).filter((c: any) => c.status === "submitted" || c.status === "under_review").length} pending
-        </Text>
-      </ImageBackground>
+      <ScreenHeader
+        imageUri={SCREEN_IMAGES.doctor.consultations}
+        title="Doctor Consultations"
+        subtitle={`${(consultations as any[]).length} total · ${(consultations as any[]).filter((c: any) => c.status === "submitted" || c.status === "under_review").length} pending`}
+      />
 
       <View style={[styles.header, { paddingTop: 12, backgroundColor: colors.background }]}>
 

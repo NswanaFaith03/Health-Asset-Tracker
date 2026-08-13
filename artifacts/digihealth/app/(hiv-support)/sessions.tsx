@@ -8,6 +8,8 @@ import { useListHivSupportSessions, useUpdateHivSupportSession, getListHivSuppor
 import { FeatureActionGrid } from "@/components/FeatureActionGrid";
 import { useColors } from "../../hooks/useColors";
 import { Toast, ToastContainer } from "../../components/Toast";
+import { SCREEN_IMAGES } from "@/constants/hospitalImages";
+import ScreenHeader from "@/components/ScreenHeader";
 
 const STATUS_COLORS: Record<string, string> = {
   requested: "#f59e0b", active: "#10b981", completed: "#6b7280", cancelled: "#ef4444",
@@ -58,15 +60,11 @@ export default function HivSessions() {
   return (
     <>
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <ImageBackground
-        source={require("../../assets/images/Couseling background.jpeg")}
-        style={[styles.header, { paddingTop: insets.top + 16 }]}
-        imageStyle={styles.headerImage}
-      >
-        <View style={styles.headerOverlay} />
-        <Text style={styles.title}>Support Sessions</Text>
-        <Text style={styles.subTitle}>HIV & AIDS Counseling Center</Text>
-      </ImageBackground>
+      <ScreenHeader
+        imageUri={SCREEN_IMAGES.support.counseling}
+        title="Support Sessions"
+        subtitle="HIV & AIDS Counseling Center"
+      />
       <FeatureActionGrid actions={actions} />
       {isLoading ? (
         <View style={styles.center}><ActivityIndicator size="large" color={colors.primary} /></View>

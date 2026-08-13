@@ -6,6 +6,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useListLabRequests, useUpdateLabRequestStatus, getListLabRequestsQueryKey } from "@workspace/api-client-react";
 import { useColors } from "../../hooks/useColors";
 import { Toast, ToastContainer } from "../../components/Toast";
+import { SCREEN_IMAGES } from "@/constants/hospitalImages";
+import ScreenHeader from "@/components/ScreenHeader";
 import { AnimatedButton } from "../../components/AnimatedButton";
 
 const STATUS_COLORS: Record<string, string> = {
@@ -50,17 +52,10 @@ export default function NurseLabRequests() {
   return (
     <>
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <ImageBackground
-        source={require("../../assets/images/nursing_students.jpg")}
-        style={[styles.header, { paddingTop: insets.top + 16 }]}
-        imageStyle={styles.headerImage}
-      >
-        <View style={styles.headerOverlay} />
-        <Text style={[styles.title, { color: "#000000" }]}>Lab Requests</Text>
-        <TouchableOpacity onPress={() => refetch()}>
-          <Feather name="refresh-cw" size={20} color="#111827" />
-        </TouchableOpacity>
-      </ImageBackground>
+      <ScreenHeader
+        imageUri={SCREEN_IMAGES.nurse.labRequests}
+        title="Lab Requests"
+      />
 
       {isLoading ? (
         <View style={styles.center}>

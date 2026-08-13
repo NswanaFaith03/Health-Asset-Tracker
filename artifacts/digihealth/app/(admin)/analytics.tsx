@@ -7,6 +7,7 @@ import { useGetAdminAnalytics, getGetAdminAnalyticsQueryKey } from "@workspace/a
 import { FeatureActionGrid } from "@/components/FeatureActionGrid";
 import { useColors } from "../../hooks/useColors";
 import { SCREEN_IMAGES } from "@/constants/hospitalImages";
+import ScreenHeader from "@/components/ScreenHeader";
 
 const STAT_CARDS = [
   { key: "totalUsers", label: "Total Users", icon: "users" },
@@ -35,15 +36,11 @@ export default function AdminAnalytics() {
       contentContainerStyle={{ paddingBottom: insets.bottom + 84 }}
       refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} />}
     >
-      <ImageBackground
-        source={{ uri: SCREEN_IMAGES.admin.analytics }}
-        style={[styles.header, { paddingTop: insets.top + 20 }]}
-        imageStyle={styles.headerImage}
-      >
-        <View style={styles.headerOverlay} />
-        <Text style={styles.title}>System Analytics</Text>
-        <Text style={styles.subTitle}>UNZA Campus Health Overview</Text>
-      </ImageBackground>
+      <ScreenHeader
+        imageUri={SCREEN_IMAGES.admin.analytics}
+        title="System Analytics"
+        subtitle="UNZA Campus Health Overview"
+      />
 
       <View style={{ paddingHorizontal: 16, paddingTop: 16 }}>
         <FeatureActionGrid actions={actions} />

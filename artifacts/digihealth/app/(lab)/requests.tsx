@@ -8,6 +8,7 @@ import { useListLabRequests, useUpdateLabRequestStatus, useUploadLabResult, getL
 import { FeatureActionGrid } from "@/components/FeatureActionGrid";
 import { useColors } from "../../hooks/useColors";
 import { SCREEN_IMAGES } from "@/constants/hospitalImages";
+import ScreenHeader from "@/components/ScreenHeader";
 
 const STATUS_COLORS: Record<string, string> = {
   pending: "#f59e0b", in_progress: "#3b82f6", completed: "#10b981", cancelled: "#ef4444",
@@ -62,14 +63,10 @@ export default function LabRequests() {
       >
         <View style={styles.headerOverlay} />
         <Text style={[styles.title, { color: "#000000", position: "relative", zIndex: 1 }]}>Lab Requests</Text>
-      </ImageBackground>
-      <FeatureActionGrid actions={actions} />
-      {isLoading ? (
-        <View style={styles.center}><ActivityIndicator size="large" color={colors.primary} /></View>
-      ) : (
-        <FlatList
-          data={requests ?? []}
-          keyExtractor={(item) => String((item as any).id)}
+      <ScreenHeader
+        imageUri={SCREEN_IMAGES.lab.requests}
+        title="Lab Requests"
+      />
           contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: insets.bottom + 84, paddingTop: 8 }}
           refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} />}
           renderItem={({ item }) => (
