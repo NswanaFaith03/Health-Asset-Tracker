@@ -164,54 +164,21 @@ export default function DoctorConsultationDetail() {
         </ScrollView>
       )}
 
-          </View>
-          {[
-            { label: "Medication", value: medication, setter: setMedication, placeholder: "e.g. Amoxicillin 500mg" },
-            { label: "Dosage", value: dosage, setter: setDosage, placeholder: "e.g. 1 tablet 3x daily" },
-            { label: "Instructions", value: instructions, setter: setInstructions, placeholder: "e.g. Take with food" },
-          ].map(({ label, value, setter, placeholder }) => (
-            <View key={label}>
-              <Text style={[styles.label, { color: colors.foreground }]}>{label}</Text>
-              <TextInput
-                style={[styles.input, { borderColor: colors.border, color: colors.foreground, backgroundColor: colors.card, marginBottom: 12 }]}
-                placeholder={placeholder}
-                placeholderTextColor={colors.mutedForeground}
-                value={value}
-                onChangeText={setter}
-              />
-            </View>
-          ))}
-          <TouchableOpacity style={[styles.btn, { backgroundColor: colors.primary, borderRadius: colors.radius }]} onPress={handlePrescription}>
-            <Text style={[styles.btnText, { color: colors.primaryForeground }]}>
-              {createPrescription.isPending ? "Issuing..." : "Issue Prescription"}
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
+      <PrescriptionModal
+        visible={showPrescriptionModal}
+        onClose={() => setShowPrescriptionModal(false)}
+        patientId={c.student?.id ?? 0}
+        consultationId={consultationId}
+        paddingTop={insets.top + 20}
+      />
 
-      <Modal visible={showLabModal} animationType="slide" presentationStyle="pageSheet">
-        <View style={[styles.modal, { backgroundColor: colors.background, paddingTop: insets.top + 20 }]}>
-          <View style={styles.modalHeader}>
-            <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Request Lab Test</Text>
-            <TouchableOpacity onPress={() => setShowLabModal(false)}>
-              <Feather name="x" size={24} color={colors.foreground} />
-            </TouchableOpacity>
-          </View>
-          <Text style={[styles.label, { color: colors.foreground }]}>Test Type</Text>
-          <TextInput
-            style={[styles.input, { borderColor: colors.border, color: colors.foreground, backgroundColor: colors.card }]}
-            placeholder="e.g. Blood Count, Malaria, HIV Test..."
-            placeholderTextColor={colors.mutedForeground}
-            value={testType}
-            onChangeText={setTestType}
-          />
-          <TouchableOpacity style={[styles.btn, { backgroundColor: colors.primary, borderRadius: colors.radius, marginTop: 16 }]} onPress={handleLabRequest}>
-            <Text style={[styles.btnText, { color: colors.primaryForeground }]}>
-              {createLabRequest.isPending ? "Creating..." : "Create Lab Request"}
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
+      <LabRequestModal
+        visible={showLabModal}
+        onClose={() => setShowLabModal(false)}
+        patientId={c.student?.id ?? 0}
+        consultationId={consultationId}
+        paddingTop={insets.top + 20}
+      />
     </View>
   );
 }

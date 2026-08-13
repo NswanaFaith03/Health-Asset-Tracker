@@ -59,10 +59,10 @@ export default function LoginScreen() {
   return (
     <>
       <KeyboardAvoidingView
-        style={{ flex: 1, backgroundColor: colors.primary }}
+        style={{ flex: 1, backgroundColor: "#ffffff" }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-      <StatusBar barStyle="light-content" backgroundColor={colors.primary} />
+      <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
       <ScrollView
         contentContainerStyle={{ flexGrow: 1 }}
         keyboardShouldPersistTaps="handled"
@@ -149,10 +149,10 @@ export default function LoginScreen() {
 
 const styles = StyleSheet.create({
   hero: { alignItems: "center", paddingBottom: 40, paddingHorizontal: 24, position: "relative" },
-  heroImage: { opacity: 0.22 },
+  heroImage: { opacity: 0.12 },
   heroOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(15, 118, 110, 0.88)",
+    backgroundColor: "rgba(255, 255, 255, 0.4)",
   },
   heroContent: { alignItems: "center", position: "relative", zIndex: 1 },
   logoCircle: {
@@ -161,10 +161,10 @@ const styles = StyleSheet.create({
     marginBottom: 16, shadowColor: "#000", shadowOpacity: 0.12, shadowRadius: 12, shadowOffset: { width: 0, height: 4 },
   },
   logoImage: { width: 54, height: 54 },
-  heroTitle: { fontSize: 26, fontWeight: "800", color: "#fff", marginBottom: 6 },
-  heroSub: { fontSize: 13, color: "rgba(255,255,255,0.75)", textAlign: "center" },
+  heroTitle: { fontSize: 26, fontWeight: "800", color: "#000000", marginBottom: 6 },
+  heroSub: { fontSize: 13, color: "#666666", textAlign: "center" },
   card: { paddingHorizontal: 24, paddingTop: 32 },
-  cardTitle: { fontSize: 22, fontWeight: "800", marginBottom: 4 },
+  cardTitle: { fontSize: 22, fontWeight: "800", marginBottom: 4, color: "#000000" },
   cardSub: { fontSize: 13, marginBottom: 24, lineHeight: 18 },
   chipRow: { flexDirection: "row", gap: 8, marginBottom: 24 },
   chip: { flexDirection: "row", alignItems: "center", gap: 5, borderWidth: 1, borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5 },
@@ -179,6 +179,6 @@ const styles = StyleSheet.create({
     height: 52, borderRadius: 14, justifyContent: "center", alignItems: "center", marginTop: 8, marginBottom: 24,
   },
   btnInner: { flexDirection: "row", alignItems: "center", gap: 8 },
-  btnText: { color: "#fff", fontSize: 16, fontWeight: "700" },
+  btnText: { color: "#ffffff", fontSize: 16, fontWeight: "700" },
   footer: { flexDirection: "row", justifyContent: "center" },
 });

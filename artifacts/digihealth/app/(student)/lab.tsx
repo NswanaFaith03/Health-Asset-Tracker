@@ -26,7 +26,7 @@ export default function StudentLab() {
         imageStyle={styles.headerImage}
       >
         <View style={styles.headerOverlay} />
-        <Text style={[styles.title, { color: "#fff", position: "relative", zIndex: 1 }]}>Lab Tests</Text>
+        <Text style={[styles.title, { color: "#000000", position: "relative", zIndex: 1 }]}>Lab Tests</Text>
       </ImageBackground>
       {isLoading ? (
         <View style={styles.center}><ActivityIndicator size="large" color={colors.primary} /></View>
@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   heroHeader: { paddingHorizontal: 16, paddingBottom: 16, position: "relative", minHeight: 120, justifyContent: "flex-end" },
   headerImage: { opacity: 0.35, resizeMode: "cover" },
-  headerOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: "rgba(124, 58, 237, 0.65)" },
+  headerOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: "transparent" },
   header: { paddingHorizontal: 16, paddingBottom: 12 },
   title: { fontSize: 24, fontWeight: "700", position: "relative", zIndex: 1 },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },

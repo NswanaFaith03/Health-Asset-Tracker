@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   header: { paddingHorizontal: 16, paddingBottom: 18, minHeight: 140, justifyContent: "flex-end" },
   headerImage: { opacity: 0.2 },
-  headerOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: "rgba(236, 72, 153, 0.82)" },
+  headerOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: "transparent" },
   headerContent: { position: "relative", zIndex: 1 },
   kicker: { color: "rgba(255,255,255,0.85)", fontSize: 12, fontWeight: "700", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 4 },
   title: { fontSize: 24, fontWeight: "800", color: "#fff" },

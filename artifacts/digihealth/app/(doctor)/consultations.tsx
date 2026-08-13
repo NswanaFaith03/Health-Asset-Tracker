@@ -53,7 +53,7 @@ export default function DoctorConsultations() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <StatusBar barStyle="light-content" />
+      <StatusBar barStyle="dark-content" />
 
       {/* ── Header ── */}
       <ImageBackground
@@ -62,8 +62,8 @@ export default function DoctorConsultations() {
         imageStyle={styles.headerImage}
       >
         <View style={styles.headerOverlay} />
-        <Text style={[styles.title, { color: "#fff" }]}>Doctor Consultations</Text>
-        <Text style={[styles.subtitle, { color: "rgba(255,255,255,0.9)" }]}>
+        <Text style={[styles.title, { color: "#000000" }]}>Doctor Consultations</Text>
+        <Text style={[styles.subtitle, { color: \"#666666\" }]}>
           {(consultations as any[]).length} total · {(consultations as any[]).filter((c: any) => c.status === "submitted" || c.status === "under_review").length} pending
         </Text>
       </ImageBackground>
@@ -157,10 +157,10 @@ const styles = StyleSheet.create({
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
   heroHeader: { paddingHorizontal: 16, paddingBottom: 16, position: "relative", minHeight: 140, justifyContent: "flex-end" },
   headerImage: { opacity: 0.35, resizeMode: "cover" },
-  headerOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: "rgba(15, 118, 110, 0.65)" },
+  headerOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: "transparent" },
   header: { paddingHorizontal: 16, paddingBottom: 12 },
-  title: { fontSize: 26, fontWeight: "800", marginBottom: 2, position: "relative", zIndex: 1, color: "#fff" },
-  subtitle: { fontSize: 13, marginBottom: 14, position: "relative", zIndex: 1, color: "rgba(255,255,255,0.9)" },
+  title: { fontSize: 26, fontWeight: "800", marginBottom: 2, position: "relative", zIndex: 1, color: "#000000" },
+  subtitle: { fontSize: 13, marginBottom: 14, position: "relative", zIndex: 1, color: "#666666" },
   searchBar: { flexDirection: "row", alignItems: "center", gap: 8, borderWidth: 1, borderRadius: 10, paddingHorizontal: 12, height: 42 },
   searchInput: { flex: 1, fontSize: 14 },
   card: { borderRadius: 12, borderWidth: 1, padding: 14, marginBottom: 10, gap: 10 },

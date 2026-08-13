@@ -10,7 +10,7 @@ interface UseSessionDetailOptions {
   /** API prefix, e.g. "/api/hiv-support" or "/api/mental-health" */
   apiPrefix: string;
   /** Query key to invalidate when session is updated. */
-  listQueryKey: unknown[];
+  listQueryKey: ReadonlyArray<unknown>;
 }
 
 /**

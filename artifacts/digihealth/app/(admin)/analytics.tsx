@@ -78,8 +78,9 @@ export default function AdminAnalytics() {
               ))}
             </View>
           )}
-        </View>
-      ) : null}
+          </>
+        ) : null}
+      </View>
     </ScrollView>
   );
 }

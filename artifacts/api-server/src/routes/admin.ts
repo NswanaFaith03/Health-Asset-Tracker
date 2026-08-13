@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { db, usersTable, consultationsTable, prescriptionsTable, labRequestsTable, mentalHealthSessionsTable, auditLogsTable, queueTable } from "@workspace/db";
-import { count, sql, desc } from "drizzle-orm";
+import { db, usersTable, consultationsTable, prescriptionsTable, labRequestsTable, mentalHealthSessionsTable, auditLogsTable, queueTable, appSettingsTable } from "@workspace/db";
+import { count, sql, desc, eq } from "drizzle-orm";
 import { requireAuth, requireRole } from "../middlewares/auth";
 
 const router = Router();
@@ -54,6 +54,35 @@ router.get("/admin/audit-logs", requireAuth, requireRole("admin"), async (req, r
     .orderBy(desc(auditLogsTable.createdAt))
     .limit(limit);
   res.json(rows);
+});
+
+router.get("/admin/emergency-phone", requireAuth, requireRole("admin"), async (req, res) => {
+  try {
+    const [setting] = await db.select().from(appSettingsTable).where(eq(appSettingsTable.key, "emergency_phone"));
+    res.json({ emergencyNumber: setting?.value || "" });
+  } catch (err) {
+    console.error("Error fetching emergency phone", err);
+    res.status(500).json({ error: "Failed to fetch emergency phone" });
+  }
+});
+
+router.put("/admin/emergency-phone", requireAuth, requireRole("admin"), async (req, res) => {
+  const { emergencyNumber } = req.body;
+  if (!emergencyNumber || typeof emergencyNumber !== "string") {
+    return res.status(400).json({ error: "Invalid emergencyNumber" });
+  }
+  try {
+    const [existing] = await db.select().from(appSettingsTable).where(eq(appSettingsTable.key, "emergency_phone"));
+    if (existing) {
+      await db.update(appSettingsTable).set({ value: emergencyNumber }).where(eq(appSettingsTable.key, "emergency_phone"));
+    } else {
+      await db.insert(appSettingsTable).values({ key: "emergency_phone", value: emergencyNumber });
+    }
+    res.json({ emergencyNumber });
+  } catch (err) {
+    console.error("Error saving emergency phone", err);
+    res.status(500).json({ error: "Failed to save emergency phone" });
+  }
 });
 
 export default router;
