@@ -8,6 +8,7 @@ import {
   View, Text, StyleSheet, ScrollView, RefreshControl,
   TouchableOpacity, StatusBar, ImageBackground, ActivityIndicator,
 } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { useGetStudentDashboard, getGetStudentDashboardQueryKey } from "@workspace/api-client-react";
@@ -19,12 +20,12 @@ import { router } from "expo-router";
 type FeatherName = React.ComponentProps<typeof Feather>["name"];
 
 const FEATURES: { label: string; icon: FeatherName; route: string; color: string }[] = [
-  { label: "New Consultation",  icon: "plus-circle",  route: "/(student)/new-consultation", color: "#6b7280" },
-  { label: "Queue",             icon: "users",        route: "/(student)/queue",            color: "#0d9488" },
-  { label: "Prescriptions",     icon: "clipboard",   route: "/(student)/prescriptions",    color: "#0369a1" },
+  { label: "New Consultation",  icon: "plus-circle",  route: "/(student)/new-consultation", color: "#4f46e5" },
+  { label: "Queue",             icon: "users",        route: "/(student)/queue",            color: "#0891b2" },
+  { label: "Prescriptions",     icon: "clipboard",   route: "/(student)/prescriptions",    color: "#2563eb" },
   { label: "Lab Results",       icon: "thermometer", route: "/(student)/lab",              color: "#7c3aed" },
-  { label: "Mental Buddy",      icon: "smile",       route: "/(student)/mental-buddy",     color: "#db2777" },
-  { label: "HIV/AIDS Support",  icon: "shield",      route: "/(student)/hiv-aids",         color: "#d97706" },
+  { label: "Mental Buddy",      icon: "smile",       route: "/(student)/mental-buddy",     color: "#ec4899" },
+  { label: "HIV/AIDS Support",  icon: "shield",      route: "/(student)/hiv-aids",         color: "#f97316" },
 ];
 
 export default function StudentHome() {
@@ -40,8 +41,8 @@ export default function StudentHome() {
   const firstName = currentUser?.name?.split(" ")[0] ?? "there";
 
   const stats = [
-    { label: "Consultations",   value: dashboard?.activeConsultations ?? 0,   icon: "activity" as FeatherName,    color: "#6b7280" },
-    { label: "Pending Rx",      value: dashboard?.pendingPrescriptions ?? 0,   icon: "clipboard" as FeatherName,   color: "#0369a1" },
+    { label: "Consultations",   value: dashboard?.activeConsultations ?? 0,   icon: "activity" as FeatherName,    color: "#4f46e5" },
+    { label: "Pending Rx",      value: dashboard?.pendingPrescriptions ?? 0,   icon: "clipboard" as FeatherName,   color: "#2563eb" },
     { label: "Lab Results",     value: dashboard?.pendingLabResults ?? 0,      icon: "thermometer" as FeatherName, color: "#7c3aed" },
   ];
 
@@ -59,7 +60,10 @@ export default function StudentHome() {
         style={[styles.header, { paddingTop: insets.top + 20 }]}
         imageStyle={styles.headerImage}
       >
-        <View style={styles.headerOverlay} />
+        <LinearGradient
+          colors={["rgba(79, 70, 229, 0.75)", "rgba(147, 51, 234, 0.75)"]}
+          style={styles.headerGradient}
+        />
         <View style={styles.headerInner}>
           <View style={styles.headerRow}>
           <View>
@@ -81,7 +85,7 @@ export default function StudentHome() {
 
         {/* Queue status */}
         {dashboard?.queuePosition && (
-          <View style={[styles.queueBanner, { backgroundColor: colors.card, borderColor: colors.border }]}> 
+          <View style={[styles.queueBanner, { backgroundColor: colors.card, borderColor: colors.border, shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.15, shadowRadius: 12, elevation: 8 }]}> 
             <View style={[styles.queueCircle, { borderColor: colors.primary }]}> 
               <Text style={[styles.queueNumber, { color: colors.primary }]}>{dashboard.queuePosition.queueNumber}</Text>
             </View>
@@ -103,8 +107,8 @@ export default function StudentHome() {
         {/* ── Stats row ── */}
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.statsRow}>
           {stats.map((s) => (
-            <View key={s.label} style={[styles.statCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-              <View style={[styles.statIcon, { backgroundColor: s.color + "18" }]}>
+            <View key={s.label} style={[styles.statCard, { backgroundColor: colors.card, borderColor: colors.border, shadowColor: s.color, shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.15, shadowRadius: 8, elevation: 4 }]}>
+              <View style={[styles.statIcon, { backgroundColor: s.color + "20" }]}>
                 <Feather name={s.icon} size={18} color={s.color} />
               </View>
               <Text style={[styles.statValue, { color: colors.foreground }]}>{s.value}</Text>
@@ -119,24 +123,26 @@ export default function StudentHome() {
           {FEATURES.map((f) => (
             <TouchableOpacity
               key={f.label}
-              style={[styles.featureButton, { backgroundColor: colors.card, borderColor: colors.border }]}
+              style={[styles.featureButton, { backgroundColor: colors.card, borderColor: colors.border, shadowColor: f.color, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.12, shadowRadius: 12, elevation: 6 }]}
               onPress={() => router.push(f.route as any)}
               activeOpacity={0.8}
             >
-              <Feather name={f.icon} size={32} color={f.color} />
+              <View style={[styles.featureIconWrapper, { backgroundColor: f.color + "15" }]}>
+                <Feather name={f.icon} size={32} color={f.color} />
+              </View>
               <Text style={[styles.featureLabel, { color: colors.foreground }]}>{f.label}</Text>
             </TouchableOpacity>
           ))}
         </View>
 
-        <View style={[styles.emergencySection, { backgroundColor: colors.secondary, borderColor: colors.border }]}> 
+        <View style={[styles.emergencySection, { backgroundColor: colors.secondary, borderColor: colors.border, shadowColor: colors.accent, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.15, shadowRadius: 12, elevation: 8 }]}> 
           <View style={styles.emergencyHeader}>
             <Feather name="phone-call" size={20} color={colors.accent} />
             <Text style={[styles.emergencyTitle, { color: colors.foreground }]}>Emergency Help</Text>
           </View>
           <Text style={[styles.emergencyText, { color: colors.mutedForeground }]}>If you are in danger or need urgent clinic help, the app will submit your current location before dialing.</Text>
           <TouchableOpacity
-            style={[styles.emergencyButton, { backgroundColor: colors.accent }]}
+            style={[styles.emergencyButton, { backgroundColor: colors.accent, shadowColor: colors.accent, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 12, elevation: 8 }]}
             onPress={handleEmergencyCall}
             disabled={isCalling || isLoadingNumber}
           >
@@ -156,39 +162,42 @@ export default function StudentHome() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   header: { paddingHorizontal: 20, paddingBottom: 24, position: "relative" },
-  headerImage: { opacity: 0.35 },
-  headerOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: "transparent" },
+  headerImage: { opacity: 0.25 },
+  headerGradient: {
+    ...StyleSheet.absoluteFillObject,
+  },
   headerInner: { position: "relative", zIndex: 1 },
   headerRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 },
-  greetingSmall: { color: "rgba(255,255,255,0.75)", fontSize: 13, marginBottom: 2 },
-  greetingName: { color: "#fff", fontSize: 24, fontWeight: "800" },
-  notifBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: "rgba(255,255,255,0.2)", alignItems: "center", justifyContent: "center" },
-  badge: { position: "absolute", top: -2, right: -2, backgroundColor: "#ef4444", borderRadius: 8, minWidth: 16, height: 16, alignItems: "center", justifyContent: "center", paddingHorizontal: 3 },
-  badgeText: { color: "#fff", fontSize: 10, fontWeight: "700" },
-  queueBanner: { borderRadius: 16, padding: 18, flexDirection: "row", alignItems: "center", gap: 16, borderWidth: 1 },
+  greetingSmall: { color: "rgba(255,255,255,0.85)", fontSize: 14, marginBottom: 2 },
+  greetingName: { color: "#fff", fontSize: 26, fontWeight: "800", textShadowColor: "rgba(0,0,0,0.2)", textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 4 },
+  notifBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: "rgba(255,255,255,0.25)", alignItems: "center", justifyContent: "center", shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.15, shadowRadius: 8, elevation: 4 },
+  badge: { position: "absolute", top: -2, right: -2, backgroundColor: "#ef4444", borderRadius: 10, minWidth: 18, height: 18, alignItems: "center", justifyContent: "center", paddingHorizontal: 4, shadowColor: "#ef4444", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.4, shadowRadius: 4, elevation: 4 },
+  badgeText: { color: "#fff", fontSize: 11, fontWeight: "700" },
+  queueBanner: { borderRadius: 18, padding: 18, flexDirection: "row", alignItems: "center", gap: 16, borderWidth: 1 },
   queueLeft: { flexDirection: "row", alignItems: "center", gap: 6 },
-  queueLabel: { fontWeight: "600", fontSize: 13 },
-  queuePos: { fontWeight: "700", fontSize: 16, marginTop: 4 },
-  queueCircle: { width: 68, height: 68, borderRadius: 34, borderWidth: 2, alignItems: "center", justifyContent: "center" },
-  queueNumber: { fontSize: 22, fontWeight: "800" },
+  queueLabel: { fontWeight: "600", fontSize: 14 },
+  queuePos: { fontWeight: "700", fontSize: 17, marginTop: 4 },
+  queueCircle: { width: 72, height: 72, borderRadius: 36, borderWidth: 2.5, alignItems: "center", justifyContent: "center" },
+  queueNumber: { fontSize: 24, fontWeight: "800" },
   queueDetails: { flex: 1 },
   queueInfo: { fontSize: 13, marginTop: 4 },
   body: { paddingHorizontal: 16, paddingTop: 20 },
   statsRow: { gap: 12, paddingBottom: 4, paddingRight: 4 },
-  statCard: { width: 100, padding: 14, borderRadius: 14, borderWidth: 1, alignItems: "center", gap: 6 },
-  statIcon: { width: 38, height: 38, borderRadius: 10, alignItems: "center", justifyContent: "center" },
-  statValue: { fontSize: 22, fontWeight: "800" },
-  statLabel: { fontSize: 11, fontWeight: "500", textAlign: "center" },
-  sectionTitle: { fontSize: 17, fontWeight: "700", marginTop: 24, marginBottom: 14 },
+  statCard: { width: 105, padding: 16, borderRadius: 16, borderWidth: 1, alignItems: "center", gap: 8 },
+  statIcon: { width: 42, height: 42, borderRadius: 12, alignItems: "center", justifyContent: "center" },
+  statValue: { fontSize: 24, fontWeight: "800" },
+  statLabel: { fontSize: 12, fontWeight: "600", textAlign: "center" },
+  sectionTitle: { fontSize: 18, fontWeight: "800", marginTop: 28, marginBottom: 16 },
   featureGrid: { flexDirection: "row", flexWrap: "wrap", gap: 12, justifyContent: "space-between" },
-  featureButton: { width: "48%", minHeight: 120, paddingVertical: 18, borderRadius: 18, borderWidth: 1, alignItems: "center", justifyContent: "center", gap: 10 },
-  featureLabel: { fontSize: 13, fontWeight: "700", textAlign: "center", lineHeight: 18 },
+  featureButton: { width: "48%", minHeight: 130, paddingVertical: 20, borderRadius: 20, borderWidth: 1, alignItems: "center", justifyContent: "center", gap: 12 },
+  featureIconWrapper: { width: 64, height: 64, borderRadius: 32, alignItems: "center", justifyContent: "center", marginBottom: 4 },
+  featureLabel: { fontSize: 14, fontWeight: "700", textAlign: "center", lineHeight: 18 },
   featureDesc: { fontSize: 11, lineHeight: 15 },
-  emergencySection: { borderWidth: 1, borderRadius: 18, padding: 18, marginTop: 18 },
+  emergencySection: { borderWidth: 1, borderRadius: 20, padding: 20, marginTop: 24 },
   emergencyHeader: { flexDirection: "row", alignItems: "center", gap: 10, marginBottom: 12 },
-  emergencyTitle: { fontSize: 16, fontWeight: "800" },
-  emergencyText: { fontSize: 13, lineHeight: 20, marginBottom: 16 },
-  emergencyButton: { alignItems: "center", justifyContent: "center", borderRadius: 14, paddingVertical: 14, marginBottom: 10 },
-  emergencyButtonText: { fontSize: 15, fontWeight: "700" },
+  emergencyTitle: { fontSize: 17, fontWeight: "800" },
+  emergencyText: { fontSize: 14, lineHeight: 20, marginBottom: 16 },
+  emergencyButton: { alignItems: "center", justifyContent: "center", borderRadius: 16, paddingVertical: 16, marginBottom: 10 },
+  emergencyButtonText: { fontSize: 16, fontWeight: "700" },
   emergencyNote: { fontSize: 12, lineHeight: 16 },
 });

@@ -75,13 +75,13 @@ function NotificationToast() {
 const toastStyles = StyleSheet.create({
   banner: {
     position: "absolute", top: 0, left: 12, right: 12, zIndex: 9999,
-    backgroundColor: "#6b7280", borderRadius: 14, flexDirection: "row", alignItems: "center",
+    backgroundColor: "#4f46e5", borderRadius: 16, flexDirection: "row", alignItems: "center",
     gap: 10, paddingHorizontal: 14, paddingVertical: 12,
-    shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.25, shadowRadius: 8, elevation: 10,
+    shadowColor: "#4f46e5", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 12, elevation: 12,
   },
-  iconWrap: { width: 32, height: 32, borderRadius: 16, backgroundColor: "rgba(255,255,255,0.2)", justifyContent: "center", alignItems: "center" },
+  iconWrap: { width: 32, height: 32, borderRadius: 16, backgroundColor: "rgba(255,255,255,0.25)", justifyContent: "center", alignItems: "center" },
   title: { fontSize: 14, fontWeight: "700", color: "#fff" },
-  msg: { fontSize: 12, color: "rgba(255,255,255,0.85)", marginTop: 2 },
+  msg: { fontSize: 12, color: "rgba(255,255,255,0.9)", marginTop: 2 },
 });
 
 

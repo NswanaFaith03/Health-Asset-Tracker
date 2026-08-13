@@ -4,12 +4,14 @@ export const spacing = {
   md: 16,
   lg: 24,
   xl: 32,
+  xxl: 48,
 };
 
 export const radii = {
   sm: 6,
   md: 10,
   lg: 12,
+  xl: 16,
   round: 999,
 };
 
@@ -31,7 +33,7 @@ export const typography = {
 };
 
 export const colors = {
-  primary: "#6b7280",
+  primary: "#4f46e5",
   primaryForeground: "#ffffff",
   background: "#ffffff",
   surface: "#f9fafb",

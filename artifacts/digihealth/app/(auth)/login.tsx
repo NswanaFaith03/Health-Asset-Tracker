@@ -4,6 +4,7 @@ import {
   StatusBar, KeyboardAvoidingView, Platform, ScrollView,
   Image, ImageBackground,
 } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
@@ -74,7 +75,10 @@ export default function LoginScreen() {
           style={[styles.hero, { paddingTop: insets.top + 40 }]}
           imageStyle={styles.heroImage}
         >
-          <View style={styles.heroOverlay} />
+          <LinearGradient
+            colors={["rgba(79, 70, 229, 0.85)", "rgba(147, 51, 234, 0.85)"]}
+            style={styles.heroGradient}
+          />
           <View style={styles.heroContent}>
             <View style={styles.logoCircle}>
               <Image source={require("../../assets/images/uzamainlogo.jpg")} style={styles.logoImage} resizeMode="contain" />
@@ -93,7 +97,7 @@ export default function LoginScreen() {
 
           {/* Email */}
           <Text style={[styles.label, { color: colors.foreground }]}>Email Address</Text>
-          <View style={[styles.inputWrap, { borderColor: email ? colors.primary : colors.border, backgroundColor: colors.card }]}>
+          <View style={[styles.inputWrap, { borderColor: email ? colors.primary : colors.border, backgroundColor: colors.card, shadowColor: colors.primary, shadowOffset: { width: 0, height: 2 }, shadowOpacity: email ? 0.2 : 0, shadowRadius: 4, elevation: email ? 4 : 0 }]}>
             <Feather name="mail" size={16} color={colors.mutedForeground} style={{ marginRight: 10 }} />
             <TextInput
               style={[styles.input, { color: colors.foreground }]}
@@ -108,7 +112,7 @@ export default function LoginScreen() {
 
           {/* Password */}
           <Text style={[styles.label, { color: colors.foreground }]}>Password</Text>
-          <View style={[styles.inputWrap, { borderColor: password ? colors.primary : colors.border, backgroundColor: colors.card }]}>
+          <View style={[styles.inputWrap, { borderColor: password ? colors.primary : colors.border, backgroundColor: colors.card, shadowColor: colors.primary, shadowOffset: { width: 0, height: 2 }, shadowOpacity: password ? 0.2 : 0, shadowRadius: 4, elevation: password ? 4 : 0 }]}>
             <Feather name="lock" size={16} color={colors.mutedForeground} style={{ marginRight: 10 }} />
             <TextInput
               style={[styles.input, { color: colors.foreground }]}
@@ -129,7 +133,7 @@ export default function LoginScreen() {
             onPress={() => doLogin(email, password)}
             isLoading={loginMutation.isPending}
             disabled={!email || !password}
-            style={[styles.btn, { backgroundColor: colors.primary }]}
+            style={[styles.btn, { backgroundColor: colors.primary, shadowColor: colors.primary, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 8 }]}
             textStyle={styles.btnText}
           />
 
@@ -149,34 +153,33 @@ export default function LoginScreen() {
 
 const styles = StyleSheet.create({
   hero: { alignItems: "center", paddingBottom: 40, paddingHorizontal: 24, position: "relative" },
-  heroImage: { opacity: 0.12 },
-  heroOverlay: {
+  heroImage: { opacity: 0.15 },
+  heroGradient: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(255, 255, 255, 0.4)",
   },
   heroContent: { alignItems: "center", position: "relative", zIndex: 1 },
   logoCircle: {
-    width: 76, height: 76, borderRadius: 38,
+    width: 80, height: 80, borderRadius: 40,
     backgroundColor: "#fff", alignItems: "center", justifyContent: "center",
-    marginBottom: 16, shadowColor: "#000", shadowOpacity: 0.12, shadowRadius: 12, shadowOffset: { width: 0, height: 4 },
+    marginBottom: 16, shadowColor: "#000", shadowOpacity: 0.15, shadowRadius: 16, shadowOffset: { width: 0, height: 4 },
   },
-  logoImage: { width: 54, height: 54 },
-  heroTitle: { fontSize: 26, fontWeight: "800", color: "#000000", marginBottom: 6 },
-  heroSub: { fontSize: 13, color: "#666666", textAlign: "center" },
+  logoImage: { width: 56, height: 56 },
+  heroTitle: { fontSize: 28, fontWeight: "800", color: "#ffffff", marginBottom: 6, textShadowColor: "rgba(0,0,0,0.2)", textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 4 },
+  heroSub: { fontSize: 14, color: "rgba(255,255,255,0.9)", textAlign: "center", textShadowColor: "rgba(0,0,0,0.15)", textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2 },
   card: { paddingHorizontal: 24, paddingTop: 32 },
-  cardTitle: { fontSize: 22, fontWeight: "800", marginBottom: 4, color: "#000000" },
-  cardSub: { fontSize: 13, marginBottom: 24, lineHeight: 18 },
+  cardTitle: { fontSize: 24, fontWeight: "800", marginBottom: 4, color: "#000000" },
+  cardSub: { fontSize: 14, marginBottom: 24, lineHeight: 18 },
   chipRow: { flexDirection: "row", gap: 8, marginBottom: 24 },
   chip: { flexDirection: "row", alignItems: "center", gap: 5, borderWidth: 1, borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5 },
   chipText: { fontSize: 11, fontWeight: "600" },
-  label: { fontSize: 13, fontWeight: "600", marginBottom: 8 },
+  label: { fontSize: 14, fontWeight: "600", marginBottom: 8 },
   inputWrap: {
     flexDirection: "row", alignItems: "center",
-    borderWidth: 1.5, borderRadius: 12, paddingHorizontal: 14, height: 50, marginBottom: 16,
+    borderWidth: 1.5, borderRadius: 14, paddingHorizontal: 14, height: 52, marginBottom: 16,
   },
   input: { flex: 1, fontSize: 15 },
   btn: {
-    height: 52, borderRadius: 14, justifyContent: "center", alignItems: "center", marginTop: 8, marginBottom: 24,
+    height: 54, borderRadius: 16, justifyContent: "center", alignItems: "center", marginTop: 8, marginBottom: 24,
   },
   btnInner: { flexDirection: "row", alignItems: "center", gap: 8 },
   btnText: { color: "#ffffff", fontSize: 16, fontWeight: "700" },

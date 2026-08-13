@@ -1,11 +1,9 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, RefreshControl, ActivityIndicator, Modal, TextInput, Alert, ImageBackground } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, RefreshControl, ActivityIndicator, Modal, TextInput, Alert } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useListLabRequests, useUpdateLabRequestStatus, useUploadLabResult, getListLabRequestsQueryKey } from "@workspace/api-client-react";
-import { FeatureActionGrid } from "@/components/FeatureActionGrid";
 import { useColors } from "../../hooks/useColors";
 import { SCREEN_IMAGES } from "@/constants/hospitalImages";
 import ScreenHeader from "@/components/ScreenHeader";
@@ -15,7 +13,6 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export default function LabRequests() {
-  const insets = useSafeAreaInsets();
   const colors = useColors();
   const queryClient = useQueryClient();
   const [showResultModal, setShowResultModal] = useState(false);
@@ -56,65 +53,60 @@ export default function LabRequests() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <ImageBackground
-        source={{ uri: SCREEN_IMAGES.lab.requests }}
-        style={[styles.heroHeader, { paddingTop: insets.top + 16 }]}
-        imageStyle={styles.headerImage}
-      >
-        <View style={styles.headerOverlay} />
-        <Text style={[styles.title, { color: "#000000", position: "relative", zIndex: 1 }]}>Lab Requests</Text>
       <ScreenHeader
         imageUri={SCREEN_IMAGES.lab.requests}
         title="Lab Requests"
       />
-          contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: insets.bottom + 84, paddingTop: 8 }}
-          refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} />}
-          renderItem={({ item }) => (
-            <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
-              <View style={styles.cardTop}>
-                <View style={{ flex: 1 }}>
-                  <Text style={[styles.patientName, { color: colors.foreground }]}>{(item as any).patient?.name ?? "Patient"}</Text>
-                  <Text style={[styles.testType, { color: colors.primary }]}>{(item as any).testType}</Text>
-                </View>
-                <View style={[styles.badge, { backgroundColor: STATUS_COLORS[(item as any).status] + "20" }]}>
-                  <Text style={[styles.badgeText, { color: STATUS_COLORS[(item as any).status] }]}>
-                    {(item as any).status?.replace(/_/g, " ")}
-                  </Text>
-                </View>
+      <FlatList
+        data={requests}
+        keyExtractor={(item) => (item as any).id.toString()}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 84, paddingTop: 8 }}
+        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} />}
+        renderItem={({ item }) => (
+          <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            <View style={styles.cardTop}>
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.patientName, { color: colors.foreground }]}>{(item as any).patient?.name ?? "Patient"}</Text>
+                <Text style={[styles.testType, { color: colors.primary }]}>{(item as any).testType}</Text>
               </View>
-              {(item as any).notes && <Text style={[styles.notes, { color: colors.mutedForeground }]}>{(item as any).notes}</Text>}
-              <Text style={[styles.date, { color: colors.mutedForeground }]}>{new Date((item as any).createdAt).toLocaleDateString()}</Text>
-              <View style={styles.btnRow}>
-                {(item as any).status === "pending" && (
-                  <TouchableOpacity
-                    style={[styles.btn, { backgroundColor: colors.secondary, borderRadius: colors.radius }]}
-                    onPress={() => handleStartTest((item as any).id)}
-                  >
-                    <Text style={[styles.btnText, { color: colors.primary }]}>Start Test</Text>
-                  </TouchableOpacity>
-                )}
-                {(item as any).status === "in_progress" && (
-                  <TouchableOpacity
-                    style={[styles.btn, { backgroundColor: colors.primary, borderRadius: colors.radius }]}
-                    onPress={() => { setSelectedRequest((item as any).id); setShowResultModal(true); }}
-                  >
-                    <Text style={[styles.btnText, { color: colors.primaryForeground }]}>Upload Results</Text>
-                  </TouchableOpacity>
-                )}
+              <View style={[styles.badge, { backgroundColor: STATUS_COLORS[(item as any).status] + "20" }]}>
+                <Text style={[styles.badgeText, { color: STATUS_COLORS[(item as any).status] }]}>
+                  {(item as any).status?.replace(/_/g, " ")}
+                </Text>
               </View>
             </View>
-          )}
-          ListEmptyComponent={
-            <View style={styles.empty}>
-              <Feather name="activity" size={48} color={colors.mutedForeground} />
-              <Text style={[styles.emptyText, { color: colors.mutedForeground }]}>No lab requests</Text>
+            {(item as any).notes && <Text style={[styles.notes, { color: colors.mutedForeground }]}>{(item as any).notes}</Text>}
+            <Text style={[styles.date, { color: colors.mutedForeground }]}>{new Date((item as any).createdAt).toLocaleDateString()}</Text>
+            <View style={styles.btnRow}>
+              {(item as any).status === "pending" && (
+                <TouchableOpacity
+                  style={[styles.btn, { backgroundColor: colors.secondary, borderRadius: colors.radius }]}
+                  onPress={() => handleStartTest((item as any).id)}
+                >
+                  <Text style={[styles.btnText, { color: colors.primary }]}>Start Test</Text>
+                </TouchableOpacity>
+              )}
+              {(item as any).status === "in_progress" && (
+                <TouchableOpacity
+                  style={[styles.btn, { backgroundColor: colors.primary, borderRadius: colors.radius }]}
+                  onPress={() => { setSelectedRequest((item as any).id); setShowResultModal(true); }}
+                >
+                  <Text style={[styles.btnText, { color: colors.primaryForeground }]}>Upload Results</Text>
+                </TouchableOpacity>
+              )}
             </View>
-          }
-        />
-      )}
+          </View>
+        )}
+        ListEmptyComponent={
+          <View style={styles.empty}>
+            <Feather name="activity" size={48} color={colors.mutedForeground} />
+            <Text style={[styles.emptyText, { color: colors.mutedForeground }]}>No lab requests</Text>
+          </View>
+        }
+      />
 
       <Modal visible={showResultModal} animationType="slide" presentationStyle="pageSheet">
-        <View style={[styles.modal, { backgroundColor: colors.background, paddingTop: insets.top + 20 }]}>
+        <View style={[styles.modal, { backgroundColor: colors.background, paddingTop: 20 }]}>
           <View style={styles.modalHeader}>
             <Text style={[styles.title, { color: colors.foreground }]}>Upload Results</Text>
             <TouchableOpacity onPress={() => setShowResultModal(false)}>

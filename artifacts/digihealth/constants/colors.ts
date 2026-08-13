@@ -6,7 +6,7 @@ export const themePalettes = {
     foreground: "#000000",
     card: "#f9fafb",
     cardForeground: "#000000",
-    primary: "#6b7280",
+    primary: "#4f46e5",
     primaryForeground: "#ffffff",
     secondary: "#e5e7eb",
     secondaryForeground: "#374151",
@@ -26,7 +26,7 @@ export const themePalettes = {
     foreground: "#000000",
     card: "#f9fafb",
     cardForeground: "#000000",
-    primary: "#6b7280",
+    primary: "#0ea5e9",
     primaryForeground: "#ffffff",
     secondary: "#e5e7eb",
     secondaryForeground: "#374151",
@@ -46,7 +46,7 @@ export const themePalettes = {
     foreground: "#000000",
     card: "#f9fafb",
     cardForeground: "#000000",
-    primary: "#6b7280",
+    primary: "#f97316",
     primaryForeground: "#ffffff",
     secondary: "#e5e7eb",
     secondaryForeground: "#374151",
@@ -63,6 +63,6 @@ export const themePalettes = {
 
 export const defaultThemeKey = "zaot";
 export type ThemeKey = keyof typeof themePalettes;
-export const radius = 12;
+export const radius = 14;
 
 export default themePalettes[defaultThemeKey];
