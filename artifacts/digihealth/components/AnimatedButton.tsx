@@ -1,5 +1,6 @@
 import React from "react";
 import { TouchableOpacity, Text, StyleSheet, ActivityIndicator, ViewStyle, TextStyle } from "react-native";
+import design from "@/constants/design";
 
 interface AnimatedButtonProps {
   label: string;
@@ -29,10 +30,10 @@ export function AnimatedButton({
   const isInteractionDisabled = isLoading || disabled;
 
   const variantStyles: Record<string, { bg: string; text: string }> = {
-    primary: { bg: backgroundColor || "#6b7280", text: textColor || "#fff" },
-    secondary: { bg: backgroundColor || "#e5e7eb", text: textColor || "#1f2937" },
+    primary: { bg: backgroundColor || design.colors.primary, text: textColor || design.colors.primaryForeground },
+    secondary: { bg: backgroundColor || design.colors.surface, text: textColor || design.colors.text },
     danger: { bg: backgroundColor || "#ef4444", text: textColor || "#fff" },
-    outline: { bg: backgroundColor || "transparent", text: textColor || "#6b7280" },
+    outline: { bg: backgroundColor || "transparent", text: textColor || design.colors.primary },
   };
 
   const { bg, text } = variantStyles[variant];

@@ -1,5 +1,6 @@
 import React from "react";
 import { View, Text, ImageBackground, StyleSheet, useWindowDimensions } from "react-native";
+import design from "@/constants/design";
 
 type Props = {
   imageUri?: string;
@@ -11,18 +12,18 @@ type Props = {
 export default function ScreenHeader({ imageUri, title, subtitle, height = 160 }: Props) {
   const { width } = useWindowDimensions();
   return (
-    <View style={styles.wrapper}>
+    <View style={[styles.wrapper, { backgroundColor: design.colors.background }] }>
       <ImageBackground
         source={imageUri ? { uri: imageUri } : require("../assets/images/happystudents.jpg")}
         style={[styles.hero, { height, width }]}
         imageStyle={styles.image}
       >
-        <View style={styles.imageOverlay} />
+        <View style={[styles.imageOverlay, { backgroundColor: "rgba(0,0,0,0.06)" }]} />
       </ImageBackground>
 
-      <View style={styles.card}>
-        <Text style={styles.title}>{title}</Text>
-        {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
+      <View style={[styles.card, { marginHorizontal: design.spacing.md, marginTop: -36, padding: design.spacing.md, borderRadius: design.radii.lg }] }>
+        <Text style={[styles.title, { fontSize: design.typography.sizes.lg, color: design.colors.text }]}>{title}</Text>
+        {subtitle ? <Text style={[styles.subtitle, { color: design.colors.muted }]}>{subtitle}</Text> : null}
       </View>
     </View>
   );
