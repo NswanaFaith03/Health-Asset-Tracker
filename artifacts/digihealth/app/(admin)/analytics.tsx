@@ -6,6 +6,7 @@ import { router } from "expo-router";
 import { useGetAdminAnalytics, getGetAdminAnalyticsQueryKey } from "@workspace/api-client-react";
 import { FeatureActionGrid } from "@/components/FeatureActionGrid";
 import { useColors } from "../../hooks/useColors";
+import { SCREEN_IMAGES } from "@/constants/hospitalImages";
 
 const STAT_CARDS = [
   { key: "totalUsers", label: "Total Users", icon: "users" },
@@ -35,7 +36,7 @@ export default function AdminAnalytics() {
       refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} />}
     >
       <ImageBackground
-        source={require("../../assets/images/school.jpg")}
+        source={{ uri: SCREEN_IMAGES.admin.analytics }}
         style={[styles.header, { paddingTop: insets.top + 20 }]}
         imageStyle={styles.headerImage}
       >

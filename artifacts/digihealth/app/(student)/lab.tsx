@@ -1,10 +1,11 @@
 import React from "react";
-import { View, Text, StyleSheet, FlatList, RefreshControl, ActivityIndicator, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, FlatList, RefreshControl, ActivityIndicator, TouchableOpacity, ImageBackground } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useListLabRequests, getListLabRequestsQueryKey } from "@workspace/api-client-react";
 import { useColors } from "../../hooks/useColors";
+import { SCREEN_IMAGES } from "@/constants/hospitalImages";
 
 const STATUS_COLORS: Record<string, string> = {
   pending: "#f59e0b", in_progress: "#3b82f6", completed: "#10b981", cancelled: "#ef4444",
@@ -19,9 +20,14 @@ export default function StudentLab() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
-        <Text style={[styles.title, { color: colors.foreground }]}>Lab Tests</Text>
-      </View>
+      <ImageBackground
+        source={{ uri: SCREEN_IMAGES.student.lab }}
+        style={[styles.heroHeader, { paddingTop: insets.top + 16 }]}
+        imageStyle={styles.headerImage}
+      >
+        <View style={styles.headerOverlay} />
+        <Text style={[styles.title, { color: "#fff", position: "relative", zIndex: 1 }]}>Lab Tests</Text>
+      </ImageBackground>
       {isLoading ? (
         <View style={styles.center}><ActivityIndicator size="large" color={colors.primary} /></View>
       ) : (
@@ -70,8 +76,11 @@ export default function StudentLab() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
+  heroHeader: { paddingHorizontal: 16, paddingBottom: 16, position: "relative", minHeight: 120, justifyContent: "flex-end" },
+  headerImage: { opacity: 0.35, resizeMode: "cover" },
+  headerOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: "rgba(124, 58, 237, 0.65)" },
   header: { paddingHorizontal: 16, paddingBottom: 12 },
-  title: { fontSize: 24, fontWeight: "700" },
+  title: { fontSize: 24, fontWeight: "700", position: "relative", zIndex: 1 },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
   card: { borderRadius: 12, borderWidth: 1, padding: 16, marginBottom: 12, gap: 10 },
   cardTop: { flexDirection: "row", alignItems: "flex-start", gap: 12 },

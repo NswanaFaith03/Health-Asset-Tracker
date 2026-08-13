@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, RefreshControl, ActivityIndicator, Alert } from "react-native";
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, RefreshControl, ActivityIndicator, Alert, ImageBackground } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -9,6 +9,7 @@ import { FeatureActionGrid } from "@/components/FeatureActionGrid";
 import { useListPrescriptions, useDispensePrescription, getListPrescriptionsQueryKey } from "@workspace/api-client-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useColors } from "../../hooks/useColors";
+import { SCREEN_IMAGES } from "@/constants/hospitalImages";
 
 export default function PharmacistPrescriptions() {
   const insets = useSafeAreaInsets();
@@ -43,9 +44,14 @@ export default function PharmacistPrescriptions() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
-        <Text style={[styles.title, { color: colors.foreground }]}>Pending Prescriptions</Text>
-      </View>
+      <ImageBackground
+        source={{ uri: SCREEN_IMAGES.pharmacist.prescriptions }}
+        style={[styles.heroHeader, { paddingTop: insets.top + 16 }]}
+        imageStyle={styles.headerImage}
+      >
+        <View style={styles.headerOverlay} />
+        <Text style={[styles.title, { color: "#fff", position: "relative", zIndex: 1 }]}>Pending Prescriptions</Text>
+      </ImageBackground>
       <FeatureActionGrid actions={actions} />
       {isLoading ? (
         <View style={styles.center}><ActivityIndicator size="large" color={colors.primary} /></View>
@@ -90,8 +96,11 @@ export default function PharmacistPrescriptions() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
+  heroHeader: { paddingHorizontal: 16, paddingBottom: 16, position: "relative", minHeight: 120, justifyContent: "flex-end" },
+  headerImage: { opacity: 0.35, resizeMode: "cover" },
+  headerOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: "rgba(139, 92, 246, 0.65)" },
   header: { paddingHorizontal: 16, paddingBottom: 12 },
-  title: { fontSize: 24, fontWeight: "700" },
+  title: { fontSize: 24, fontWeight: "700", position: "relative", zIndex: 1 },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
   card: { borderRadius: 12, borderWidth: 1, padding: 14, marginBottom: 10, gap: 8 },
   cardTop: { flexDirection: "row", alignItems: "flex-start" },

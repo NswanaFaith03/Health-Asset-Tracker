@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import {
   View, Text, StyleSheet, FlatList, TouchableOpacity,
-  RefreshControl, ActivityIndicator, StatusBar, TextInput,
+  RefreshControl, ActivityIndicator, StatusBar, TextInput, ImageBackground, Image,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
@@ -9,6 +9,7 @@ import { router } from "expo-router";
 import { useListConsultations, getListConsultationsQueryKey } from "@workspace/api-client-react";
 import { FeatureActionGrid } from "@/components/FeatureActionGrid";
 import { useColors } from "../../hooks/useColors";
+import { SCREEN_IMAGES } from "@/constants/hospitalImages";
 
 type FeatherName = React.ComponentProps<typeof Feather>["name"];
 
@@ -52,14 +53,22 @@ export default function DoctorConsultations() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <StatusBar barStyle="dark-content" />
+      <StatusBar barStyle="light-content" />
 
       {/* ── Header ── */}
-      <View style={[styles.header, { paddingTop: insets.top + 16, backgroundColor: colors.background }]}>
-        <Text style={[styles.title, { color: colors.foreground }]}>Consultations</Text>
-        <Text style={[styles.subtitle, { color: colors.mutedForeground }]}>
+      <ImageBackground
+        source={{ uri: SCREEN_IMAGES.doctor.consultations }}
+        style={[styles.heroHeader, { paddingTop: insets.top + 16 }]}
+        imageStyle={styles.headerImage}
+      >
+        <View style={styles.headerOverlay} />
+        <Text style={[styles.title, { color: "#fff" }]}>Doctor Consultations</Text>
+        <Text style={[styles.subtitle, { color: "rgba(255,255,255,0.9)" }]}>
           {(consultations as any[]).length} total · {(consultations as any[]).filter((c: any) => c.status === "submitted" || c.status === "under_review").length} pending
         </Text>
+      </ImageBackground>
+
+      <View style={[styles.header, { paddingTop: 12, backgroundColor: colors.background }]}>
 
         {/* Search */}
         <View style={[styles.searchBar, { backgroundColor: colors.card, borderColor: colors.border }]}>
@@ -146,9 +155,12 @@ export default function DoctorConsultations() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
+  heroHeader: { paddingHorizontal: 16, paddingBottom: 16, position: "relative", minHeight: 140, justifyContent: "flex-end" },
+  headerImage: { opacity: 0.35, resizeMode: "cover" },
+  headerOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: "rgba(15, 118, 110, 0.65)" },
   header: { paddingHorizontal: 16, paddingBottom: 12 },
-  title: { fontSize: 26, fontWeight: "800", marginBottom: 2 },
-  subtitle: { fontSize: 13, marginBottom: 14 },
+  title: { fontSize: 26, fontWeight: "800", marginBottom: 2, position: "relative", zIndex: 1, color: "#fff" },
+  subtitle: { fontSize: 13, marginBottom: 14, position: "relative", zIndex: 1, color: "rgba(255,255,255,0.9)" },
   searchBar: { flexDirection: "row", alignItems: "center", gap: 8, borderWidth: 1, borderRadius: 10, paddingHorizontal: 12, height: 42 },
   searchInput: { flex: 1, fontSize: 14 },
   card: { borderRadius: 12, borderWidth: 1, padding: 14, marginBottom: 10, gap: 10 },

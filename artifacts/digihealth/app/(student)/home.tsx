@@ -12,7 +12,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { useGetStudentDashboard, getGetStudentDashboardQueryKey } from "@workspace/api-client-react";
 import { useColors } from "../../hooks/useColors";
-import { useTheme } from "../../contexts/ThemeContext";
 import { useAuth } from "../../contexts/AuthContext";
 import { useEmergency } from "../../features/emergency/useEmergency";
 import { router } from "expo-router";
@@ -28,16 +27,9 @@ const FEATURES: { label: string; icon: FeatherName; route: string; color: string
   { label: "HIV/AIDS Support",  icon: "shield",      route: "/(student)/hiv-aids",         color: "#d97706" },
 ];
 
-const THEME_OPTIONS = [
-  { key: "zaot", label: "Zambian", color: "#006b3f" },
-  { key: "ocean", label: "Ocean", color: "#0f766e" },
-  { key: "sunrise", label: "Sunrise", color: "#c2410c" },
-] as const;
-
 export default function StudentHome() {
   const insets = useSafeAreaInsets();
   const colors = useColors();
-  const { themeKey, setThemeKey } = useTheme();
   const { currentUser } = useAuth();
   const { isLoadingNumber, isCalling, handleEmergencyCall } = useEmergency();
 
@@ -156,25 +148,6 @@ export default function StudentHome() {
           </TouchableOpacity>
           <Text style={[styles.emergencyNote, { color: colors.mutedForeground }]}>Number loaded from admin settings.</Text>
         </View>
-
-        <Text style={[styles.sectionTitle, { color: colors.foreground, marginTop: 18 }]}>Theme</Text>
-        <View style={styles.themeRow}>
-          {THEME_OPTIONS.map((option) => (
-            <TouchableOpacity
-              key={option.key}
-              style={[
-                styles.themeChip,
-                {
-                  backgroundColor: option.color,
-                  borderColor: themeKey === option.key ? colors.primary : colors.border,
-                },
-              ]}
-              onPress={() => setThemeKey(option.key)}
-            >
-              <Text style={[styles.themeLabel, { color: "#fff" }]}>{option.label}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
       </View>
     </ScrollView>
   );
@@ -218,7 +191,4 @@ const styles = StyleSheet.create({
   emergencyButton: { alignItems: "center", justifyContent: "center", borderRadius: 14, paddingVertical: 14, marginBottom: 10 },
   emergencyButtonText: { fontSize: 15, fontWeight: "700" },
   emergencyNote: { fontSize: 12, lineHeight: 16 },
-  themeRow: { flexDirection: "row", alignItems: "center", gap: 10, flexWrap: "wrap" },
-  themeChip: { paddingVertical: 12, paddingHorizontal: 14, borderRadius: 16, borderWidth: 2 },
-  themeLabel: { fontSize: 13, fontWeight: "700" },
 });

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, RefreshControl, ActivityIndicator, Modal, TextInput } from "react-native";
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, RefreshControl, ActivityIndicator, Modal, TextInput, ImageBackground } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { useQueryClient } from "@tanstack/react-query";
@@ -7,6 +7,7 @@ import { useGetQueue, useJoinQueue, getGetQueueQueryKey, customFetch } from "@wo
 import { useColors } from "../../hooks/useColors";
 import { Toast, ToastContainer } from "../../components/Toast";
 import { AnimatedButton } from "../../components/AnimatedButton";
+import { SCREEN_IMAGES } from "@/constants/hospitalImages";
 
 export default function NurseQueueManagement() {
   const insets = useSafeAreaInsets();
@@ -97,14 +98,24 @@ export default function NurseQueueManagement() {
   return (
     <>
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
-        <Text style={[styles.title, { color: colors.foreground }]}>Queue Management</Text>
-        <TouchableOpacity
-          style={[styles.addBtn, { backgroundColor: colors.primary }]}
-          onPress={() => setShowModal(true)}
-        >
-          <Feather name="plus" size={20} color={colors.primaryForeground} />
-        </TouchableOpacity>
+      <ImageBackground
+        source={{ uri: SCREEN_IMAGES.nurse.queue }}
+        style={[styles.heroHeader, { paddingTop: insets.top + 16 }]}
+        imageStyle={styles.headerImage}
+      >
+        <View style={styles.headerOverlay} />
+        <View style={[styles.headerContent, { position: "relative", zIndex: 1 }]}>
+          <Text style={[styles.title, { color: "#fff" }]}>Queue Management</Text>
+          <TouchableOpacity
+            style={[styles.addBtn, { backgroundColor: colors.primary }]}
+            onPress={() => setShowModal(true)}
+          >
+            <Feather name="plus" size={20} color={colors.primaryForeground} />
+          </TouchableOpacity>
+        </View>
+      </ImageBackground>
+
+      <View style={[styles.header, { paddingTop: 12, paddingHorizontal: 16, paddingBottom: 12 }]}>
       </View>
 
       {isLoading ? (
@@ -280,8 +291,12 @@ export default function NurseQueueManagement() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
+  heroHeader: { paddingHorizontal: 16, paddingBottom: 16, position: "relative", minHeight: 120, justifyContent: "flex-end", flexDirection: "row", alignItems: "flex-end" },
+  headerImage: { opacity: 0.35, resizeMode: "cover" },
+  headerOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: "rgba(15, 118, 110, 0.65)" },
+  headerContent: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", flex: 1 },
   header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 16, paddingBottom: 12 },
-  title: { fontSize: 24, fontWeight: "700" },
+  title: { fontSize: 24, fontWeight: "700", color: "#fff" },
   addBtn: { width: 40, height: 40, borderRadius: 20, justifyContent: "center", alignItems: "center" },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
   card: { borderRadius: 12, borderWidth: 1, padding: 14, marginBottom: 10, gap: 8 },

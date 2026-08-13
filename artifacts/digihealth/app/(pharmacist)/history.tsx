@@ -1,9 +1,10 @@
 import React from "react";
-import { View, Text, StyleSheet, FlatList, RefreshControl, ActivityIndicator } from "react-native";
+import { View, Text, StyleSheet, FlatList, RefreshControl, ActivityIndicator, ImageBackground } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { useListPrescriptions, getListPrescriptionsQueryKey } from "@workspace/api-client-react";
 import { useColors } from "../../hooks/useColors";
+import { SCREEN_IMAGES } from "@/constants/hospitalImages";
 
 export default function PharmacistHistory() {
   const insets = useSafeAreaInsets();
@@ -14,9 +15,14 @@ export default function PharmacistHistory() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
-        <Text style={[styles.title, { color: colors.foreground }]}>Dispensed History</Text>
-      </View>
+      <ImageBackground
+        source={{ uri: SCREEN_IMAGES.pharmacist.history }}
+        style={[styles.heroHeader, { paddingTop: insets.top + 16 }]}
+        imageStyle={styles.headerImage}
+      >
+        <View style={styles.headerOverlay} />
+        <Text style={[styles.title, { color: "#fff", position: "relative", zIndex: 1 }]}>Dispensed History</Text>
+      </ImageBackground>
       {isLoading ? (
         <View style={styles.center}><ActivityIndicator size="large" color={colors.primary} /></View>
       ) : (
@@ -58,8 +64,11 @@ export default function PharmacistHistory() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
+  heroHeader: { paddingHorizontal: 16, paddingBottom: 16, position: "relative", minHeight: 120, justifyContent: "flex-end" },
+  headerImage: { opacity: 0.35, resizeMode: "cover" },
+  headerOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: "rgba(139, 92, 246, 0.65)" },
   header: { paddingHorizontal: 16, paddingBottom: 12 },
-  title: { fontSize: 24, fontWeight: "700" },
+  title: { fontSize: 24, fontWeight: "700", position: "relative", zIndex: 1 },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
   card: { borderRadius: 12, borderWidth: 1, padding: 14, marginBottom: 10, gap: 8 },
   cardTop: { flexDirection: "row", alignItems: "center", gap: 12 },
