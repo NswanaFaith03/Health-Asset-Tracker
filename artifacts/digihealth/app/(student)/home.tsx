@@ -19,7 +19,7 @@ import { router } from "expo-router";
 type FeatherName = React.ComponentProps<typeof Feather>["name"];
 
 const FEATURES: { label: string; icon: FeatherName; route: string; color: string }[] = [
-  { label: "New Consultation",  icon: "plus-circle",  route: "/(student)/new-consultation", color: "#0f766e" },
+  { label: "New Consultation",  icon: "plus-circle",  route: "/(student)/new-consultation", color: "#6b7280" },
   { label: "Queue",             icon: "users",        route: "/(student)/queue",            color: "#0d9488" },
   { label: "Prescriptions",     icon: "clipboard",   route: "/(student)/prescriptions",    color: "#0369a1" },
   { label: "Lab Results",       icon: "thermometer", route: "/(student)/lab",              color: "#7c3aed" },
@@ -40,7 +40,7 @@ export default function StudentHome() {
   const firstName = currentUser?.name?.split(" ")[0] ?? "there";
 
   const stats = [
-    { label: "Consultations",   value: dashboard?.activeConsultations ?? 0,   icon: "activity" as FeatherName,    color: "#0f766e" },
+    { label: "Consultations",   value: dashboard?.activeConsultations ?? 0,   icon: "activity" as FeatherName,    color: "#6b7280" },
     { label: "Pending Rx",      value: dashboard?.pendingPrescriptions ?? 0,   icon: "clipboard" as FeatherName,   color: "#0369a1" },
     { label: "Lab Results",     value: dashboard?.pendingLabResults ?? 0,      icon: "thermometer" as FeatherName, color: "#7c3aed" },
   ];

@@ -29,10 +29,10 @@ export function AnimatedButton({
   const isInteractionDisabled = isLoading || disabled;
 
   const variantStyles: Record<string, { bg: string; text: string }> = {
-    primary: { bg: backgroundColor || "#0f766e", text: textColor || "#fff" },
+    primary: { bg: backgroundColor || "#6b7280", text: textColor || "#fff" },
     secondary: { bg: backgroundColor || "#e5e7eb", text: textColor || "#1f2937" },
     danger: { bg: backgroundColor || "#ef4444", text: textColor || "#fff" },
-    outline: { bg: backgroundColor || "transparent", text: textColor || "#0f766e" },
+    outline: { bg: backgroundColor || "transparent", text: textColor || "#6b7280" },
   };
 
   const { bg, text } = variantStyles[variant];

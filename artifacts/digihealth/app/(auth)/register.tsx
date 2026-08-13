@@ -50,11 +50,11 @@ export default function RegisterScreen() {
       >
         <View style={styles.heroOverlay} />
         <TouchableOpacity onPress={() => router.back()} style={styles.backRow}>
-          <Feather name="arrow-left" size={20} color="#fff" />
-          <Text style={styles.backText}>Sign In</Text>
+          <Feather name="arrow-left" size={20} color="#111827" />
+          <Text style={[styles.backText, { color: "#111827" }]}>Sign In</Text>
         </TouchableOpacity>
-        <Text style={styles.heroTitle}>Create Account</Text>
-        <Text style={styles.heroSub}>University of Zambia Health Services</Text>
+        <Text style={[styles.heroTitle, { color: "#000000" }]}>Create Account</Text>
+        <Text style={[styles.heroSub, { color: "#6b7280" }]}>University of Zambia Health Services</Text>
       </ImageBackground>
 
       <ScrollView
@@ -138,17 +138,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 24,
     position: "relative",
-    backgroundColor: "#0f766e",
+    backgroundColor: "transparent",
   },
   heroImage: { opacity: 0.35, resizeMode: "cover" },
   heroOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(15, 118, 110, 0.75)",
+    backgroundColor: "rgba(255,255,255,0.5)",
   },
   backRow: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 16, zIndex: 2 },
-  backText: { fontSize: 15, fontWeight: "600", color: "#fff" },
-  heroTitle: { fontSize: 26, fontWeight: "800", color: "#fff", marginBottom: 4, zIndex: 2 },
-  heroSub: { fontSize: 13, color: "rgba(255,255,255,0.85)", zIndex: 2 },
+  backText: { fontSize: 15, fontWeight: "600", color: "#111827" },
+  heroTitle: { fontSize: 26, fontWeight: "800", color: "#000000", marginBottom: 4, zIndex: 2 },
+  heroSub: { fontSize: 13, color: "#6b7280", zIndex: 2 },
   title: { fontSize: 28, fontWeight: "800", marginBottom: 4 },
   subtitle: { fontSize: 14, marginBottom: 24, lineHeight: 20 },
   sectionLabel: { fontSize: 13, fontWeight: "700", textTransform: "uppercase", letterSpacing: 0.6, marginBottom: 12 },

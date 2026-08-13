@@ -75,7 +75,7 @@ function NotificationToast() {
 const toastStyles = StyleSheet.create({
   banner: {
     position: "absolute", top: 0, left: 12, right: 12, zIndex: 9999,
-    backgroundColor: "#0f766e", borderRadius: 14, flexDirection: "row", alignItems: "center",
+    backgroundColor: "#6b7280", borderRadius: 14, flexDirection: "row", alignItems: "center",
     gap: 10, paddingHorizontal: 14, paddingVertical: 12,
     shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.25, shadowRadius: 8, elevation: 10,
   },

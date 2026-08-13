@@ -72,6 +72,6 @@ const styles = StyleSheet.create({
   positionLabel: { fontSize: 34, fontWeight: "800" },
   statusText: { fontSize: 18, fontWeight: "700", marginTop: 8, textAlign: "center" },
   detailText: { fontSize: 14, textAlign: "center", marginTop: 4, lineHeight: 20 },
-  noteBox: { marginTop: 16, width: "100%", flexDirection: "row", alignItems: "flex-start", gap: 10, padding: 14, borderRadius: 16, backgroundColor: "rgba(15, 118, 110, 0.08)" },
+  noteBox: { marginTop: 16, width: "100%", flexDirection: "row", alignItems: "flex-start", gap: 10, padding: 14, borderRadius: 16, backgroundColor: "transparent" },
   noteText: { flex: 1, fontSize: 13, lineHeight: 20 },
 });

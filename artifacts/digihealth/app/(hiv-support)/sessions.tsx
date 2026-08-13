@@ -142,14 +142,11 @@ export default function HivSessions() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  header: { paddingHorizontal: 16, paddingBottom: 20, position: "relative", backgroundColor: "#0f766e" },
+  header: { paddingHorizontal: 16, paddingBottom: 20, position: "relative", backgroundColor: "transparent" },
   headerImage: { opacity: 0.35, resizeMode: "cover" },
-  headerOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(15, 118, 110, 0.78)",
-  },
-  title: { fontSize: 24, fontWeight: "800", color: "#fff", zIndex: 2 },
-  subTitle: { fontSize: 13, color: "rgba(255,255,255,0.85)", marginTop: 2, zIndex: 2 },
+  headerOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: "transparent" },
+  title: { fontSize: 24, fontWeight: "800", color: "#000000", zIndex: 2 },
+  subTitle: { fontSize: 13, color: "#6b7280", marginTop: 2, zIndex: 2 },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
   card: { borderRadius: 12, borderWidth: 1, padding: 14, marginBottom: 10, gap: 8 },
   cardTop: { flexDirection: "row", alignItems: "center", gap: 10 },

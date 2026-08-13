@@ -33,7 +33,7 @@ export default function DoctorQueue() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <StatusBar barStyle="light-content" backgroundColor={colors.primary} />
+      <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
 
       {/* ── Header ── */}
       <ImageBackground
@@ -165,23 +165,20 @@ export default function DoctorQueue() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
-  header: { paddingHorizontal: 20, paddingBottom: 20, position: "relative", backgroundColor: "#0f766e" },
+  header: { paddingHorizontal: 20, paddingBottom: 20, position: "relative" },
   headerImage: { opacity: 0.28, resizeMode: "cover" },
-  headerOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(15, 118, 110, 0.82)",
-  },
+  headerOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: "transparent" },
   headerRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 },
-  headerGreeting: { color: "rgba(255,255,255,0.72)", fontSize: 13, marginBottom: 2 },
-  headerName: { color: "#fff", fontSize: 22, fontWeight: "800" },
-  onDutyBadge: { flexDirection: "row", alignItems: "center", gap: 5, backgroundColor: "rgba(255,255,255,0.18)", borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5 },
+  headerGreeting: { color: "#6b7280", fontSize: 13, marginBottom: 2 },
+  headerName: { color: "#000000", fontSize: 22, fontWeight: "800" },
+  onDutyBadge: { flexDirection: "row", alignItems: "center", gap: 5, backgroundColor: "transparent", borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5 },
   onDutyDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: "#4ade80" },
-  onDutyText: { color: "#fff", fontSize: 12, fontWeight: "600" },
-  queueSummaryRow: { flexDirection: "row", backgroundColor: "rgba(255,255,255,0.15)", borderRadius: 12, padding: 14, gap: 16 },
+  onDutyText: { color: "#111827", fontSize: 12, fontWeight: "600" },
+  queueSummaryRow: { flexDirection: "row", backgroundColor: "transparent", borderRadius: 12, padding: 14, gap: 16 },
   summaryItem: { flex: 1, alignItems: "center" },
-  summaryNum: { color: "#fff", fontSize: 22, fontWeight: "800" },
-  summaryLabel: { color: "rgba(255,255,255,0.75)", fontSize: 11, marginTop: 2 },
-  summaryDivider: { width: 1, backgroundColor: "rgba(255,255,255,0.25)" },
+  summaryNum: { color: "#111827", fontSize: 22, fontWeight: "800" },
+  summaryLabel: { color: "#6b7280", fontSize: 11, marginTop: 2 },
+  summaryDivider: { width: 1, backgroundColor: "#e5e7eb" },
   sectionLabel: { fontSize: 13, fontWeight: "700", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 10, marginTop: 16 },
   nextCard: { borderRadius: 16, borderWidth: 2, padding: 16, gap: 14 },
   nextCardTop: { flexDirection: "row", alignItems: "flex-start", gap: 12 },

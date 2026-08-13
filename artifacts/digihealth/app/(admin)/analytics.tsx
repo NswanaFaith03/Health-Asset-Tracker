@@ -87,14 +87,11 @@ export default function AdminAnalytics() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  header: { paddingHorizontal: 20, paddingBottom: 24, position: "relative", backgroundColor: "#0f766e" },
+  header: { paddingHorizontal: 20, paddingBottom: 24, position: "relative", backgroundColor: "transparent" },
   headerImage: { opacity: 0.32, resizeMode: "cover" },
-  headerOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(15, 118, 110, 0.78)",
-  },
-  title: { fontSize: 24, fontWeight: "800", color: "#fff", zIndex: 2 },
-  subTitle: { fontSize: 13, color: "rgba(255,255,255,0.85)", marginTop: 2, zIndex: 2 },
+  headerOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: "transparent" },
+  title: { fontSize: 24, fontWeight: "800", color: "#000000", zIndex: 2 },
+  subTitle: { fontSize: 13, color: "#6b7280", marginTop: 2, zIndex: 2 },
   center: { flex: 1, justifyContent: "center", alignItems: "center", paddingTop: 60 },
   highlight: { borderRadius: 16, padding: 20, marginBottom: 16 },
   highlightLabel: { fontSize: 14, fontWeight: "500", opacity: 0.8 },

@@ -56,9 +56,9 @@ export default function NurseLabRequests() {
         imageStyle={styles.headerImage}
       >
         <View style={styles.headerOverlay} />
-        <Text style={styles.title}>Lab Requests</Text>
+        <Text style={[styles.title, { color: "#000000" }]}>Lab Requests</Text>
         <TouchableOpacity onPress={() => refetch()}>
-          <Feather name="refresh-cw" size={20} color="#fff" />
+          <Feather name="refresh-cw" size={20} color="#111827" />
         </TouchableOpacity>
       </ImageBackground>
 
@@ -195,14 +195,11 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   header: {
     flexDirection: "row", justifyContent: "space-between", alignItems: "center",
-    paddingHorizontal: 16, paddingBottom: 16, position: "relative", backgroundColor: "#0f766e",
+    paddingHorizontal: 16, paddingBottom: 16, position: "relative", backgroundColor: "transparent",
   },
   headerImage: { opacity: 0.32, resizeMode: "cover" },
-  headerOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(15, 118, 110, 0.78)",
-  },
-  title: { fontSize: 24, fontWeight: "700", color: "#fff", zIndex: 2 },
+  headerOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: "transparent" },
+  title: { fontSize: 24, fontWeight: "700", color: "#000000", zIndex: 2 },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
   card: { borderRadius: 12, borderWidth: 1, padding: 14, marginBottom: 10, gap: 8 },
   cardTop: { flexDirection: "row", alignItems: "center", gap: 10 },
