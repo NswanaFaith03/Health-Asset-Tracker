@@ -78,10 +78,10 @@ router.put("/admin/emergency-phone", requireAuth, requireRole("admin"), async (r
     } else {
       await db.insert(appSettingsTable).values({ key: "emergency_phone", value: emergencyNumber });
     }
-    res.json({ emergencyNumber });
+    return res.json({ emergencyNumber });
   } catch (err) {
     console.error("Error saving emergency phone", err);
-    res.status(500).json({ error: "Failed to save emergency phone" });
+    return res.status(500).json({ error: "Failed to save emergency phone" });
   }
 });
 
