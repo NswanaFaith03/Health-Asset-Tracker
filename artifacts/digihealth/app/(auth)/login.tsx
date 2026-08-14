@@ -75,11 +75,13 @@ export default function LoginScreen() {
           imageStyle={styles.heroImage}
         >
           <View style={styles.heroContent}>
-            <View style={styles.logoCircle}>
-              <Image source={require("../../assets/images/uzamainlogo.jpg")} style={styles.logoImage} resizeMode="contain" />
+            <View style={styles.contentCard}>
+              <View style={styles.logoCircle}>
+                <Image source={require("../../assets/images/uzamainlogo.jpg")} style={styles.logoImage} resizeMode="contain" />
+              </View>
+              <Text style={styles.heroTitle}>UNZA DigiHealth</Text>
+              <Text style={styles.heroSub}>University of Zambia Campus Clinic</Text>
             </View>
-            <Text style={styles.heroTitle}>UNZA DigiHealth</Text>
-            <Text style={styles.heroSub}>University of Zambia Campus Clinic</Text>
           </View>
         </ImageBackground>
 
@@ -150,14 +152,24 @@ const styles = StyleSheet.create({
   hero: { alignItems: "center", paddingBottom: 40, paddingHorizontal: 24, position: "relative" },
   heroImage: { opacity: 1 },
   heroContent: { alignItems: "center", position: "relative", zIndex: 1 },
+  contentCard: {
+    backgroundColor: "rgba(255, 255, 255, 0.85)",
+    borderRadius: 20,
+    padding: 24,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 16,
+    elevation: 8,
+  },
   logoCircle: {
     width: 80, height: 80, borderRadius: 40,
     backgroundColor: "#fff", alignItems: "center", justifyContent: "center",
     marginBottom: 16, shadowColor: "#000", shadowOpacity: 0.25, shadowRadius: 20, shadowOffset: { width: 0, height: 6 },
   },
   logoImage: { width: 56, height: 56 },
-  heroTitle: { fontSize: 28, fontWeight: "800", color: "#000000", marginBottom: 6, textShadowColor: "rgba(255,255,255,0.8)", textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2 },
-  heroSub: { fontSize: 14, color: "#000000", textAlign: "center", textShadowColor: "rgba(255,255,255,0.8)", textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2, fontWeight: "600" },
+  heroTitle: { fontSize: 28, fontWeight: "800", color: "#000000", marginBottom: 6 },
+  heroSub: { fontSize: 14, color: "#666666", textAlign: "center", fontWeight: "600" },
   card: { paddingHorizontal: 24, paddingTop: 32 },
   cardTitle: { fontSize: 24, fontWeight: "800", marginBottom: 4, color: "#000000" },
   cardSub: { fontSize: 14, marginBottom: 24, lineHeight: 18 },

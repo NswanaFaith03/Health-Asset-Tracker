@@ -60,42 +60,44 @@ export default function StudentHome() {
         imageStyle={styles.headerImage}
       >
         <View style={styles.headerInner}>
-          <View style={styles.headerRow}>
-          <View>
-            <Text style={styles.greetingSmall}>Good day 👋</Text>
-            <Text style={styles.greetingName}>{firstName}</Text>
-          </View>
-          <TouchableOpacity
-            style={styles.notifBtn}
-            onPress={() => router.push("/(student)/notifications")}
-          >
-            <Feather name="bell" size={20} color="#fff" />
-            {(dashboard?.unreadNotifications ?? 0) > 0 && (
-              <View style={styles.badge}>
-                <Text style={styles.badgeText}>{dashboard!.unreadNotifications}</Text>
-              </View>
-            )}
-          </TouchableOpacity>
-        </View>
-
-        {/* Queue status */}
-        {dashboard?.queuePosition && (
-          <View style={[styles.queueBanner, { backgroundColor: colors.card, borderColor: colors.border, shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.15, shadowRadius: 12, elevation: 8 }]}> 
-            <View style={[styles.queueCircle, { borderColor: colors.primary }]}> 
-              <Text style={[styles.queueNumber, { color: colors.primary }]}>{dashboard.queuePosition.queueNumber}</Text>
+          <View style={styles.headerContentCard}>
+            <View style={styles.headerRow}>
+            <View>
+              <Text style={styles.greetingSmall}>Good day 👋</Text>
+              <Text style={styles.greetingName}>{firstName}</Text>
             </View>
-            <View style={styles.queueDetails}>
-              <Text style={[styles.queueLabel, { color: colors.foreground }]}>Your queue spot</Text>
-              <Text style={[styles.queuePos, { color: colors.foreground }]}>#{dashboard.queuePosition.position} of {dashboard.queuePosition.totalInQueue}</Text>
-              {dashboard.queuePosition.estimatedWaitMinutes ? (
-                <Text style={[styles.queueInfo, { color: colors.mutedForeground }]}>~{dashboard.queuePosition.estimatedWaitMinutes} min wait</Text>
-              ) : (
-                <Text style={[styles.queueInfo, { color: colors.mutedForeground }]}>Waiting for doctor availability</Text>
+            <TouchableOpacity
+              style={styles.notifBtn}
+              onPress={() => router.push("/(student)/notifications")}
+            >
+              <Feather name="bell" size={20} color="#10b981" />
+              {(dashboard?.unreadNotifications ?? 0) > 0 && (
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>{dashboard!.unreadNotifications}</Text>
+                </View>
               )}
-            </View>
+            </TouchableOpacity>
           </View>
-        )}
-      </View>
+
+          {/* Queue status */}
+          {dashboard?.queuePosition && (
+            <View style={[styles.queueBanner, { backgroundColor: colors.card, borderColor: colors.border, shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.15, shadowRadius: 12, elevation: 8 }]}> 
+              <View style={[styles.queueCircle, { borderColor: colors.primary }]}> 
+                <Text style={[styles.queueNumber, { color: colors.primary }]}>{dashboard.queuePosition.queueNumber}</Text>
+              </View>
+              <View style={styles.queueDetails}>
+                <Text style={[styles.queueLabel, { color: colors.foreground }]}>Your queue spot</Text>
+                <Text style={[styles.queuePos, { color: colors.foreground }]}>#{dashboard.queuePosition.position} of {dashboard.queuePosition.totalInQueue}</Text>
+                {dashboard.queuePosition.estimatedWaitMinutes ? (
+                  <Text style={[styles.queueInfo, { color: colors.mutedForeground }]}>~{dashboard.queuePosition.estimatedWaitMinutes} min wait</Text>
+                ) : (
+                  <Text style={[styles.queueInfo, { color: colors.mutedForeground }]}>Waiting for doctor availability</Text>
+                )}
+              </View>
+            </View>
+          )}
+          </View>
+        </View>
       </ImageBackground>
 
       <View style={styles.body}>
@@ -159,10 +161,20 @@ const styles = StyleSheet.create({
   header: { paddingHorizontal: 20, paddingBottom: 24, position: "relative" },
   headerImage: { opacity: 1 },
   headerInner: { position: "relative", zIndex: 1 },
+  headerContentCard: {
+    backgroundColor: "rgba(255, 255, 255, 0.85)",
+    borderRadius: 20,
+    padding: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 16,
+    elevation: 8,
+  },
   headerRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 },
-  greetingSmall: { color: "#000000", fontSize: 14, marginBottom: 2, textShadowColor: "rgba(255,255,255,0.8)", textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2, fontWeight: "600" },
-  greetingName: { color: "#000000", fontSize: 26, fontWeight: "800", textShadowColor: "rgba(255,255,255,0.8)", textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2 },
-  notifBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: "rgba(255,255,255,0.7)", alignItems: "center", justifyContent: "center", shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 8, elevation: 4 },
+  greetingSmall: { color: "#000000", fontSize: 14, marginBottom: 2, fontWeight: "600" },
+  greetingName: { color: "#000000", fontSize: 26, fontWeight: "800" },
+  notifBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: "#f0fdf4", alignItems: "center", justifyContent: "center", shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 8, elevation: 4 },
   badge: { position: "absolute", top: -2, right: -2, backgroundColor: "#ef4444", borderRadius: 10, minWidth: 18, height: 18, alignItems: "center", justifyContent: "center", paddingHorizontal: 4, shadowColor: "#ef4444", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.4, shadowRadius: 4, elevation: 4 },
   badgeText: { color: "#fff", fontSize: 11, fontWeight: "700" },
   queueBanner: { borderRadius: 18, padding: 18, flexDirection: "row", alignItems: "center", gap: 16, borderWidth: 1 },
