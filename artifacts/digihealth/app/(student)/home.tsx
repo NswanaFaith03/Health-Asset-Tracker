@@ -8,7 +8,6 @@ import {
   View, Text, StyleSheet, ScrollView, RefreshControl,
   TouchableOpacity, StatusBar, ImageBackground, ActivityIndicator,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { useGetStudentDashboard, getGetStudentDashboardQueryKey } from "@workspace/api-client-react";
@@ -20,10 +19,10 @@ import { router } from "expo-router";
 type FeatherName = React.ComponentProps<typeof Feather>["name"];
 
 const FEATURES: { label: string; icon: FeatherName; route: string; color: string }[] = [
-  { label: "New Consultation",  icon: "plus-circle",  route: "/(student)/new-consultation", color: "#4f46e5" },
-  { label: "Queue",             icon: "users",        route: "/(student)/queue",            color: "#0891b2" },
-  { label: "Prescriptions",     icon: "clipboard",   route: "/(student)/prescriptions",    color: "#2563eb" },
-  { label: "Lab Results",       icon: "thermometer", route: "/(student)/lab",              color: "#7c3aed" },
+  { label: "New Consultation",  icon: "plus-circle",  route: "/(student)/new-consultation", color: "#10b981" },
+  { label: "Queue",             icon: "users",        route: "/(student)/queue",            color: "#059669" },
+  { label: "Prescriptions",     icon: "clipboard",   route: "/(student)/prescriptions",    color: "#0891b2" },
+  { label: "Lab Results",       icon: "thermometer", route: "/(student)/lab",              color: "#14b8a6" },
   { label: "Mental Buddy",      icon: "smile",       route: "/(student)/mental-buddy",     color: "#ec4899" },
   { label: "HIV/AIDS Support",  icon: "shield",      route: "/(student)/hiv-aids",         color: "#f97316" },
 ];
@@ -41,9 +40,9 @@ export default function StudentHome() {
   const firstName = currentUser?.name?.split(" ")[0] ?? "there";
 
   const stats = [
-    { label: "Consultations",   value: dashboard?.activeConsultations ?? 0,   icon: "activity" as FeatherName,    color: "#4f46e5" },
-    { label: "Pending Rx",      value: dashboard?.pendingPrescriptions ?? 0,   icon: "clipboard" as FeatherName,   color: "#2563eb" },
-    { label: "Lab Results",     value: dashboard?.pendingLabResults ?? 0,      icon: "thermometer" as FeatherName, color: "#7c3aed" },
+    { label: "Consultations",   value: dashboard?.activeConsultations ?? 0,   icon: "activity" as FeatherName,    color: "#10b981" },
+    { label: "Pending Rx",      value: dashboard?.pendingPrescriptions ?? 0,   icon: "clipboard" as FeatherName,   color: "#0891b2" },
+    { label: "Lab Results",     value: dashboard?.pendingLabResults ?? 0,      icon: "thermometer" as FeatherName, color: "#14b8a6" },
   ];
 
   return (
@@ -60,10 +59,6 @@ export default function StudentHome() {
         style={[styles.header, { paddingTop: insets.top + 20 }]}
         imageStyle={styles.headerImage}
       >
-        <LinearGradient
-          colors={["rgba(79, 70, 229, 0.75)", "rgba(147, 51, 234, 0.75)"]}
-          style={styles.headerGradient}
-        />
         <View style={styles.headerInner}>
           <View style={styles.headerRow}>
           <View>
@@ -162,15 +157,12 @@ export default function StudentHome() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   header: { paddingHorizontal: 20, paddingBottom: 24, position: "relative" },
-  headerImage: { opacity: 0.25 },
-  headerGradient: {
-    ...StyleSheet.absoluteFillObject,
-  },
+  headerImage: { opacity: 1 },
   headerInner: { position: "relative", zIndex: 1 },
   headerRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 },
-  greetingSmall: { color: "rgba(255,255,255,0.85)", fontSize: 14, marginBottom: 2 },
-  greetingName: { color: "#fff", fontSize: 26, fontWeight: "800", textShadowColor: "rgba(0,0,0,0.2)", textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 4 },
-  notifBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: "rgba(255,255,255,0.25)", alignItems: "center", justifyContent: "center", shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.15, shadowRadius: 8, elevation: 4 },
+  greetingSmall: { color: "#000000", fontSize: 14, marginBottom: 2, textShadowColor: "rgba(255,255,255,0.8)", textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2, fontWeight: "600" },
+  greetingName: { color: "#000000", fontSize: 26, fontWeight: "800", textShadowColor: "rgba(255,255,255,0.8)", textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2 },
+  notifBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: "rgba(255,255,255,0.7)", alignItems: "center", justifyContent: "center", shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 8, elevation: 4 },
   badge: { position: "absolute", top: -2, right: -2, backgroundColor: "#ef4444", borderRadius: 10, minWidth: 18, height: 18, alignItems: "center", justifyContent: "center", paddingHorizontal: 4, shadowColor: "#ef4444", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.4, shadowRadius: 4, elevation: 4 },
   badgeText: { color: "#fff", fontSize: 11, fontWeight: "700" },
   queueBanner: { borderRadius: 18, padding: 18, flexDirection: "row", alignItems: "center", gap: 16, borderWidth: 1 },

@@ -33,7 +33,7 @@ export const typography = {
 };
 
 export const colors = {
-  primary: "#4f46e5",
+  primary: "#10b981",
   primaryForeground: "#ffffff",
   background: "#ffffff",
   surface: "#f9fafb",

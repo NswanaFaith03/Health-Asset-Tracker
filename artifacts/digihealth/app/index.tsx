@@ -8,7 +8,7 @@ export default function IndexScreen() {
   if (isLoading) {
     return (
       <View style={styles.container}>
-        <ActivityIndicator size="large" color="#4f46e5" />
+        <ActivityIndicator size="large" color="#10b981" />
       </View>
     );
   }

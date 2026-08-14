@@ -4,7 +4,6 @@ import {
   StatusBar, KeyboardAvoidingView, Platform, ScrollView,
   Image, ImageBackground,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
@@ -75,10 +74,6 @@ export default function LoginScreen() {
           style={[styles.hero, { paddingTop: insets.top + 40 }]}
           imageStyle={styles.heroImage}
         >
-          <LinearGradient
-            colors={["rgba(79, 70, 229, 0.85)", "rgba(147, 51, 234, 0.85)"]}
-            style={styles.heroGradient}
-          />
           <View style={styles.heroContent}>
             <View style={styles.logoCircle}>
               <Image source={require("../../assets/images/uzamainlogo.jpg")} style={styles.logoImage} resizeMode="contain" />
@@ -153,19 +148,16 @@ export default function LoginScreen() {
 
 const styles = StyleSheet.create({
   hero: { alignItems: "center", paddingBottom: 40, paddingHorizontal: 24, position: "relative" },
-  heroImage: { opacity: 0.15 },
-  heroGradient: {
-    ...StyleSheet.absoluteFillObject,
-  },
+  heroImage: { opacity: 1 },
   heroContent: { alignItems: "center", position: "relative", zIndex: 1 },
   logoCircle: {
     width: 80, height: 80, borderRadius: 40,
     backgroundColor: "#fff", alignItems: "center", justifyContent: "center",
-    marginBottom: 16, shadowColor: "#000", shadowOpacity: 0.15, shadowRadius: 16, shadowOffset: { width: 0, height: 4 },
+    marginBottom: 16, shadowColor: "#000", shadowOpacity: 0.25, shadowRadius: 20, shadowOffset: { width: 0, height: 6 },
   },
   logoImage: { width: 56, height: 56 },
-  heroTitle: { fontSize: 28, fontWeight: "800", color: "#ffffff", marginBottom: 6, textShadowColor: "rgba(0,0,0,0.2)", textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 4 },
-  heroSub: { fontSize: 14, color: "rgba(255,255,255,0.9)", textAlign: "center", textShadowColor: "rgba(0,0,0,0.15)", textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2 },
+  heroTitle: { fontSize: 28, fontWeight: "800", color: "#000000", marginBottom: 6, textShadowColor: "rgba(255,255,255,0.8)", textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2 },
+  heroSub: { fontSize: 14, color: "#000000", textAlign: "center", textShadowColor: "rgba(255,255,255,0.8)", textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2, fontWeight: "600" },
   card: { paddingHorizontal: 24, paddingTop: 32 },
   cardTitle: { fontSize: 24, fontWeight: "800", marginBottom: 4, color: "#000000" },
   cardSub: { fontSize: 14, marginBottom: 24, lineHeight: 18 },
