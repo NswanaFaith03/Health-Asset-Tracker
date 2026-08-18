@@ -41,26 +41,27 @@ export default function DoctorQueue() {
         style={[styles.header, { paddingTop: insets.top + 20 }]}
         imageStyle={styles.headerImage}
       >
-        <View style={styles.headerOverlay} />
-        <View style={styles.headerRow}>
-          <View>
-            <Text style={styles.headerGreeting}>Welcome back</Text>
-            <Text style={styles.headerName}>Dr. {firstName}</Text>
+        <View style={styles.headerContentCard}>
+          <View style={styles.headerRow}>
+            <View>
+              <Text style={styles.headerGreeting}>Welcome back</Text>
+              <Text style={styles.headerName}>Dr. {firstName}</Text>
+            </View>
+            <View style={styles.onDutyBadge}>
+              <View style={styles.onDutyDot} />
+              <Text style={styles.onDutyText}>On Duty</Text>
+            </View>
           </View>
-          <View style={styles.onDutyBadge}>
-            <View style={styles.onDutyDot} />
-            <Text style={styles.onDutyText}>On Duty</Text>
-          </View>
-        </View>
-        <View style={styles.queueSummaryRow}>
-          <View style={styles.summaryItem}>
-            <Text style={styles.summaryNum}>{(queue as any[]).length}</Text>
-            <Text style={styles.summaryLabel}>In Queue</Text>
-          </View>
-          <View style={styles.summaryDivider} />
-          <View style={styles.summaryItem}>
-            <Text style={styles.summaryNum}>{nextPatient ? `~${(nextPatient as any).estimatedWaitMinutes ?? 10} min` : "—"}</Text>
-            <Text style={styles.summaryLabel}>Next Wait</Text>
+          <View style={styles.queueSummaryRow}>
+            <View style={styles.summaryItem}>
+              <Text style={styles.summaryNum}>{(queue as any[]).length}</Text>
+              <Text style={styles.summaryLabel}>In Queue</Text>
+            </View>
+            <View style={styles.summaryDivider} />
+            <View style={styles.summaryItem}>
+              <Text style={styles.summaryNum}>{nextPatient ? `~${(nextPatient as any).estimatedWaitMinutes ?? 10} min` : "—"}</Text>
+              <Text style={styles.summaryLabel}>Next Wait</Text>
+            </View>
           </View>
         </View>
       </ImageBackground>
@@ -103,7 +104,7 @@ export default function DoctorQueue() {
                   </View>
                   <TouchableOpacity
                     style={[styles.callBtn, { backgroundColor: colors.primary }]}
-                    onPress={() => router.push({ pathname: "/(doctor)/consultation-detail", params: { id: String((nextPatient as any).consultation?.id) } })}
+                    onPress={() => router.push(`/(doctor)/consultation-detail?id=${(nextPatient as any).consultation?.id}`)}
                     activeOpacity={0.85}
                   >
                     <Feather name="eye" size={18} color="#fff" />
@@ -166,8 +167,17 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
   header: { paddingHorizontal: 20, paddingBottom: 20, position: "relative" },
-  headerImage: { opacity: 0.28, resizeMode: "cover" },
-  headerOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: "transparent" },
+  headerImage: { opacity: 1, resizeMode: "cover" },
+  headerContentCard: {
+    backgroundColor: "rgba(255, 255, 255, 0.85)",
+    borderRadius: 20,
+    padding: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 16,
+    elevation: 8,
+  },
   headerRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 },
   headerGreeting: { color: "#6b7280", fontSize: 13, marginBottom: 2 },
   headerName: { color: "#000000", fontSize: 22, fontWeight: "800" },

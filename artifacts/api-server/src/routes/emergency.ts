@@ -7,8 +7,17 @@ import { eq } from "drizzle-orm";
 const router = Router();
 
 router.get("/emergency/phone", requireAuth, async (req, res) => {
-  const settings = await db.select().from(appSettingsTable).where(eq(appSettingsTable.key, "emergency_phone"));
-  res.json({ emergencyNumber: settings?.[0]?.value ?? null });
+  try {
+    const [setting] = await db.select({ value: appSettingsTable.value })
+      .from(appSettingsTable)
+      .where(eq(appSettingsTable.key, "emergency_phone"))
+      .limit(1);
+
+    res.json({ emergencyNumber: setting?.value ?? null });
+  } catch (error) {
+    console.error("Error fetching emergency phone", error);
+    res.status(500).json({ error: "Failed to fetch emergency phone" });
+  }
 });
 
 router.post("/emergency/calls", requireAuth, async (req, res) => {

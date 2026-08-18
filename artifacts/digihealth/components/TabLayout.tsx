@@ -9,9 +9,10 @@ import { useColors } from "@/hooks/useColors";
 type TabLayoutProps = {
   allowedRoles: string[];
   children: ReactNode;
+  headerRight?: ReactNode;
 };
 
-export function TabLayout({ allowedRoles, children }: TabLayoutProps) {
+export function TabLayout({ allowedRoles, children, headerRight }: TabLayoutProps) {
   const { currentUser, logout } = useAuth();
   const colors = useColors();
   const insets = useSafeAreaInsets();
@@ -31,9 +32,12 @@ export function TabLayout({ allowedRoles, children }: TabLayoutProps) {
           <Text style={[styles.title, { color: colors.foreground }]}>Hi, {currentUser.name?.split(" ")[0] ?? "there"}</Text>
           <Text style={[styles.subtitle, { color: colors.mutedForeground }]}>Signed in as {currentUser.role.replace(/_/g, " ")}</Text>
         </View>
-        <TouchableOpacity style={[styles.logoutBtn, { backgroundColor: colors.primary }]} onPress={() => logout().catch(() => {})}>
-          <Feather name="log-out" size={18} color="#fff" />
-        </TouchableOpacity>
+        <View style={styles.headerActions}>
+          {headerRight}
+          <TouchableOpacity style={[styles.logoutBtn, { backgroundColor: colors.primary }]} onPress={() => logout().catch(() => {})}>
+            <Feather name="log-out" size={18} color="#fff" />
+          </TouchableOpacity>
+        </View>
       </View>
       <Tabs
         screenOptions={{
@@ -62,6 +66,11 @@ const styles = StyleSheet.create({
   },
   title: { fontSize: 18, fontWeight: "700", marginBottom: 2 },
   subtitle: { fontSize: 12, lineHeight: 18 },
+  headerActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
   logoutBtn: {
     width: 42,
     height: 42,

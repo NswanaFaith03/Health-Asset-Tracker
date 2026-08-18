@@ -10,6 +10,9 @@ interface AuthContextType {
   login: (token: string, user: User) => Promise<void>;
   logout: () => Promise<void>;
   updateCurrentUser: (user: User) => Promise<void>;
+  isOnShift: boolean;
+  startShift: () => Promise<void>;
+  endShift: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -18,6 +21,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isOnShift, setIsOnShift] = useState(false);
 
   // Provide the auth token to the API client
   useEffect(() => {
@@ -29,10 +33,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         const storedToken = await AsyncStorage.getItem("auth_token");
         const storedUserStr = await AsyncStorage.getItem("auth_user");
+        const storedShift = await AsyncStorage.getItem("shift_status");
         
         if (storedToken && storedUserStr) {
           setToken(storedToken);
           setCurrentUser(JSON.parse(storedUserStr));
+        }
+        if (storedShift) {
+          setIsOnShift(storedShift === "active");
         }
       } catch (e) {
         console.error("Failed to load auth state", e);
@@ -67,16 +75,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       await AsyncStorage.removeItem("auth_token");
       await AsyncStorage.removeItem("auth_user");
+      await AsyncStorage.removeItem("shift_status");
       setToken(null);
       setCurrentUser(null);
+      setIsOnShift(false);
       router.replace("/(auth)/login");
     } catch (e) {
       console.error("Failed to clear auth state", e);
     }
   };
 
+  const startShift = async () => {
+    try {
+      setIsOnShift(true);
+      await AsyncStorage.setItem("shift_status", "active");
+    } catch (e) {
+      console.error("Failed to start shift", e);
+    }
+  };
+
+  const endShift = async () => {
+    try {
+      setIsOnShift(false);
+      await AsyncStorage.setItem("shift_status", "inactive");
+    } catch (e) {
+      console.error("Failed to end shift", e);
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ currentUser, token, isLoading, login, logout, updateCurrentUser }}>
+    <AuthContext.Provider value={{ currentUser, token, isLoading, login, logout, updateCurrentUser, isOnShift, startShift, endShift }}>
       {children}
     </AuthContext.Provider>
   );

@@ -74,6 +74,7 @@ export default function LoginScreen() {
           style={[styles.hero, { paddingTop: insets.top + 40 }]}
           imageStyle={styles.heroImage}
         >
+          <View style={styles.heroOverlay} />
           <View style={styles.heroContent}>
             <View style={styles.contentCard}>
               <View style={styles.logoCircle}>
@@ -151,23 +152,25 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   hero: { alignItems: "center", paddingBottom: 40, paddingHorizontal: 24, position: "relative" },
   heroImage: { opacity: 1 },
-  heroContent: { alignItems: "center", position: "relative", zIndex: 1 },
+  heroOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: "rgba(255,255,255,0.52)" },
+  heroContent: { flex: 1, width: "100%", alignItems: "center", justifyContent: "center", position: "relative", zIndex: 1 },
   contentCard: {
-    backgroundColor: "rgba(255, 255, 255, 0.85)",
-    borderRadius: 20,
+    backgroundColor: "rgba(255, 255, 255, 0.18)",
+    borderRadius: 24,
     padding: 24,
+    alignItems: "center",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
+    shadowOpacity: 0.12,
     shadowRadius: 16,
     elevation: 8,
   },
   logoCircle: {
-    width: 80, height: 80, borderRadius: 40,
-    backgroundColor: "#fff", alignItems: "center", justifyContent: "center",
-    marginBottom: 16, shadowColor: "#000", shadowOpacity: 0.25, shadowRadius: 20, shadowOffset: { width: 0, height: 6 },
+    width: 92, height: 92, borderRadius: 46,
+    backgroundColor: "rgba(255,255,255,0.9)", alignItems: "center", justifyContent: "center",
+    marginBottom: 16, shadowColor: "#000", shadowOpacity: 0.2, shadowRadius: 18, shadowOffset: { width: 0, height: 6 },
   },
-  logoImage: { width: 56, height: 56 },
+  logoImage: { width: 62, height: 62 },
   heroTitle: { fontSize: 28, fontWeight: "800", color: "#000000", marginBottom: 6 },
   heroSub: { fontSize: 14, color: "#666666", textAlign: "center", fontWeight: "600" },
   card: { paddingHorizontal: 24, paddingTop: 32 },

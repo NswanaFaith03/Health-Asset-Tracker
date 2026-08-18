@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import {
   View, Text, TextInput, StyleSheet, TouchableOpacity,
-  ScrollView, ImageBackground,
+  ScrollView, ImageBackground, Image,
 } from "react-native";
 import { router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -49,12 +49,17 @@ export default function RegisterScreen() {
         imageStyle={styles.heroImage}
       >
         <View style={styles.heroOverlay} />
-        <TouchableOpacity onPress={() => router.back()} style={styles.backRow}>
-          <Feather name="arrow-left" size={20} color="#111827" />
-          <Text style={[styles.backText, { color: "#111827" }]}>Sign In</Text>
-        </TouchableOpacity>
-        <Text style={[styles.heroTitle, { color: "#000000" }]}>Create Account</Text>
-        <Text style={[styles.heroSub, { color: "#6b7280" }]}>University of Zambia Health Services</Text>
+        <View style={styles.heroContent}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.backRow}>
+            <Feather name="arrow-left" size={20} color="#111827" />
+            <Text style={[styles.backText, { color: "#111827" }]}>Sign In</Text>
+          </TouchableOpacity>
+          <View style={styles.logoWrap}>
+            <Image source={require("../../assets/images/uzamainlogo.jpg")} style={styles.logoImage} resizeMode="contain" />
+          </View>
+          <Text style={[styles.heroTitle, { color: "#000000" }]}>Create Account</Text>
+          <Text style={[styles.heroSub, { color: "#6b7280" }]}>University of Zambia Health Services</Text>
+        </View>
       </ImageBackground>
 
       <ScrollView
@@ -143,12 +148,13 @@ const styles = StyleSheet.create({
   heroImage: { opacity: 0.35, resizeMode: "cover" },
   heroOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(255,255,255,0.5)",
+    backgroundColor: "rgba(255,255,255,0.52)",
   },
-  backRow: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 16, zIndex: 2 },
+  heroContent: { zIndex: 2, alignItems: "center", justifyContent: "center", minHeight: 180 },
+  backRow: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 16, alignSelf: "flex-start" },
   backText: { fontSize: 15, fontWeight: "600", color: "#111827" },
-  heroTitle: { fontSize: 26, fontWeight: "800", color: "#000000", marginBottom: 4, zIndex: 2 },
-  heroSub: { fontSize: 13, color: "#6b7280", zIndex: 2 },
+  heroTitle: { fontSize: 26, fontWeight: "800", color: "#000000", marginBottom: 4 },
+  heroSub: { fontSize: 13, color: "#6b7280" },
   title: { fontSize: 28, fontWeight: "800", marginBottom: 4 },
   subtitle: { fontSize: 14, marginBottom: 24, lineHeight: 20 },
   sectionLabel: { fontSize: 13, fontWeight: "700", textTransform: "uppercase", letterSpacing: 0.6, marginBottom: 12 },
@@ -164,4 +170,13 @@ const styles = StyleSheet.create({
   },
   buttonText: { fontSize: 16, fontWeight: "700" },
   footer: { flexDirection: "row", justifyContent: "center", marginTop: 20 },
+  logoWrap: {
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 16,
+  },
+  logoImage: {
+    width: 120,
+    height: 40,
+  },
 });

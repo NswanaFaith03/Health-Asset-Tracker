@@ -98,7 +98,7 @@ export default function DoctorConsultations() {
             return (
               <TouchableOpacity
                 style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border, borderLeftColor: sev?.color ?? colors.border, borderLeftWidth: 3 }]}
-                onPress={() => router.push({ pathname: "/(doctor)/consultation-detail", params: { id: (item as any).id } })}
+                onPress={() => router.push(`/(doctor)/consultation-detail?id=${(item as any).id}`)}
                 activeOpacity={0.75}
               >
                 <View style={styles.cardRow}>
