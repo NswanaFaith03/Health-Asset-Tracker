@@ -77,12 +77,15 @@ router.put("/admin/emergency-phone", requireAuth, requireRole("admin"), async (r
   }
 
   try {
-    await db.execute(sql`
-      INSERT INTO app_settings (key, value, created_at, updated_at)
-      VALUES ('emergency_phone', ${emergencyNumber}, NOW(), NOW())
-      ON CONFLICT (key)
-      DO UPDATE SET value = EXCLUDED.value, updated_at = NOW();
-    `);
+    const [existing] = await db.select().from(appSettingsTable).where(eq(appSettingsTable.key, "emergency_phone")).limit(1);
+    
+    if (existing) {
+      await db.update(appSettingsTable)
+        .set({ value: emergencyNumber })
+        .where(eq(appSettingsTable.key, "emergency_phone"));
+    } else {
+      await db.insert(appSettingsTable).values({ key: "emergency_phone", value: emergencyNumber });
+    }
 
     return res.json({ emergencyNumber });
   } catch (err) {
