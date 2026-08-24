@@ -1,3 +1,13 @@
+/**
+ * @module Notification Routes
+ * @file notifications.ts
+ * @developer Faith
+ * @role Senior Student Experience Engineer
+ * 
+ * Part of the DigiHealth Asset Tracker system.
+ * Designed with Solid principles, strict separation of concerns, and modular isolation.
+ */
+
 import { Router } from "express";
 import { db, notificationsTable } from "@workspace/db";
 import { eq, and } from "drizzle-orm";

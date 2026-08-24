@@ -29,7 +29,7 @@ process.env.PORT = String(PORT);
 
 async function runTests() {
   console.log("🚀 Importing Express App...");
-  const { default: app } = await import("../../artifacts/api-server/src/app.ts");
+  const { default: app } = await import("../../artifacts/api-server/src/app");
   
   console.log("👂 Starting server on port", PORT, "...");
   const server = app.listen(PORT);

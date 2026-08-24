@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { db, usersTable } from "@workspace/db";
+import { db, usersTable, consultationsTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
 
 export async function seedDefaultAdmin() {
@@ -24,6 +24,25 @@ export async function seedDefaultAdmin() {
   console.log("   Email:    root@unza.zm");
   console.log("   Password: adminadmin");
   return { created: true, user };
+}
+
+export async function migrateConsultationSchema() {
+  console.log("🔄 Migrating consultation schema...");
+  
+  try {
+    // Add new columns if they don't exist
+    await db.execute(`
+      ALTER TABLE consultations 
+      ADD COLUMN IF NOT EXISTS dismissal_reason TEXT,
+      ADD COLUMN IF NOT EXISTS resolution_reason TEXT,
+      ADD COLUMN IF NOT EXISTS information_requests JSONB DEFAULT '[]'::jsonb
+    `);
+    console.log("✅ Consultation schema migrated successfully");
+    return { success: true };
+  } catch (err) {
+    console.error("❌ Migration failed:", err);
+    return { success: false, error: err };
+  }
 }
 
 // If executed directly (cli), run and exit with appropriate code

@@ -1,3 +1,13 @@
+/**
+ * @module Mental Health Routes
+ * @file mental-health.ts
+ * @developer moses
+ * @role Senior Mental Health & Support Engineer
+ * 
+ * Part of the DigiHealth Asset Tracker system.
+ * Designed with Solid principles, strict separation of concerns, and modular isolation.
+ */
+
 import { Router } from "express";
 import { db, mentalHealthSessionsTable, messagesTable, usersTable } from "@workspace/db";
 import { eq, or } from "drizzle-orm";
@@ -121,9 +131,24 @@ router.get("/mental-health/messages/:sessionId", requireAuth, async (req, res) =
     .where(eq(messagesTable.sessionId, sessionId))
     .orderBy(messagesTable.createdAt);
 
+  const [session] = await db.select().from(mentalHealthSessionsTable).where(eq(mentalHealthSessionsTable.id, sessionId)).limit(1);
+
   const enriched = await Promise.all(rows.map(async (m) => {
     const [sender] = await db.select().from(usersTable).where(eq(usersTable.id, m.senderId)).limit(1);
-    const { passwordHash: _, ...safeSender } = sender ?? { passwordHash: "", id: m.senderId, name: "Unknown", email: "", role: "student", status: "active", createdAt: new Date(), updatedAt: new Date(), studentNumber: null, phone: null };
+    const { passwordHash: _, ...fullSender } = sender ?? { passwordHash: "", id: m.senderId, name: "Unknown", email: "", role: "student", status: "active", createdAt: new Date(), updatedAt: new Date(), studentNumber: null, phone: null };
+
+    // If the session is anonymous, hide identifying details for messages from the student
+    let safeSender: any = fullSender;
+    if (session && session.isAnonymous && fullSender?.id === session.studentId) {
+      safeSender = {
+        id: fullSender.id,
+        name: "Anonymous",
+        role: fullSender.role,
+        status: fullSender.status,
+        createdAt: fullSender.createdAt,
+      };
+    }
+
     return { ...m, sender: safeSender };
   }));
 
@@ -152,7 +177,19 @@ router.post("/mental-health/messages/:sessionId", requireAuth, async (req, res) 
   }
 
   const [sender] = await db.select().from(usersTable).where(eq(usersTable.id, msg.senderId)).limit(1);
-  const { passwordHash: _, ...safeSender } = sender ?? { passwordHash: "", id: msg.senderId, name: "Unknown", email: "", role: "student", status: "active", createdAt: new Date(), updatedAt: new Date(), studentNumber: null, phone: null };
+  const { passwordHash: _, ...fullSender } = sender ?? { passwordHash: "", id: msg.senderId, name: "Unknown", email: "", role: "student", status: "active", createdAt: new Date(), updatedAt: new Date(), studentNumber: null, phone: null };
+
+  let safeSender: any = fullSender;
+  if (session && session.isAnonymous && fullSender?.id === session.studentId) {
+    safeSender = {
+      id: fullSender.id,
+      name: "Anonymous",
+      role: fullSender.role,
+      status: fullSender.status,
+      createdAt: fullSender.createdAt,
+    };
+  }
+
   res.status(201).json({ ...msg, sender: safeSender });
 });
 

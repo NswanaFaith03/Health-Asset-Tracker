@@ -1,3 +1,13 @@
+/**
+ * @module Consultation Routes
+ * @file consultations.ts
+ * @developer AAron
+ * @role Senior Clinical Systems Architect
+ * 
+ * Part of the DigiHealth Asset Tracker system.
+ * Designed with Solid principles, strict separation of concerns, and modular isolation.
+ */
+
 import { Router } from "express";
 import { db, consultationsTable, usersTable, queueTable } from "@workspace/db";
 import { eq, and } from "drizzle-orm";
@@ -6,6 +16,27 @@ import { logAudit } from "../lib/audit";
 import { createNotification } from "../lib/notify";
 
 const router = Router();
+
+// Modular consultation action system
+interface ConsultationAction {
+  action: "dismiss" | "resolve" | "request_info" | "respond_to_info";
+  reason?: string;
+  userId: number;
+  requestId?: string;
+}
+
+// Role-based consultation action permissions
+const ACTION_PERMISSIONS: Record<string, string[]> = {
+  dismiss: ["doctor", "admin"],
+  resolve: ["doctor", "admin"],
+  request_info: ["doctor", "nurse", "admin"],
+  respond_to_info: ["student"],
+};
+
+async function canPerformAction(action: string, userRole: string): Promise<boolean> {
+  const allowedRoles = ACTION_PERMISSIONS[action] || [];
+  return allowedRoles.includes(userRole);
+}
 
 async function getNextQueueNumber() {
   const allWaiting = await db.select().from(queueTable).where(eq(queueTable.status, "waiting"));
@@ -168,6 +199,111 @@ router.patch("/consultations/:id/status", requireAuth, async (req, res) => {
     await createNotification(existing.studentId, "Consultation Updated", `Your consultation status is now: ${status}`, "consultation");
   }
   res.json(await enrichConsultation(updated));
+});
+
+// New modular consultation action endpoints
+router.post("/consultations/:id/actions", requireAuth, async (req, res) => {
+  const id = Number(req.params.id);
+  const { action, reason, requestId } = req.body;
+  const user = req.user!;
+
+  if (!action) {
+    return res.status(400).json({ error: "validation", message: "action is required" });
+  }
+
+  const hasPermission = await canPerformAction(action, user.role);
+  if (!hasPermission) {
+    return res.status(403).json({ error: "forbidden", message: `User role ${user.role} cannot perform action ${action}` });
+  }
+
+  const [existing] = await db.select().from(consultationsTable).where(eq(consultationsTable.id, id)).limit(1);
+  if (!existing) {
+    return res.status(404).json({ error: "not_found" });
+  }
+
+  try {
+    const updateData: Partial<typeof consultationsTable.$inferSelect> = {};
+    let notificationMessage = "";
+    let notificationTitle = "";
+    const actorName = (user as any)?.name ?? "User";
+
+    switch (action) {
+      case "dismiss":
+        if (!reason) {
+          return res.status(400).json({ error: "validation", message: "reason is required for dismissal" });
+        }
+        updateData.status = "dismissed";
+        updateData.dismissalReason = reason;
+        notificationTitle = "Consultation Dismissed";
+        notificationMessage = `Your consultation has been dismissed by the doctor. Reason: ${reason}`;
+        break;
+
+      case "resolve":
+        if (!reason) {
+          return res.status(400).json({ error: "validation", message: "reason is required for resolution" });
+        }
+        updateData.status = "resolved";
+        updateData.resolutionReason = reason;
+        notificationTitle = "Consultation Resolved";
+        notificationMessage = `Your consultation has been resolved. Reason: ${reason}`;
+        break;
+
+      case "request_info":
+        if (!reason) {
+          return res.status(400).json({ error: "validation", message: "information request message is required" });
+        }
+        const currentRequests = (existing.informationRequests as any[]) || [];
+        const newRequestId = `req_${Date.now()}_${user.id}`;
+        currentRequests.push({
+          id: newRequestId,
+          userId: user.id,
+          userName: actorName,
+          role: user.role,
+          message: reason,
+          timestamp: new Date().toISOString(),
+          response: null,
+        });
+        updateData.informationRequests = currentRequests;
+        notificationTitle = "Information Request";
+        notificationMessage = `${actorName} (${user.role}) requested additional information for your consultation`;
+        break;
+
+      case "respond_to_info":
+        if (!requestId) {
+          return res.status(400).json({ error: "validation", message: "requestId is required for response" });
+        }
+        const infoRequests = (existing.informationRequests as any[]) || [];
+        const requestIndex = infoRequests.findIndex((r: any) => r.id === requestId);
+        if (requestIndex === -1) {
+          return res.status(404).json({ error: "not_found", message: "Information request not found" });
+        }
+        infoRequests[requestIndex].response = reason;
+        infoRequests[requestIndex].respondedAt = new Date().toISOString();
+        updateData.informationRequests = infoRequests;
+        notificationTitle = "Information Response";
+        notificationMessage = `Your response to the information request has been recorded`;
+        break;
+
+      default:
+        return res.status(400).json({ error: "validation", message: `Invalid action: ${action}` });
+    }
+
+    const [updated] = await db.update(consultationsTable)
+      .set(updateData)
+      .where(eq(consultationsTable.id, id))
+      .returning();
+
+    await logAudit(req, `consultation_action_${action}`, "consultation", id, `reason=${reason}`);
+
+    if (notificationTitle && existing.studentId) {
+      await createNotification(existing.studentId, notificationTitle, notificationMessage, "consultation");
+    }
+
+    return res.json(await enrichConsultation(updated));
+  } catch (err) {
+    console.error("Error performing consultation action:", err);
+    return res.status(500).json({ error: "Failed to perform action" });
+  }
 });
 
 export default router;

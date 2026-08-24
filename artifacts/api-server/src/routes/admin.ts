@@ -1,3 +1,13 @@
+/**
+ * @module Admin Routes
+ * @file admin.ts
+ * @developer Joshua
+ * @role Senior Security, Authentication, & Core Platform Lead
+ * 
+ * Part of the DigiHealth Asset Tracker system.
+ * Designed with Solid principles, strict separation of concerns, and modular isolation.
+ */
+
 import { Router } from "express";
 import { db, usersTable, consultationsTable, prescriptionsTable, labRequestsTable, mentalHealthSessionsTable, auditLogsTable, queueTable, appSettingsTable } from "@workspace/db";
 import { count, sql, desc, eq } from "drizzle-orm";

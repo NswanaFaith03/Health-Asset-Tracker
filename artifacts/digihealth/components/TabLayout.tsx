@@ -18,11 +18,11 @@ export function TabLayout({ allowedRoles, children, headerRight }: TabLayoutProp
   const insets = useSafeAreaInsets();
 
   if (!currentUser) {
-    return <Redirect href="/(auth)/login" />;
+    return <Redirect href="/(Joshua-auth)/login" />;
   }
 
   if (!allowedRoles.includes(currentUser.role)) {
-    return <Redirect href="/(auth)/login" />;
+    return <Redirect href="/(Joshua-auth)/login" />;
   }
 
   return (

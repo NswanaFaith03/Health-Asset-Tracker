@@ -79,7 +79,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setToken(null);
       setCurrentUser(null);
       setIsOnShift(false);
-      router.replace("/(auth)/login");
+      router.replace("/(Joshua-auth)/login");
     } catch (e) {
       console.error("Failed to clear auth state", e);
     }

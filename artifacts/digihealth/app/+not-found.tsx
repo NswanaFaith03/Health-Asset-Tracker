@@ -1,3 +1,13 @@
+/**
+ * @module Core App Entry
+ * @file +not-found.tsx
+ * @developer Joshua
+ * @role Senior Security, Authentication, & Core Platform Lead
+ * 
+ * Part of the DigiHealth Asset Tracker system.
+ * Designed with Solid principles, strict separation of concerns, and modular isolation.
+ */
+
 import { Link, Stack } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 

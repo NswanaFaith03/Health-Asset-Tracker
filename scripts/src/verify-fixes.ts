@@ -14,7 +14,9 @@ try {
   console.error("Could not find .env.local, checking process.env...");
 }
 
-const env: Record<string, string> = { ...process.env };
+const env: Record<string, string> = Object.fromEntries(
+  Object.entries(process.env).map(([k, v]) => [k, v ?? ""])
+);
 envData.split("\n").forEach((line) => {
   const trimmed = line.trim();
   if (!trimmed || trimmed.startsWith("#")) return;

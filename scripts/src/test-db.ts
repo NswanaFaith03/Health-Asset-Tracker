@@ -25,7 +25,7 @@ envData.split("\n").forEach((line) => {
 });
 
 async function main() {
-  const { db, usersTable } = await import("../../lib/db/src/index.ts");
+  const { db, usersTable } = await import("../../lib/db/src/index");
   console.log("Attempting to insert test user directly...");
   
   const randomEmail = `test-direct-insert-${Date.now()}@unza.zm`;

@@ -1,3 +1,13 @@
+/**
+ * @module Auth Routes
+ * @file auth.ts
+ * @developer Joshua
+ * @role Senior Security, Authentication, & Core Platform Lead
+ * 
+ * Part of the DigiHealth Asset Tracker system.
+ * Designed with Solid principles, strict separation of concerns, and modular isolation.
+ */
+
 import { Router } from "express";
 import bcrypt from "bcryptjs";
 import { db, usersTable } from "@workspace/db";
@@ -143,6 +153,37 @@ router.post("/auth/change-password", requireAuth, async (req, res) => {
   await db.update(usersTable).set({ passwordHash: newHash, requiresPasswordReset: false }).where(eq(usersTable.id, user.id));
   await logAudit(req, "change_password", "user", user.id);
   res.json({ success: true, message: "Password changed" });
+});
+
+router.post("/auth/forgot-password", async (req, res) => {
+  const { email, studentNumber, newPassword } = req.body;
+  if (!email || !studentNumber || !newPassword) {
+    res.status(400).json({ error: "validation", message: "email, studentNumber, and newPassword are required" });
+    return;
+  }
+  const normalizedEmail = email.toLowerCase().trim();
+  const [user] = await db.select().from(usersTable).where(ilike(usersTable.email, normalizedEmail)).limit(1);
+  if (!user) {
+    res.status(404).json({ error: "not_found", message: "User not found" });
+    return;
+  }
+  if (user.role !== "student") {
+    res.status(403).json({
+      error: "forbidden",
+      message: "Only students can reset their password via this screen. Other roles must request a password reset from the admin.",
+    });
+    return;
+  }
+  if (!user.studentNumber || user.studentNumber.trim().toLowerCase() !== studentNumber.trim().toLowerCase()) {
+    res.status(400).json({ error: "validation", message: "Invalid student number for this email" });
+    return;
+  }
+  const passwordHash = await bcrypt.hash(newPassword, 10);
+  await db.update(usersTable)
+    .set({ passwordHash, requiresPasswordReset: false })
+    .where(eq(usersTable.id, user.id));
+  await logAudit(req, "forgot_password_reset", "user", user.id);
+  res.json({ success: true, message: "Password reset successful" });
 });
 
 export default router;

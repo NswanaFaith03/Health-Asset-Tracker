@@ -1,3 +1,13 @@
+/**
+ * @module HIV Support Routes
+ * @file hiv-support.ts
+ * @developer moses
+ * @role Senior Mental Health & Support Engineer
+ * 
+ * Part of the DigiHealth Asset Tracker system.
+ * Designed with Solid principles, strict separation of concerns, and modular isolation.
+ */
+
 import { Router } from "express";
 import { db, hivSupportSessionsTable, hivResourcesTable, usersTable, messagesTable } from "@workspace/db";
 import { eq, or } from "drizzle-orm";
@@ -7,19 +17,27 @@ import { createNotification } from "../lib/notify";
 
 const router = Router();
 
-async function enrichSession(s: typeof hivSupportSessionsTable.$inferSelect) {
+async function enrichSession(s: typeof hivSupportSessionsTable.$inferSelect & { isAnonymous?: boolean }) {
   const safeUser = (u: typeof usersTable.$inferSelect | undefined) => {
     if (!u) return null;
     const { passwordHash: _, ...safe } = u;
     return safe;
   };
-  const [student] = await db.select().from(usersTable).where(eq(usersTable.id, s.studentId)).limit(1);
+  let student = null;
+  if (!s.isAnonymous) {
+    const [stu] = await db.select().from(usersTable).where(eq(usersTable.id, s.studentId)).limit(1);
+    student = safeUser(stu);
+  } else {
+    student = { id: s.studentId, name: "Anonymous", role: "student", status: "active", createdAt: new Date() } as any;
+  }
+
   let professional = null;
   if (s.professionalId) {
     const [p] = await db.select().from(usersTable).where(eq(usersTable.id, s.professionalId)).limit(1);
     professional = safeUser(p);
   }
-  return { ...s, student: safeUser(student), professional };
+
+  return { ...s, student, professional };
 }
 
 router.get("/hiv-support/sessions", requireAuth, async (req, res) => {
@@ -45,7 +63,7 @@ router.get("/hiv-support/sessions", requireAuth, async (req, res) => {
 });
 
 router.post("/hiv-support/sessions", requireAuth, async (req, res) => {
-  const { topic, appointmentDate, notes } = req.body;
+  const { topic, appointmentDate, notes, isAnonymous } = req.body;
   if (!topic) {
     res.status(400).json({ error: "validation", message: "topic is required" });
     return;
@@ -55,8 +73,9 @@ router.post("/hiv-support/sessions", requireAuth, async (req, res) => {
     topic,
     notes: notes ?? null,
     status: "requested",
+    isAnonymous: !!isAnonymous,
     appointmentDate: appointmentDate ? new Date(appointmentDate) : null,
-  }).returning();
+  } as any).returning();
   await logAudit(req, "create_hiv_session", "hiv_support_session", session.id);
   res.status(201).json(await enrichSession(session));
 });
@@ -100,10 +119,17 @@ router.get("/hiv-support/sessions/:id/messages", requireAuth, async (req, res) =
     .where(eq(messagesTable.sessionId, sessionId))
     .orderBy(messagesTable.createdAt);
 
+  const [session] = await db.select().from(hivSupportSessionsTable).where(eq(hivSupportSessionsTable.id, sessionId)).limit(1) as any;
   const fallback = (id: number) => ({ passwordHash: "", id, name: "Unknown", email: "", role: "student", status: "active", createdAt: new Date(), updatedAt: new Date(), studentNumber: null, phone: null, avatarUrl: null, requiresPasswordReset: false });
   const enriched = await Promise.all(rows.map(async (m) => {
     const [sender] = await db.select().from(usersTable).where(eq(usersTable.id, m.senderId)).limit(1);
-    const { passwordHash: _, ...safeSender } = sender ?? fallback(m.senderId);
+    const { passwordHash: _, ...fullSender } = sender ?? fallback(m.senderId);
+
+    let safeSender: any = fullSender;
+    if (session && (session as any).isAnonymous && fullSender?.id === (session as any).studentId) {
+      safeSender = { id: fullSender.id, name: "Anonymous", role: fullSender.role, status: fullSender.status, createdAt: fullSender.createdAt };
+    }
+
     return { ...m, sender: safeSender };
   }));
 
@@ -124,7 +150,7 @@ router.post("/hiv-support/sessions/:id/messages", requireAuth, async (req, res) 
   }).returning();
 
   // Notify the other party
-  const [session] = await db.select().from(hivSupportSessionsTable).where(eq(hivSupportSessionsTable.id, sessionId)).limit(1);
+  const [session] = await db.select().from(hivSupportSessionsTable).where(eq(hivSupportSessionsTable.id, sessionId)).limit(1) as any;
   if (session) {
     const targetId = req.user!.id === session.studentId ? session.professionalId : session.studentId;
     if (targetId) {
@@ -134,7 +160,11 @@ router.post("/hiv-support/sessions/:id/messages", requireAuth, async (req, res) 
 
   const fallback = (id: number) => ({ passwordHash: "", id, name: "Unknown", email: "", role: "student", status: "active", createdAt: new Date(), updatedAt: new Date(), studentNumber: null, phone: null, avatarUrl: null, requiresPasswordReset: false });
   const [sender] = await db.select().from(usersTable).where(eq(usersTable.id, msg.senderId)).limit(1);
-  const { passwordHash: _, ...safeSender } = sender ?? fallback(msg.senderId);
+  const { passwordHash: _, ...fullSender } = sender ?? fallback(msg.senderId);
+  let safeSender: any = fullSender;
+  if (session && (session as any).isAnonymous && fullSender?.id === (session as any).studentId) {
+    safeSender = { id: fullSender.id, name: "Anonymous", role: fullSender.role, status: fullSender.status, createdAt: fullSender.createdAt };
+  }
   res.status(201).json({ ...msg, sender: safeSender });
 });
 

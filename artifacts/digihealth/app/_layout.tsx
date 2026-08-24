@@ -1,3 +1,13 @@
+/**
+ * @module Core App Entry
+ * @file _layout.tsx
+ * @developer Joshua
+ * @role Senior Security, Authentication, & Core Platform Lead
+ * 
+ * Part of the DigiHealth Asset Tracker system.
+ * Designed with Solid principles, strict separation of concerns, and modular isolation.
+ */
+
 import {
   Inter_400Regular,
   Inter_500Medium,
@@ -116,14 +126,14 @@ function RootLayoutNav() {
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="index" />
-      <Stack.Screen name="(auth)" />
-      <Stack.Screen name="(student)" />
-      <Stack.Screen name="(doctor)" />
-      <Stack.Screen name="(pharmacist)" />
-      <Stack.Screen name="(lab)" />
-      <Stack.Screen name="(mental-health)" />
-      <Stack.Screen name="(hiv-support)" />
-      <Stack.Screen name="(admin)" />
+      <Stack.Screen name="(Joshua-auth)" />
+      <Stack.Screen name="(Faith-student)" />
+      <Stack.Screen name="(AAron-doctor)" />
+      <Stack.Screen name="(Khadijah-Joshua-pharmacist)" />
+      <Stack.Screen name="(Khadijah-lab)" />
+      <Stack.Screen name="(Faith-moses-mental-health)" />
+      <Stack.Screen name="(moses-hiv-support)" />
+      <Stack.Screen name="(Joshua-admin)" />
     </Stack>
   );
 }

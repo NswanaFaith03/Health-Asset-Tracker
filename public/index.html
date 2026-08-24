@@ -1,226 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UNZA DigiHealth API | Status</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-    <style>
-        :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --accent-color: #0f766e;
-            --accent-glow: rgba(15, 118, 110, 0.4);
-            --text-color: #f8fafc;
-            --muted-text: #94a3b8;
-        }
-
-        body {
-            background-image: linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.85)), url('/school.jpg');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            color: var(--text-color);
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow-x: hidden;
-        }
-
-        .background-glow {
-            position: absolute;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, var(--accent-glow) 0%, rgba(15, 23, 42, 0) 70%);
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: -1;
-            pointer-events: none;
-        }
-
-        .api-card {
-            background-color: rgba(30, 41, 59, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 24px;
-            padding: 3rem 2.5rem;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            max-width: 520px;
-            width: 100%;
-            text-align: center;
-            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-        }
-
-        .api-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 30px 60px rgba(15, 118, 110, 0.25);
-            border-color: rgba(15, 118, 110, 0.4);
-        }
-
-        .status-badge {
-            background-color: rgba(16, 185, 129, 0.1);
-            color: #10b981;
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            padding: 0.5rem 1.25rem;
-            border-radius: 9999px;
-            font-size: 0.875rem;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 2rem;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
-            }
-            70% {
-                box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
-            }
-            100% {
-                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
-            }
-        }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            background-color: #10b981;
-            border-radius: 50%;
-        }
-
-        .logo-icon {
-            font-size: 3rem;
-            color: var(--accent-color);
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, #0f766e, #14b8a6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        h1 {
-            font-size: 2rem;
-            font-weight: 800;
-            letter-spacing: -0.025em;
-            margin-bottom: 0.5rem;
-        }
-
-        .subtitle {
-            color: var(--muted-text);
-            font-size: 1rem;
-            margin-bottom: 2.5rem;
-        }
-
-        .metadata-section {
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            padding-top: 1.5rem;
-            margin-bottom: 2rem;
-            text-align: left;
-        }
-
-        .metadata-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.75rem;
-            font-size: 0.9rem;
-        }
-
-        .metadata-label {
-            color: var(--muted-text);
-        }
-
-        .metadata-value {
-            font-weight: 500;
-            color: var(--text-color);
-        }
-
-        .btn-custom {
-            background: linear-gradient(135deg, #0f766e, #0d9488);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            padding: 0.75rem 1.5rem;
-            font-weight: 600;
-            width: 100%;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .btn-custom:hover {
-            background: linear-gradient(135deg, #0d9488, #14b8a6);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
-            color: white;
-        }
+  <head>
+    <meta charset="utf-8" />
+    <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>UNZA DigiHealth</title>
+    <!-- The `react-native-web` recommended style reset: https://necolas.github.io/react-native-web/docs/setup/#root-element -->
+    <style id="expo-reset">
+      /* These styles make the body full-height */
+      html,
+      body {
+        height: 100%;
+      }
+      /* These styles disable body scrolling if you are using <ScrollView> */
+      body {
+        overflow: hidden;
+      }
+      /* These styles make the root element full-height */
+      #root {
+        display: flex;
+        height: 100%;
+        flex: 1;
+      }
     </style>
-</head>
-<body>
-    <div class="background-glow"></div>
-    <div class="api-card">
-        <div class="status-badge">
-            <span class="status-dot"></span>
-            System Online
-        </div>
-        <i class="fa-solid fa-house-medical logo-icon"></i>
-        <h1>UNZA DigiHealth</h1>
-        <p class="subtitle">Production API Server Gateway</p>
-        
-        <div class="metadata-section">
-            <div class="metadata-item">
-                <span class="metadata-label"><i class="fa-solid fa-server me-2"></i>Environment</span>
-                <span class="metadata-value">Vercel Serverless</span>
-            </div>
-            <div class="metadata-item">
-                <span class="metadata-label"><i class="fa-solid fa-database me-2"></i>Database</span>
-                <span class="metadata-value">Neon PostgreSQL</span>
-            </div>
-            <div class="metadata-item">
-                <span class="metadata-label"><i class="fa-solid fa-shield-halved me-2"></i>Endpoints Security</span>
-                <span class="metadata-value">JWT Enabled</span>
-            </div>
-            <div class="metadata-item">
-                <span class="metadata-label"><i class="fa-solid fa-network-wired me-2"></i>API Version</span>
-                <span class="metadata-value">v1.0.0</span>
-            </div>
-        </div>
+  <link rel="icon" href="/favicon.ico" /></head>
 
-        <a href="/api/health" class="btn-custom" target="_blank">
-            <i class="fa-solid fa-heart-pulse"></i>
-            Check API Health
-        </a>
-    </div>
-
-    <!-- Bootstrap 5 JS Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Canvas Confetti CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const btn = document.querySelector('.btn-custom');
-            if (btn) {
-                btn.addEventListener('click', (e) => {
-                    confetti({
-                        particleCount: 120,
-                        spread: 70,
-                        origin: { y: 0.6 },
-                        colors: ['#0f766e', '#14b8a6', '#38bdf8', '#ffffff']
-                    });
-                });
-            }
-        });
-    </script>
+  <body>
+    <!-- Use static rendering with Expo Router to support running without JavaScript. -->
+    <noscript>
+      You need to enable JavaScript to run this app.
+    </noscript>
+    <!-- The root element for your Expo app. -->
+    <div id="root"></div>
+  <script src="/_expo/static/js/web/entry-7cb01496442577739cd9a1cd2ad234cb.js" defer></script>
 </body>
 </html>

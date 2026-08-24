@@ -1,3 +1,13 @@
+/**
+ * @module Base API Routing
+ * @file index.ts
+ * @developer Joshua
+ * @role Senior Security, Authentication, & Core Platform Lead
+ * 
+ * Part of the DigiHealth Asset Tracker system.
+ * Designed with Solid principles, strict separation of concerns, and modular isolation.
+ */
+
 import { Router, type IRouter } from "express";
 import healthRouter from "./health";
 import authRouter from "./auth";

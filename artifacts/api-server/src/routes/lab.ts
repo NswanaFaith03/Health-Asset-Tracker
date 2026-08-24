@@ -1,3 +1,13 @@
+/**
+ * @module Lab Routes
+ * @file lab.ts
+ * @developer Khadijah
+ * @role Senior Diagnostics & Pharmacy Integration Specialist
+ * 
+ * Part of the DigiHealth Asset Tracker system.
+ * Designed with Solid principles, strict separation of concerns, and modular isolation.
+ */
+
 import { Router } from "express";
 import { db, labRequestsTable, labResultsTable, usersTable } from "@workspace/db";
 import { eq, and } from "drizzle-orm";

@@ -1,4 +1,15 @@
+/**
+ * @module User Routes
+ * @file users.ts
+ * @developer Joshua
+ * @role Senior Security, Authentication, & Core Platform Lead
+ * 
+ * Part of the DigiHealth Asset Tracker system.
+ * Designed with Solid principles, strict separation of concerns, and modular isolation.
+ */
+
 import { Router } from "express";
+import bcrypt from "bcryptjs";
 import { db, usersTable } from "@workspace/db";
 import { eq, ilike, or } from "drizzle-orm";
 import { requireAuth, requireRole } from "../middlewares/auth";
@@ -116,6 +127,26 @@ router.post("/users/me/avatar", requireAuth, async (req, res) => {
     console.error(err);
     res.status(500).json({ error: "server_error" });
   }
+});
+
+router.post("/users/:id/reset-password", requireAuth, requireRole("admin"), async (req, res) => {
+  const id = Number(req.params.id);
+  const { newPassword } = req.body;
+  if (!newPassword) {
+    res.status(400).json({ error: "validation", message: "newPassword is required" });
+    return;
+  }
+  const passwordHash = await bcrypt.hash(newPassword, 10);
+  const [updated] = await db.update(usersTable)
+    .set({ passwordHash, requiresPasswordReset: true })
+    .where(eq(usersTable.id, id))
+    .returning();
+  if (!updated) {
+    res.status(404).json({ error: "not_found" });
+    return;
+  }
+  await logAudit(req, "admin_reset_password", "user", id);
+  res.json({ success: true, message: "User password reset successful. The user will be required to change it on their next login." });
 });
 
 export default router;
