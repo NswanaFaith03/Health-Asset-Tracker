@@ -111,6 +111,11 @@ function getDevApiBaseUrl(): string {
     return "http://10.0.2.2:5000";
   }
 
+  if (Platform.OS === "web") {
+    // For web, use production API or local development server
+    return process.env.EXPO_PUBLIC_API_URL || "http://localhost:5000";
+  }
+
   return "http://localhost:5000";
 }
 

@@ -9,7 +9,7 @@
  */
 
 import React, { useState } from "react";
-import { View, StyleSheet, TouchableOpacity, Text, TextInput, Modal, ScrollView, Alert } from "react-native";
+import { View, StyleSheet, TouchableOpacity, Text, TextInput, Modal, ScrollView, Alert, Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Feather } from "@expo/vector-icons";
 import { useColors } from "@/hooks/useColors";
@@ -131,8 +131,10 @@ export function ConsultationActions({ consultationId, currentStatus, consultatio
   const executeAction = async (action: ConsultationAction) => {
     setIsProcessing(true);
     try {
-      // Get token from AsyncStorage for the API call
-      const token = await AsyncStorage.getItem("auth_token");
+      // Get token from storage for the API call
+      const token = Platform.OS === "web" 
+        ? localStorage.getItem("auth_token")
+        : await AsyncStorage.getItem("auth_token");
       
       const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/consultations/${consultationId}/actions`, {
         method: "POST",

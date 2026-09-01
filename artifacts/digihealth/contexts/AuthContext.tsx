@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { User, setAuthTokenGetter } from "@workspace/api-client-react";
 import { router } from "expo-router";
@@ -17,6 +18,30 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Storage helpers for cross-platform compatibility
+const storage = {
+  getItem: async (key: string): Promise<string | null> => {
+    if (Platform.OS === "web") {
+      return localStorage.getItem(key);
+    }
+    return AsyncStorage.getItem(key);
+  },
+  setItem: async (key: string, value: string): Promise<void> => {
+    if (Platform.OS === "web") {
+      localStorage.setItem(key, value);
+    } else {
+      await AsyncStorage.setItem(key, value);
+    }
+  },
+  removeItem: async (key: string): Promise<void> => {
+    if (Platform.OS === "web") {
+      localStorage.removeItem(key);
+    } else {
+      await AsyncStorage.removeItem(key);
+    }
+  },
+};
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
@@ -31,9 +56,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const loadAuth = async () => {
       try {
-        const storedToken = await AsyncStorage.getItem("auth_token");
-        const storedUserStr = await AsyncStorage.getItem("auth_user");
-        const storedShift = await AsyncStorage.getItem("shift_status");
+        const storedToken = await storage.getItem("auth_token");
+        const storedUserStr = await storage.getItem("auth_user");
+        const storedShift = await storage.getItem("shift_status");
         
         if (storedToken && storedUserStr) {
           setToken(storedToken);
@@ -55,8 +80,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       setToken(newToken);
       setCurrentUser(user);
-      await AsyncStorage.setItem("auth_token", newToken);
-      await AsyncStorage.setItem("auth_user", JSON.stringify(user));
+      await storage.setItem("auth_token", newToken);
+      await storage.setItem("auth_user", JSON.stringify(user));
     } catch (e) {
       console.error("Failed to save auth state", e);
     }
@@ -65,7 +90,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const updateCurrentUser = async (user: User) => {
     try {
       setCurrentUser(user);
-      await AsyncStorage.setItem("auth_user", JSON.stringify(user));
+      await storage.setItem("auth_user", JSON.stringify(user));
     } catch (e) {
       console.error("Failed to update auth user state", e);
     }
@@ -73,9 +98,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = async () => {
     try {
-      await AsyncStorage.removeItem("auth_token");
-      await AsyncStorage.removeItem("auth_user");
-      await AsyncStorage.removeItem("shift_status");
+      await storage.removeItem("auth_token");
+      await storage.removeItem("auth_user");
+      await storage.removeItem("shift_status");
       setToken(null);
       setCurrentUser(null);
       setIsOnShift(false);
@@ -88,7 +113,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const startShift = async () => {
     try {
       setIsOnShift(true);
-      await AsyncStorage.setItem("shift_status", "active");
+      await storage.setItem("shift_status", "active");
     } catch (e) {
       console.error("Failed to start shift", e);
     }
@@ -97,7 +122,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const endShift = async () => {
     try {
       setIsOnShift(false);
-      await AsyncStorage.setItem("shift_status", "inactive");
+      await storage.setItem("shift_status", "inactive");
     } catch (e) {
       console.error("Failed to end shift", e);
     }
