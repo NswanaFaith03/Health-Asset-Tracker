@@ -1,15 +1,16 @@
 {
   "version": 2,
-  "buildCommand": "cd artifacts/digihealth && pnpm exec expo export -p web && cd ../../ && cp -r artifacts/digihealth/dist/* .",
+  "buildCommand": "cd artifacts/digihealth && pnpm exec expo export -p web",
+  "outputDirectory": "artifacts/digihealth/dist",
   "installCommand": "pnpm install",
-  "public": "",
+  "framework": "expo",
   "rewrites": [
     {
-      "source": "/api/(.*)",
+      "source": "/api/:path*",
       "destination": "/api/index.js"
     },
     {
-      "source": "/((?!api|_expo|assets|favicon.ico|metadata.json).*)",
+      "source": "/:path*",
       "destination": "/index.html"
     }
   ]
