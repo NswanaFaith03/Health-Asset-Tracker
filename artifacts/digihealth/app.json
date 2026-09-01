@@ -21,7 +21,16 @@
       "usesCleartextTraffic": true
     },
     "web": {
-      "favicon": "./assets/images/icon.png"
+      "favicon": "./assets/images/icon.png",
+      "bundler": "metro",
+      "output": "static",
+      "config": {
+        "publicPath": "/",
+        "optimizeForSpeed": true
+      },
+      "meta": {
+        "viewport": "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+      }
     },
     "plugins": [
       [
