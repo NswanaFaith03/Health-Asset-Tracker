@@ -37,6 +37,7 @@ import { ConsultationActions } from "../../features/AAron-consultation/component
 import {
   STATUS_COLORS, SEVERITY_COLORS,
 } from "../../features/AAron-consultation/constants";
+import { useWeb } from "../../hooks/useWeb";
 
 export default function DoctorConsultationDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -44,6 +45,7 @@ export default function DoctorConsultationDetail() {
   const colors = useColors();
   const queryClient = useQueryClient();
   const { currentUser } = useAuth();
+  const isWeb = useWeb();
   const consultationId = useMemo(() => {
     const parsed = Number(id);
     return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
@@ -103,6 +105,157 @@ export default function DoctorConsultationDetail() {
   };
 
   const c = consultation as any;
+
+  // Web-specific header and layout
+  if (isWeb) {
+    return (
+      <View style={[styles.webContainer, { backgroundColor: colors.background }]}>
+        {/* Web Header */}
+        <View style={[styles.webHeader, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
+          <View style={styles.webHeaderContent}>
+            <TouchableOpacity onPress={() => router.back()} style={styles.webBackButton}>
+              <Feather name="arrow-left" size={20} color={colors.foreground} />
+            </TouchableOpacity>
+            <Text style={[styles.webTitle, { color: colors.foreground }]}>Consultation Details</Text>
+            <View style={{ width: 40 }} />
+          </View>
+        </View>
+
+        {/* Main Content with max-width container */}
+        <View style={[styles.webContent, { paddingTop: insets.top + 80, paddingBottom: insets.bottom + 40 }]}>
+          {isLoading ? (
+            <View style={styles.center}><ActivityIndicator size="large" color={colors.primary} /></View>
+          ) : consultationId <= 0 || !c ? (
+            <View style={styles.center}><Text style={{ color: colors.mutedForeground }}>Consultation not found</Text></View>
+          ) : (
+            <>
+              {/* Patient summary card */}
+              <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}> 
+                <Text style={[styles.patientName, { color: colors.foreground }]}>{c.student?.name ?? "Patient"}</Text>
+                <View style={styles.row}>
+                  <Badge status={c.status ?? ""} colorMap={STATUS_COLORS} />
+                  <Badge status={c.severity ?? ""} colorMap={SEVERITY_COLORS} />
+                </View>
+                <Text style={[styles.label, { color: colors.mutedForeground }]}>Symptoms</Text>
+                <Text style={[styles.value, { color: colors.foreground }]}>{c.symptoms}</Text>
+                {(c.attachments ?? []).length > 0 && (
+                  <View style={[styles.attachmentsSection, { borderColor: colors.border }]}> 
+                    <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Attached Photos</Text>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.attachmentsRow}>
+                      {(c.attachments ?? []).map((uri: string) => (
+                        <Image key={uri} source={{ uri }} style={styles.attachmentPreview} />
+                      ))}
+                    </ScrollView>
+                  </View>
+                )}
+              </View>
+
+              {c.status === "submitted" && (
+                <TouchableOpacity
+                  style={[styles.btn, { backgroundColor: colors.primary, borderRadius: colors.radius }]}
+                  onPress={handleAssign}
+                >
+                  <Text style={[styles.btnText, { color: colors.primaryForeground }]}>Accept & Assign to Me</Text>
+                </TouchableOpacity>
+              )}
+
+              {(c.status === "closed" || c.status === "resolved") && (
+                <TouchableOpacity
+                  style={[styles.btn, { backgroundColor: colors.secondary, borderRadius: colors.radius, marginTop: 12 }]}
+                  onPress={() => handleLifecycleToggle("submitted")}
+                >
+                  <Text style={[styles.btnText, { color: colors.primary }]}>Reopen Consultation</Text>
+                </TouchableOpacity>
+              )}
+
+              {c.status !== "closed" && c.status !== "resolved" && (
+                <TouchableOpacity
+                  style={[styles.btn, { backgroundColor: colors.muted, borderRadius: colors.radius, marginTop: 12 }]}
+                  onPress={() => handleLifecycleToggle("closed")}
+                >
+                  <Text style={[styles.btnText, { color: colors.foreground }]}>Close Consultation</Text>
+                </TouchableOpacity>
+              )}
+
+              {/* Response card */}
+              <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border, marginTop: 16 }]}> 
+                <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Response</Text>
+                <Text style={[styles.label, { color: colors.mutedForeground }]}>Diagnosis</Text>
+                <TextInput
+                  style={[styles.input, { borderColor: colors.border, color: colors.foreground, backgroundColor: colors.background }]}
+                  placeholder="Enter diagnosis..."
+                  placeholderTextColor={colors.mutedForeground}
+                  value={diagnosis || (c.diagnosis ?? "")}
+                  onChangeText={setDiagnosis}
+                  multiline
+                />
+                <Text style={[styles.label, { color: colors.mutedForeground, marginTop: 12 }]}>Notes</Text>
+                <TextInput
+                  style={[styles.input, { borderColor: colors.border, color: colors.foreground, backgroundColor: colors.background }]}
+                  placeholder="Additional notes..."
+                  placeholderTextColor={colors.mutedForeground}
+                  value={notes || (c.notes ?? "")}
+                  onChangeText={setNotes}
+                  multiline
+                />
+                <TouchableOpacity
+                  style={[styles.btn, { backgroundColor: colors.primary, borderRadius: colors.radius, marginTop: 12 }]}
+                  onPress={handleRespond}
+                >
+                  <Text style={[styles.btnText, { color: colors.primaryForeground }]}>Submit Response</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Consultation Actions - Polymorphic */}
+              <ConsultationActions
+                consultationId={consultationId}
+                currentStatus={c.status ?? ""}
+                consultationOwnerId={c.student?.id ?? 0}
+                onActionComplete={() => {
+                  queryClient.invalidateQueries({ queryKey: getGetConsultationQueryKey(consultationId) });
+                  queryClient.invalidateQueries({ queryKey: getListConsultationsQueryKey() });
+                }}
+              />
+
+              {/* Action buttons → open feature modals */}
+              <View style={styles.actions}>
+                <TouchableOpacity
+                  style={[styles.actionBtn, { backgroundColor: colors.secondary, borderRadius: colors.radius }]}
+                  onPress={() => setShowPrescriptionModal(true)}
+                >
+                  <Feather name="package" size={18} color={colors.primary} />
+                  <Text style={[styles.actionText, { color: colors.primary }]}>Prescribe</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.actionBtn, { backgroundColor: colors.secondary, borderRadius: colors.radius }]}
+                  onPress={() => setShowLabModal(true)}
+                >
+                  <Feather name="activity" size={18} color={colors.primary} />
+                  <Text style={[styles.actionText, { color: colors.primary }]}>Lab Request</Text>
+                </TouchableOpacity>
+              </View>
+            </>
+          )}
+
+          <PrescriptionModal
+            visible={showPrescriptionModal}
+            onClose={() => setShowPrescriptionModal(false)}
+            patientId={c?.student?.id ?? 0}
+            consultationId={consultationId}
+            paddingTop={20}
+          />
+
+          <LabRequestModal
+            visible={showLabModal}
+            onClose={() => setShowLabModal(false)}
+            patientId={c?.student?.id ?? 0}
+            consultationId={consultationId}
+            paddingTop={20}
+          />
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}> 
@@ -272,4 +425,38 @@ const styles = StyleSheet.create({
   actionText: { fontSize: 15, fontWeight: "600" },
   modal: { flex: 1, paddingHorizontal: 20 },
   modalHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 20 },
+  // Web-specific styles
+  webContainer: { flex: 1, minHeight: "100%" as any },
+  webHeader: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 1000,
+    borderBottomWidth: 1,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  webHeaderContent: {
+    maxWidth: 1200,
+    width: "100%",
+    marginHorizontal: "auto",
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  webBackButton: { padding: 8, borderRadius: 8 },
+  webTitle: { fontSize: 20, fontWeight: "700" },
+  webContent: {
+    flex: 1,
+    maxWidth: 1200,
+    width: "100%",
+    marginHorizontal: "auto",
+    paddingHorizontal: 20,
+  },
 });
