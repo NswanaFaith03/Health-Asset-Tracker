@@ -18,7 +18,7 @@
 import React, { useMemo, useState } from "react";
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  ActivityIndicator, TextInput, Alert, Image,
+  ActivityIndicator, TextInput, Alert, Image, Platform,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
@@ -37,7 +37,6 @@ import { ConsultationActions } from "../../features/AAron-consultation/component
 import {
   STATUS_COLORS, SEVERITY_COLORS,
 } from "../../features/AAron-consultation/constants";
-import { useWeb } from "../../hooks/useWeb";
 
 export default function DoctorConsultationDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -45,7 +44,6 @@ export default function DoctorConsultationDetail() {
   const colors = useColors();
   const queryClient = useQueryClient();
   const { currentUser } = useAuth();
-  const isWeb = useWeb();
   const consultationId = useMemo(() => {
     const parsed = Number(id);
     return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
@@ -107,7 +105,7 @@ export default function DoctorConsultationDetail() {
   const c = consultation as any;
 
   // Web-specific header and layout
-  if (isWeb) {
+  if (Platform.OS === "web") {
     return (
       <View style={[styles.webContainer, { backgroundColor: colors.background }]}>
         {/* Web Header */}
