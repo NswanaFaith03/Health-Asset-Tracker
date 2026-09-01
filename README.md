@@ -89,9 +89,8 @@ cd Health-Asset-Tracker
 # Install dependencies
 pnpm install
 
-# Set up environment variables
-cp .env.example .env
-# Configure your database connection and API URL
+# Environment variables are already configured in .env.local
+# DATABASE_URL is set for Neon PostgreSQL database
 ```
 
 ### Database Setup
@@ -106,7 +105,33 @@ pnpm run seed
 
 ### Running the Application
 
-#### Mobile Development
+#### 🚀 Web Development (Full CRUD Operations)
+
+**IMPORTANT**: For web CRUD operations to work, you must run both the backend API server and the web frontend.
+
+**Step 1: Start the Backend API Server**
+```bash
+cd artifacts/api-server
+# Set the database URL from .env.local
+export DATABASE_URL="postgresql://neondb_owner:npg_0PDLmV2uXvWT@ep-round-night-at8gqed4-pooler.c-9.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require"
+pnpm run dev
+```
+
+The backend will start on `http://localhost:5000`
+
+**Step 2: Start the Web Frontend**
+```bash
+cd artifacts/digihealth
+npx expo start --web
+```
+
+The web frontend will start on `http://localhost:8081`
+
+**Access the Web App**: Open http://localhost:8081 in your browser
+
+**Note**: The web version is configured to use the local development API (http://localhost:5000) by default for development. CRUD operations will only work when both services are running.
+
+#### 📱 Mobile Development
 ```bash
 cd artifacts/digihealth
 npx expo start
@@ -118,18 +143,10 @@ npx expo start --android
 npx expo start --ios
 ```
 
-#### Web Development
-```bash
-cd artifacts/digihealth
-npx expo start --web
-
-# Or build for production
-npx expo export -p web
-```
-
-#### Backend API
+#### 🔧 Backend API Only
 ```bash
 cd artifacts/api-server
+export DATABASE_URL="postgresql://neondb_owner:npg_0PDLmV2uXvWT@ep-round-night-at8gqed4-pooler.c-9.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require"
 pnpm run dev
 ```
 
@@ -279,7 +296,13 @@ pnpm run typecheck
 ## 🐛 Known Issues & Troubleshooting
 
 ### Web Platform Issues
-- **API Not Connecting**: Ensure `EXPO_PUBLIC_API_URL` is set correctly
+- **CRUD Operations Not Working**: Ensure backend API server is running on port 5000
+  ```bash
+  cd artifacts/api-server
+  export DATABASE_URL="postgresql://neondb_owner:npg_0PDLmV2uXvWT@ep-round-night-at8gqed4-pooler.c-9.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require"
+  pnpm run dev
+  ```
+- **API Not Connecting**: Check that both backend (port 5000) and frontend (port 8081) are running
 - **Storage Issues**: localStorage vs AsyncStorage compatibility handled in AuthContext
 - **TypeScript Errors**: Web-specific style properties may need type assertions
 
@@ -287,6 +310,11 @@ pnpm run typecheck
 - **EAS Build Failures**: Check EAS project configuration and API keys
 - **Route Navigation Issues**: Ensure route paths are properly formatted
 - **AsyncStorage Issues**: Ensure AsyncStorage is properly installed
+
+### Backend Issues
+- **Database Connection Error**: Ensure DATABASE_URL is set from .env.local file
+- **Port Already in Use**: Kill existing processes on port 5000 (`pkill -f node`)
+- **Migration Errors**: Run database migrations if schema changes
 
 ## 📞 Support
 
