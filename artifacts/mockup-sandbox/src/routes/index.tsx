@@ -13,6 +13,26 @@ import StudentMentalBuddy from '../pages/student/MentalBuddy';
 import StudentHivAids from '../pages/student/HivAids';
 import StudentNotifications from '../pages/student/Notifications';
 import NewConsultation from '../pages/student/NewConsultation';
+import DoctorLayout from '../components/DoctorLayout';
+import DoctorQueue from '../pages/doctor/Queue';
+import DoctorConsultations from '../pages/doctor/Consultations';
+import DoctorPrescriptions from '../pages/doctor/Prescriptions';
+import DoctorLabRequests from '../pages/doctor/LabRequests';
+import PharmacistLayout from '../components/PharmacistLayout';
+import PharmacistPrescriptions from '../pages/pharmacist/Prescriptions';
+import PharmacistHistory from '../pages/pharmacist/History';
+import LabLayout from '../components/LabLayout';
+import LabRequests from '../pages/lab/Requests';
+import LabResults from '../pages/lab/Results';
+import CounselorLayout from '../components/CounselorLayout';
+import CounselorSessions from '../pages/counselor/Sessions';
+import HivLayout from '../components/HivLayout';
+import HivSessions from '../pages/hiv/Sessions';
+import HivResources from '../pages/hiv/Resources';
+import AdminLayout from '../components/AdminLayout';
+import AdminAnalytics from '../pages/admin/Analytics';
+import AdminUsers from '../pages/admin/Users';
+import AdminAudit from '../pages/admin/Audit';
 
 // Protected route component
 function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode; allowedRoles?: string[] }) {
@@ -75,8 +95,6 @@ function RoleBasedRedirect() {
       return <Navigate to="/pharmacist/prescriptions" replace />;
     case "lab_technician":
       return <Navigate to="/lab/requests" replace />;
-    case "nurse":
-      return <Navigate to="/nurse/lab-requests" replace />;
     case "mental_health_counselor":
       return <Navigate to="/counselor/sessions" replace />;
     case "hiv_professional":
@@ -120,30 +138,49 @@ export const router = createBrowserRouter([
       { path: "notifications", element: <StudentNotifications /> },
     ],
   },
-  // Placeholder routes for other roles (to be implemented)
+  // Doctor routes
   {
-    path: "/doctor/*",
+    path: "/doctor",
     element: (
       <ProtectedRoute allowedRoles={["doctor"]}>
-        <div style={{ padding: "2rem", color: "white" }}>Doctor Dashboard - Coming Soon</div>
+        <DoctorLayout />
       </ProtectedRoute>
     ),
+    children: [
+      { index: true, element: <Navigate to="/doctor/queue" replace /> },
+      { path: "queue", element: <DoctorQueue /> },
+      { path: "consultations", element: <DoctorConsultations /> },
+      { path: "prescriptions", element: <DoctorPrescriptions /> },
+      { path: "lab-requests", element: <DoctorLabRequests /> },
+    ],
   },
+  // Pharmacist routes
   {
-    path: "/pharmacist/*",
+    path: "/pharmacist",
     element: (
       <ProtectedRoute allowedRoles={["pharmacist"]}>
-        <div style={{ padding: "2rem", color: "white" }}>Pharmacist Dashboard - Coming Soon</div>
+        <PharmacistLayout />
       </ProtectedRoute>
     ),
+    children: [
+      { index: true, element: <Navigate to="/pharmacist/prescriptions" replace /> },
+      { path: "prescriptions", element: <PharmacistPrescriptions /> },
+      { path: "history", element: <PharmacistHistory /> },
+    ],
   },
+  // Lab technician routes
   {
-    path: "/lab/*",
+    path: "/lab",
     element: (
       <ProtectedRoute allowedRoles={["lab_technician"]}>
-        <div style={{ padding: "2rem", color: "white" }}>Lab Dashboard - Coming Soon</div>
+        <LabLayout />
       </ProtectedRoute>
     ),
+    children: [
+      { index: true, element: <Navigate to="/lab/requests" replace /> },
+      { path: "requests", element: <LabRequests /> },
+      { path: "results", element: <LabResults /> },
+    ],
   },
   {
     path: "/nurse/*",
@@ -153,29 +190,47 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
   },
+  // Mental health counselor routes
   {
-    path: "/counselor/*",
+    path: "/counselor",
     element: (
       <ProtectedRoute allowedRoles={["mental_health_counselor"]}>
-        <div style={{ padding: "2rem", color: "white" }}>Counselor Dashboard - Coming Soon</div>
+        <CounselorLayout />
       </ProtectedRoute>
     ),
+    children: [
+      { index: true, element: <Navigate to="/counselor/sessions" replace /> },
+      { path: "sessions", element: <CounselorSessions /> },
+    ],
   },
+  // HIV professional routes
   {
-    path: "/hiv/*",
+    path: "/hiv",
     element: (
       <ProtectedRoute allowedRoles={["hiv_professional"]}>
-        <div style={{ padding: "2rem", color: "white" }}>HIV Support Dashboard - Coming Soon</div>
+        <HivLayout />
       </ProtectedRoute>
     ),
+    children: [
+      { index: true, element: <Navigate to="/hiv/sessions" replace /> },
+      { path: "sessions", element: <HivSessions /> },
+      { path: "resources", element: <HivResources /> },
+    ],
   },
+  // Admin routes
   {
-    path: "/admin/*",
+    path: "/admin",
     element: (
       <ProtectedRoute allowedRoles={["admin"]}>
-        <div style={{ padding: "2rem", color: "white" }}>Admin Dashboard - Coming Soon</div>
+        <AdminLayout />
       </ProtectedRoute>
     ),
+    children: [
+      { index: true, element: <Navigate to="/admin/analytics" replace /> },
+      { path: "analytics", element: <AdminAnalytics /> },
+      { path: "users", element: <AdminUsers /> },
+      { path: "audit", element: <AdminAudit /> },
+    ],
   },
   {
     path: "/unauthorized",

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -10,7 +10,7 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSlidingOut, setIsSlidingOut] = useState(false);
-  const swiperRef = useRef<any>(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const backgroundImages = [
     '/images/happystudents.jpg',
@@ -20,35 +20,12 @@ export default function LoginPage() {
     '/images/zambia_graduate_nurses.jpg'
   ];
 
-  // Initialize Swiper
+  // Auto-rotate background images
   useEffect(() => {
-    if (typeof window !== 'undefined' && (window as any).Swiper) {
-      swiperRef.current = new (window as any).Swiper('.swiper', {
-        direction: 'horizontal',
-        loop: true,
-        autoplay: {
-          delay: 6000,
-          disableOnInteraction: false,
-        },
-        speed: 1000,
-        effect: 'fade',
-        fadeEffect: {
-          crossFade: true
-        },
-        pagination: {
-          el: '.swiper-pagination',
-          clickable: true,
-        },
-        allowTouchMove: true,
-        passiveListeners: true,
-      });
-    }
-
-    return () => {
-      if (swiperRef.current) {
-        swiperRef.current.destroy();
-      }
-    };
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % backgroundImages.length);
+    }, 6000);
+    return () => clearInterval(interval);
   }, []);
 
   const handleLogin = async (e?: React.FormEvent) => {
@@ -67,12 +44,7 @@ export default function LoginPage() {
       // Slide back in on error
       setTimeout(() => {
         setIsSlidingOut(false);
-        (window as any).Swal.fire({
-          icon: 'error',
-          title: 'Login Failed',
-          text: 'Invalid email or password. Please try again.',
-          confirmButtonColor: '#10b981'
-        });
+        setError('Invalid email or password. Please try again.');
       }, 500);
     } finally {
       setIsSubmitting(false);
@@ -87,32 +59,17 @@ export default function LoginPage() {
       alignItems: 'center',
       justifyContent: 'center'
     }}>
-      {/* Swiper Background */}
+      {/* Background Image */}
       <div style={{
         position: 'absolute',
         inset: 0,
-        zIndex: 0
-      }}>
-        <div className="swiper" style={{ width: '100%', height: '100%' }}>
-          <div className="swiper-wrapper">
-            {backgroundImages.map((image, index) => (
-              <div key={index} className="swiper-slide" style={{
-                width: '100%',
-                height: '100%',
-                backgroundImage: `url('${image}')`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundAttachment: 'fixed'
-              }} />
-            ))}
-          </div>
-          <div className="swiper-pagination" style={{
-            position: 'absolute',
-            bottom: '30px',
-            zIndex: 10
-          }} />
-        </div>
-      </div>
+        zIndex: 0,
+        backgroundImage: `url('${backgroundImages[currentImageIndex]}')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed',
+        transition: 'background-image 1s ease-in-out'
+      }} />
 
       {/* Dark Overlay */}
       <div style={{
