@@ -1,5 +1,5 @@
 import { useAuth } from '../../contexts/AuthContext';
-import { useGetStudentDashboard, getGetStudentDashboardQueryKey } from '@workspace/api-client-react';
+import { useGetStudentDashboard, getGetStudentDashboardQueryKey } from '@/lib/api-client';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useRef } from 'react';
 import { Stethoscope, Pill, Microscope, Plus, Users, Clipboard, Thermometer, Smile, Shield, Phone, Hand } from 'lucide-react';

@@ -1,4 +1,4 @@
-import { useListLabRequests, getListLabRequestsQueryKey } from '@workspace/api-client-react';
+import { useListLabRequests, getListLabRequestsQueryKey } from '@/lib/api-client';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Microscope, Zap } from 'lucide-react';
 

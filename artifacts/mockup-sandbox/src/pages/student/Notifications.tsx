@@ -1,4 +1,4 @@
-import { useListNotifications, getListNotificationsQueryKey } from '@workspace/api-client-react';
+import { useListNotifications, getListNotificationsQueryKey } from '@/lib/api-client';
 import { RefreshCw, Bell, Pill, Microscope, Stethoscope, Users, Megaphone, LucideIcon } from 'lucide-react';
 
 const getNotificationIcon = (type: string): LucideIcon => {

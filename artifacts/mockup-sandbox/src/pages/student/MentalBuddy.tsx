@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useListMentalHealthSessions, useCreateMentalHealthSession, getListMentalHealthSessionsQueryKey } from '@workspace/api-client-react';
+import { useListMentalHealthSessions, useCreateMentalHealthSession, getListMentalHealthSessionsQueryKey } from '@/lib/api-client';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Brain, Lock } from 'lucide-react';

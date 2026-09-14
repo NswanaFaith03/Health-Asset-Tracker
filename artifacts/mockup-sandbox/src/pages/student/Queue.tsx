@@ -1,4 +1,4 @@
-import { useGetMyQueuePosition, getGetMyQueuePositionQueryKey } from '@workspace/api-client-react';
+import { useGetMyQueuePosition, getGetMyQueuePositionQueryKey } from '@/lib/api-client';
 import { RefreshCw, Users, Info } from 'lucide-react';
 
 export default function StudentQueue() {

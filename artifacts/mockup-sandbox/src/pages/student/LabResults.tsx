@@ -1,4 +1,4 @@
-import { useListLabRequests, getListLabRequestsQueryKey } from '@workspace/api-client-react';
+import { useListLabRequests, getListLabRequestsQueryKey } from '@/lib/api-client';
 import { BarChart3, TrendingUp, Clipboard, FileText } from 'lucide-react';
 
 const STATUS_COLORS: Record<string, string> = {

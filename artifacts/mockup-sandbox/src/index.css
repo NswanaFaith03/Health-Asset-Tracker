@@ -84,7 +84,7 @@
   ::selection { background: rgba(16,185,129,0.3); color: #fff; }
   ::-webkit-scrollbar { width: 5px; height: 5px; }
   ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb: { background: rgba(16,185,129,0.4); border-radius: 99px; }
+  ::-webkit-scrollbar-thumb { background: rgba(16,185,129,0.4); border-radius: 99px; }
   ::-webkit-scrollbar-thumb:hover { background: rgba(16,185,129,0.7); }
 }
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useListNotifications, getListNotificationsQueryKey } from '@workspace/api-client-react';
+import { useListNotifications, getListNotificationsQueryKey } from '@/lib/api-client';
 import { useQueryClient } from '@tanstack/react-query';
 import { Bell, X } from 'lucide-react';
 

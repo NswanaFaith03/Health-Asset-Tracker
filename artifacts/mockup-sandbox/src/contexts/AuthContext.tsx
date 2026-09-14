@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
-import { login, logout, getMe, type LoginRequest, type User } from "@workspace/api-client-react";
+import { login, logout, getMe, type LoginRequest, type User } from "@/lib/api-client";
 import { getApiBaseUrl } from "../lib/api-base-url";
-import { setBaseUrl, setAuthTokenGetter } from "@workspace/api-client-react";
+import { setBaseUrl, setAuthTokenGetter } from "@/lib/api-client";
 
 interface AuthContextType {
   user: User | null;

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useListHivSupportSessions, useListHivResources, useCreateHivSupportSession, getListHivSupportSessionsQueryKey, getListHivResourcesQueryKey } from '@workspace/api-client-react';
+import { useListHivSupportSessions, useListHivResources, useCreateHivSupportSession, getListHivSupportSessionsQueryKey, getListHivResourcesQueryKey } from '@/lib/api-client';
 import { useQueryClient } from '@tanstack/react-query';
 import { Plus, Heart, BookOpen } from 'lucide-react';
 

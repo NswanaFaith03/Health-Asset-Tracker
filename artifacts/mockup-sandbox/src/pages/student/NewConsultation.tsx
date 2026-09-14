@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Plus, Send } from 'lucide-react';
-import { useCreateConsultation } from '@workspace/api-client-react';
+import { useCreateConsultation } from '@/lib/api-client';
 
 export default function NewConsultation() {
   const navigate = useNavigate();

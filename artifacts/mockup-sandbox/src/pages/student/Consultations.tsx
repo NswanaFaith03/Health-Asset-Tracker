@@ -1,4 +1,4 @@
-import { useListConsultations, getListConsultationsQueryKey } from '@workspace/api-client-react';
+import { useListConsultations, getListConsultationsQueryKey } from '@/lib/api-client';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Clipboard } from 'lucide-react';
 

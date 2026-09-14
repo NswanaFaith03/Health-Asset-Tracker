@@ -1,4 +1,4 @@
-import { useListPrescriptions, getListPrescriptionsQueryKey } from '@workspace/api-client-react';
+import { useListPrescriptions, getListPrescriptionsQueryKey } from '@/lib/api-client';
 import { Pill, Clipboard, Info, Clock } from 'lucide-react';
 
 const STATUS_COLORS: Record<string, string> = {
