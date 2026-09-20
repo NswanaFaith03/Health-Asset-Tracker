@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { db, usersTable } from "@workspace/db";
-import { eq, ilike, or } from "drizzle-orm";
+import { eq, ilike, or, and } from "drizzle-orm";
 import { requireAuth, requireRole } from "../middlewares/auth";
 import { logAudit } from "../lib/audit";
 
@@ -11,21 +11,22 @@ function safeUser(u: typeof usersTable.$inferSelect) {
   return rest;
 }
 
-router.get("/users", requireAuth, requireRole("admin"), async (req, res) => {
+router.get("/users", requireAuth, requireRole("admin", "nurse"), async (req, res) => {
   const { role, search } = req.query as { role?: string; search?: string };
   let query = db.select().from(usersTable);
-  const conditions: ReturnType<typeof eq>[] = [];
+  const conditions: any[] = [];
   if (role) conditions.push(eq(usersTable.role, role));
   if (search) {
     conditions.push(
       or(
         ilike(usersTable.name, `%${search}%`),
         ilike(usersTable.email, `%${search}%`),
-      ) as ReturnType<typeof eq>,
+        ilike(usersTable.studentNumber, `%${search}%`),
+      ),
     );
   }
   const users = conditions.length > 0
-    ? await db.select().from(usersTable).where(conditions[0])
+    ? await db.select().from(usersTable).where(conditions.length === 1 ? conditions[0] : and(...conditions))
     : await db.select().from(usersTable);
   res.json(users.map(safeUser));
 });

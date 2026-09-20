@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { db, queueTable, usersTable, consultationsTable } from "@workspace/db";
-import { eq, and, count } from "drizzle-orm";
-import { requireAuth } from "../middlewares/auth";
+import { eq, and, count, ilike, or } from "drizzle-orm";
+import { requireAuth, requireRole } from "../middlewares/auth";
 import { createNotification } from "../lib/notify";
 
 const router = Router();
@@ -79,6 +79,43 @@ router.post("/queue/join", requireAuth, async (req, res) => {
     estimatedWaitMinutes: (allWaiting.length + 1) * 15,
   }).returning();
 
+  // Send notification to the student
+  await createNotification(req.user!.id, "Queue Joined", "You have been added to the consultation queue", "queue");
+
+  res.status(201).json(await enrichEntry(entry));
+});
+
+// New endpoint for nurses to add students to queue
+router.post("/queue/add-student", requireAuth, requireRole("nurse", "admin"), async (req, res) => {
+  const { consultationId, studentId } = req.body;
+  if (!consultationId || !studentId) {
+    res.status(400).json({ error: "validation", message: "consultationId and studentId are required" });
+    return;
+  }
+
+  const existing = await db.select().from(queueTable)
+    .where(and(eq(queueTable.studentId, studentId), eq(queueTable.status, "waiting")))
+    .limit(1);
+
+  if (existing.length > 0) {
+    res.status(400).json({ error: "conflict", message: "Student already in queue" });
+    return;
+  }
+
+  const allWaiting = await db.select().from(queueTable).where(eq(queueTable.status, "waiting"));
+  const maxQueue = allWaiting.length > 0 ? Math.max(...allWaiting.map((e) => e.queueNumber)) : 0;
+
+  const [entry] = await db.insert(queueTable).values({
+    consultationId,
+    studentId,
+    queueNumber: maxQueue + 1,
+    status: "waiting",
+    estimatedWaitMinutes: (allWaiting.length + 1) * 15,
+  }).returning();
+
+  // Send notification to the student
+  await createNotification(studentId, "Queue Assignment", "You have been added to the consultation queue by a nurse", "queue");
+
   res.status(201).json(await enrichEntry(entry));
 });
 
@@ -95,6 +132,42 @@ router.patch("/queue/:id/complete", requireAuth, async (req, res) => {
     .returning();
   await createNotification(entry.studentId, "Queue Complete", "Your turn is complete", "queue");
   res.json(await enrichEntry(updated));
+});
+
+// Search endpoint for nurses to find students to add to queue
+router.get("/queue/search-students", requireAuth, requireRole("nurse", "admin"), async (req, res) => {
+  const { search, limit = 10 } = req.query as { search?: string; limit?: string };
+
+  if (!search) {
+    res.status(400).json({ error: "validation", message: "search parameter is required" });
+    return;
+  }
+
+  const searchTerm = `%${search}%`;
+  const limitNum = Math.min(Math.max(Number(limit) || 10, 1), 50); // Between 1 and 50
+
+  try {
+    const users = await db.select()
+      .from(usersTable)
+      .where(
+        and(
+          eq(usersTable.role, "student"),
+          or(
+            ilike(usersTable.name, searchTerm),
+            ilike(usersTable.email, searchTerm),
+            ilike(usersTable.studentNumber, searchTerm),
+          )
+        )
+      )
+      .limit(limitNum);
+
+    // Return safe user data (excluding password hash)
+    const safeUsers = users.map(({ passwordHash: _, ...safeUser }) => safeUser);
+    res.json(safeUsers);
+  } catch (error) {
+    console.error("Error searching students:", error);
+    res.status(500).json({ error: "internal_error", message: "Failed to search students" });
+  }
 });
 
 export default router;
