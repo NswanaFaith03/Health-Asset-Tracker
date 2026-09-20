@@ -29,6 +29,14 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Middleware to unwrap data wrapper from API client
+app.use((req, res, next) => {
+  if (req.body && typeof req.body === 'object' && 'data' in req.body) {
+    req.body = req.body.data;
+  }
+  next();
+});
+
 app.use("/api", router);
 
 export default app;
