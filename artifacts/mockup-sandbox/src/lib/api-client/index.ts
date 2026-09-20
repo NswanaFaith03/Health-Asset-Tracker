@@ -1,11 +1,14 @@
 /**
- * API client wrapper that uses the shared @workspace/api-client-react package
- * and configures it with the production API URL
+ * API client that matches the Expo app's implementation
+ * Uses the same API client format for form submission compatibility
  */
-export * from '@workspace/api-client-react';
+export * from "./generated/api";
+export * from "./generated/api.schemas";
+export { setBaseUrl, setAuthTokenGetter } from "./custom-fetch";
+export type { AuthTokenGetter } from "./custom-fetch";
 
-import { setBaseUrl } from '@workspace/api-client-react';
-import { getApiBaseUrl } from '../api-base-url';
+import { setBaseUrl } from "./custom-fetch";
+import { getApiBaseUrl } from "../api-base-url";
 
-// Configure the shared API client with production URL
+// Configure with production API URL to match Expo app
 setBaseUrl(getApiBaseUrl());
