@@ -6,6 +6,10 @@ import "./index.css";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { router } from "./routes";
+import { setForceDirectData } from "./lib/api-client/custom-fetch";
+
+// Force direct data sending for production compatibility
+setForceDirectData(true);
 
 // Create a client
 const queryClient = new QueryClient({

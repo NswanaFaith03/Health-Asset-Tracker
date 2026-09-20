@@ -18,6 +18,13 @@ const DEFAULT_JSON_ACCEPT = "application/json, application/problem+json";
 let _baseUrl: string | null = null;
 let _authTokenGetter: AuthTokenGetter | null = null;
 
+// Force direct data sending for production compatibility
+let _forceDirectData = false;
+
+export function setForceDirectData(force: boolean): void {
+  _forceDirectData = force;
+}
+
 /**
  * Set a base URL that is prepended to every relative request URL
  * (i.e. paths that start with `/`).
@@ -336,6 +343,18 @@ export async function customFetch<T = unknown>(
   }
 
   const headers = mergeHeaders(isRequest(input) ? input.headers : undefined, headersInit);
+
+  // Force direct data sending for production compatibility
+  if (_forceDirectData && typeof init.body === "string" && looksLikeJson(init.body)) {
+    try {
+      const parsed = JSON.parse(init.body);
+      if (parsed.data && typeof parsed.data === "object") {
+        init.body = JSON.stringify(parsed.data);
+      }
+    } catch (e) {
+      // Not JSON, leave as is
+    }
+  }
 
   if (
     typeof init.body === "string" &&
