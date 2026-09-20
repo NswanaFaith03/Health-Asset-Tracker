@@ -285,18 +285,6 @@ export async function customFetch<T = unknown>(
 
   const headers = mergeHeaders(isRequest(input) ? input.headers : undefined, headersInit);
 
-  // Unwrap data wrapper for production backend compatibility
-  if (typeof init.body === "string" && looksLikeJson(init.body)) {
-    try {
-      const parsed = JSON.parse(init.body);
-      if (parsed.data && typeof parsed.data === "object") {
-        init.body = JSON.stringify(parsed.data);
-      }
-    } catch (e) {
-      // Not JSON, leave as is
-    }
-  }
-
   if (
     typeof init.body === "string" &&
     !headers.has("content-type") &&

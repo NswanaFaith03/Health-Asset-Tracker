@@ -28,7 +28,7 @@ export default function NewConsultation() {
     }
     
     createConsultation(
-      { data: { symptoms: symptoms.trim(), severity } },
+      { symptoms: symptoms.trim(), severity } as any,
       {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: getListConsultationsQueryKey() });
