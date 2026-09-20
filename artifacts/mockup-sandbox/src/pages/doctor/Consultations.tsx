@@ -1,183 +1,201 @@
 import { useState } from 'react';
+import { useListConsultations, getListConsultationsQueryKey } from '@/lib/api-client';
+import { useNavigate } from 'react-router-dom';
 import { Activity, Search, Filter } from 'lucide-react';
 
-interface Consultation {
-  id: number;
-  studentName: string;
-  studentNumber: string;
-  symptoms: string;
-  severity: 'low' | 'medium' | 'high' | 'critical';
-  status: 'submitted' | 'under_review' | 'assigned' | 'responded' | 'closed';
-  createdAt: string;
-}
+const STATUS_COLORS: Record<string, string> = {
+  submitted: '#f59e0b',
+  under_review: '#3b82f6',
+  assigned: '#8b5cf6',
+  responded: '#10b981',
+  closed: '#6b7280',
+};
+
+const STATUS_LABELS: Record<string, string> = {
+  submitted: 'Submitted',
+  under_review: 'Under Review',
+  assigned: 'Assigned',
+  responded: 'Responded',
+  closed: 'Closed',
+};
+
+const SEVERITY_COLORS: Record<string, string> = {
+  low: '#10b981',
+  medium: '#f59e0b',
+  high: '#f97316',
+  critical: '#ef4444',
+};
 
 export default function DoctorConsultations() {
-  const [consultations, setConsultations] = useState<Consultation[]>([
-    {
-      id: 1,
-      studentName: 'John Banda',
-      studentNumber: 'STU001',
-      symptoms: 'Severe headache and fever',
-      severity: 'high',
-      status: 'assigned',
-      createdAt: '2024-01-15T10:30:00Z'
-    },
-    {
-      id: 2,
-      studentName: 'Mary Phiri',
-      studentNumber: 'STU002',
-      symptoms: 'Mild cough and sore throat',
-      severity: 'low',
-      status: 'responded',
-      createdAt: '2024-01-15T09:15:00Z'
-    },
-    {
-      id: 3,
-      studentName: 'Joseph Mwamba',
-      studentNumber: 'STU003',
-      symptoms: 'Stomach pain and nausea',
-      severity: 'medium',
-      status: 'under_review',
-      createdAt: '2024-01-15T08:45:00Z'
-    }
-  ]);
+  const navigate = useNavigate();
+  const [search, setSearch] = useState('');
+  const { data: consultations = [], isLoading, refetch } = useListConsultations(undefined, {
+    query: { queryKey: getListConsultationsQueryKey() }
+  });
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'submitted': return 'hsl(217, 33%, 17%)';
-      case 'under_review': return 'hsl(45, 93%, 47%)';
-      case 'assigned': return 'hsl(217, 91%, 60%)';
-      case 'responded': return 'hsl(142, 76%, 36%)';
-      case 'closed': return 'hsl(215, 20%, 65%)';
-      default: return 'hsl(217, 33%, 17%)';
-    }
-  };
+  const filtered = consultations.filter((c) => {
+    if (!search) return true;
+    const q = search.toLowerCase();
+    return (
+      (c.student?.name ?? "").toLowerCase().includes(q) ||
+      (c.symptoms ?? "").toLowerCase().includes(q)
+    );
+  });
 
-  const getSeverityColor = (severity: string) => {
-    switch (severity) {
-      case 'critical': return 'hsl(0, 72%, 51%)';
-      case 'high': return 'hsl(28, 100%, 50%)';
-      case 'medium': return 'hsl(45, 93%, 47%)';
-      case 'low': return 'hsl(142, 76%, 36%)';
-      default: return 'hsl(217, 33%, 17%)';
-    }
-  };
+  if (isLoading) {
+    return (
+      <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
+        <div style={{ color: '#64748b' }}>Loading consultations...</div>
+      </div>
+    );
+  }
 
   return (
-    <div>
+    <div style={{ padding: '1rem', maxWidth: '1200px', margin: '0 auto' }}>
       <div style={{ marginBottom: '2rem' }}>
-        <h1 style={{ color: 'white', fontSize: '1.875rem', fontWeight: '700', marginBottom: '0.5rem' }}>
+        <h1 style={{ color: '#1e293b', fontSize: '1.875rem', fontWeight: '700', marginBottom: '0.5rem' }}>
           Consultations
         </h1>
-        <p style={{ color: 'hsl(215, 20%, 65%)', marginBottom: 0 }}>
-          Review and respond to student consultations
+        <p style={{ color: '#64748b', marginBottom: 0 }}>
+          {consultations.length} total · {consultations.filter(c => c.status === 'submitted' || c.status === 'under_review').length} pending
         </p>
       </div>
 
-      {/* Search and Filter */}
-      <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
-        <div style={{ flex: 1, position: 'relative' }}>
-          <Search size={20} style={{
-            position: 'absolute',
-            left: '1rem',
-            top: '50%',
-            transform: 'translateY(-50%)',
-            color: 'hsl(215, 20%, 65%)'
-          }} />
-          <input
-            type="text"
-            placeholder="Search consultations..."
+      {/* Search */}
+      <div style={{ marginBottom: '2rem', position: 'relative' }}>
+        <Search size={20} style={{
+          position: 'absolute',
+          left: '1rem',
+          top: '50%',
+          transform: 'translateY(-50%)',
+          color: '#64748b'
+        }} />
+        <input
+          type="text"
+          placeholder="Search patients or symptoms…"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          style={{
+            width: '100%',
+            padding: '0.75rem 1rem 0.75rem 3rem',
+            background: '#ffffff',
+            border: '1px solid #e2e8f0',
+            borderRadius: '8px',
+            color: '#1e293b',
+            fontSize: '0.875rem',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+          }}
+        />
+        {search.length > 0 && (
+          <button
+            onClick={() => setSearch('')}
             style={{
-              width: '100%',
-              padding: '0.75rem 1rem 0.75rem 3rem',
-              background: 'hsl(217, 33%, 17%)',
-              border: '1px solid hsl(217, 33%, 25%)',
-              borderRadius: '8px',
-              color: 'white',
-              fontSize: '0.875rem'
+              position: 'absolute',
+              right: '1rem',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              background: 'none',
+              border: 'none',
+              color: '#64748b',
+              cursor: 'pointer'
             }}
-          />
-        </div>
-        <button style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.5rem',
-          padding: '0.75rem 1.5rem',
-          background: 'hsl(217, 33%, 17%)',
-          border: '1px solid hsl(217, 33%, 25%)',
-          borderRadius: '8px',
-          color: 'white',
-          cursor: 'pointer',
-          fontSize: '0.875rem',
-          fontWeight: '600'
-        }}>
-          <Filter size={16} />
-          Filter
-        </button>
+          >
+            ✕
+          </button>
+        )}
       </div>
 
       {/* Consultations List */}
-      <div style={{
-        background: 'hsl(217, 33%, 17%)',
-        borderRadius: '12px',
-        border: '1px solid hsl(217, 33%, 25%)',
-        overflow: 'hidden'
-      }}>
-        {consultations.map((consultation) => (
-          <div
-            key={consultation.id}
-            style={{
-              padding: '1.5rem',
-              borderBottom: '1px solid hsl(217, 33%, 25%)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '1.5rem'
-            }}
-          >
-            <div style={{ flex: 1 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.25rem' }}>
-                <h3 style={{ color: 'white', fontSize: '1rem', fontWeight: '600', margin: 0 }}>
-                  {consultation.studentName}
-                </h3>
-                <span style={{
-                  padding: '0.25rem 0.5rem',
-                  borderRadius: '4px',
-                  fontSize: '0.75rem',
-                  fontWeight: '600',
-                  background: getSeverityColor(consultation.severity),
-                  color: 'white'
-                }}>
-                  {consultation.severity.toUpperCase()}
-                </span>
-              </div>
-              <p style={{ color: 'hsl(215, 20%, 65%)', fontSize: '0.875rem', margin: '0.25rem 0' }}>
-                {consultation.studentNumber}
-              </p>
-              <p style={{ color: 'white', fontSize: '0.875rem', margin: 0 }}>
-                {consultation.symptoms}
-              </p>
-            </div>
-
-            <div style={{ textAlign: 'right' }}>
-              <div style={{
-                padding: '0.5rem 1rem',
-                borderRadius: '8px',
-                background: getStatusColor(consultation.status),
-                color: 'white',
-                fontSize: '0.875rem',
-                fontWeight: '600',
-                marginBottom: '0.5rem',
-                display: 'inline-block'
-              }}>
-                {consultation.status.replace('_', ' ').toUpperCase()}
-              </div>
-              <div style={{ color: 'hsl(215, 20%, 65%)', fontSize: '0.875rem' }}>
-                {new Date(consultation.createdAt).toLocaleDateString()}
-              </div>
-            </div>
+      {filtered.length === 0 ? (
+        <div style={{
+          textAlign: 'center',
+          padding: '4rem 2rem',
+          background: '#ffffff',
+          borderRadius: '12px',
+          border: '1px solid #e2e8f0',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+        }}>
+          <div style={{ marginBottom: '1rem' }}>
+            <Activity size={48} style={{ color: '#64748b' }} />
           </div>
-        ))}
-      </div>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#1e293b', marginBottom: '0.5rem' }}>
+            No consultations
+          </h2>
+          <p style={{ color: '#64748b', margin: 0 }}>
+            {search ? 'No results for your search' : 'Patient consultations will appear here'}
+          </p>
+        </div>
+      ) : (
+        <div style={{ display: 'grid', gap: '1rem' }}>
+          {filtered.map((consultation) => {
+            const statusColor = STATUS_COLORS[consultation.status] || STATUS_COLORS.submitted;
+            const severityColor = SEVERITY_COLORS[consultation.severity];
+            return (
+              <div
+                key={consultation.id}
+                onClick={() => navigate(`/doctor/consultations/${consultation.id}`)}
+                style={{
+                  background: '#ffffff',
+                  borderRadius: '12px',
+                  border: '1px solid #e2e8f0',
+                  borderLeft: `3px solid ${severityColor || '#6b7280'}`,
+                  padding: '1.5rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = statusColor;
+                  e.currentTarget.style.boxShadow = `0 4px 12px ${statusColor}20`;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = '#e2e8f0';
+                  e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.05)';
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '0.75rem' }}>
+                  <div style={{ flex: 1 }}>
+                    <h3 style={{ color: '#1e293b', fontSize: '1rem', fontWeight: '600', margin: '0 0 0.25rem 0' }}>
+                      {consultation.student?.name ?? 'Patient'}
+                    </h3>
+                    <p style={{ color: '#64748b', fontSize: '0.875rem', margin: 0, lineHeight: '1.4' }}>
+                      {consultation.symptoms}
+                    </p>
+                  </div>
+                  <div style={{
+                    padding: '0.25rem 0.75rem',
+                    borderRadius: '20px',
+                    fontSize: '0.75rem',
+                    fontWeight: '700',
+                    background: `${statusColor}20`,
+                    color: statusColor
+                  }}>
+                    {STATUS_LABELS[consultation.status] || consultation.status}
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  {severityColor && (
+                    <span style={{
+                      padding: '0.25rem 0.75rem',
+                      borderRadius: '20px',
+                      fontSize: '0.75rem',
+                      fontWeight: '600',
+                      background: `${severityColor}18`,
+                      color: severityColor
+                    }}>
+                      {consultation.severity} severity
+                    </span>
+                  )}
+                  <span style={{ color: '#64748b', fontSize: '0.875rem' }}>
+                    {new Date(consultation.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

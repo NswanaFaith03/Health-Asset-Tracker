@@ -13,6 +13,7 @@ import StudentMentalBuddy from '../pages/student/MentalBuddy';
 import StudentHivAids from '../pages/student/HivAids';
 import StudentNotifications from '../pages/student/Notifications';
 import NewConsultation from '../pages/student/NewConsultation';
+import StudentMedicalReport from '../pages/student/MedicalReport';
 import DoctorLayout from '../components/DoctorLayout';
 import DoctorQueue from '../pages/doctor/Queue';
 import DoctorConsultations from '../pages/doctor/Consultations';
@@ -33,6 +34,9 @@ import AdminLayout from '../components/AdminLayout';
 import AdminAnalytics from '../pages/admin/Analytics';
 import AdminUsers from '../pages/admin/Users';
 import AdminAudit from '../pages/admin/Audit';
+import NurseLayout from '../components/NurseLayout';
+import NurseQueue from '../pages/nurse/Queue';
+import NurseReports from '../pages/nurse/Reports';
 
 // Protected route component
 function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode; allowedRoles?: string[] }) {
@@ -57,6 +61,7 @@ function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode;
   }
 
   if (allowedRoles && user && !allowedRoles.includes(user.role)) {
+    console.log('User role:', user.role, 'Allowed roles:', allowedRoles);
     return <Navigate to="/unauthorized" replace />;
   }
 
@@ -101,6 +106,8 @@ function RoleBasedRedirect() {
       return <Navigate to="/hiv/sessions" replace />;
     case "admin":
       return <Navigate to="/admin/analytics" replace />;
+    case "nurse":
+      return <Navigate to="/nurse/queue" replace />;
     default:
       return <Navigate to="/login" replace />;
   }
@@ -132,6 +139,7 @@ export const router = createBrowserRouter([
       { path: "prescriptions", element: <StudentPrescriptions /> },
       { path: "lab", element: <StudentLab /> },
       { path: "lab-results", element: <StudentLabResults /> },
+      { path: "lab/medical-report", element: <StudentMedicalReport /> },
       { path: "queue", element: <StudentQueue /> },
       { path: "mental-buddy", element: <StudentMentalBuddy /> },
       { path: "hiv-aids", element: <StudentHivAids /> },
@@ -183,12 +191,17 @@ export const router = createBrowserRouter([
     ],
   },
   {
-    path: "/nurse/*",
+    path: "/nurse",
     element: (
       <ProtectedRoute allowedRoles={["nurse"]}>
-        <div style={{ padding: "2rem", color: "white" }}>Nurse Dashboard - Coming Soon</div>
+        <NurseLayout />
       </ProtectedRoute>
     ),
+    children: [
+      { index: true, element: <Navigate to="/nurse/queue" replace /> },
+      { path: "queue", element: <NurseQueue /> },
+      { path: "reports", element: <NurseReports /> },
+    ],
   },
   // Mental health counselor routes
   {

@@ -57,26 +57,47 @@ export default function StudentLab() {
             </h1>
             <p style={{ margin: 0, opacity: 0.9 }}>Request and track laboratory tests</p>
           </div>
-          <button
-            onClick={() => navigate('/student/lab/new')}
-            style={{
-              background: 'white',
-              color: '#8b5cf6',
-              border: 'none',
-              borderRadius: '8px',
-              padding: '0.75rem 1.5rem',
-              fontSize: '1rem',
-              fontWeight: '600',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)'
-            }}
-          >
-            <Plus style={{ width: '1.25rem', height: '1.25rem' }} />
-            New Lab Request
-          </button>
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <button
+              onClick={() => navigate('/student/lab/new')}
+              style={{
+                background: 'white',
+                color: '#8b5cf6',
+                border: 'none',
+                borderRadius: '8px',
+                padding: '0.75rem 1.5rem',
+                fontSize: '1rem',
+                fontWeight: '600',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)'
+              }}
+            >
+              <Plus style={{ width: '1.25rem', height: '1.25rem' }} />
+              New Lab Request
+            </button>
+            <button
+              onClick={() => navigate('/student/lab/medical-report')}
+              style={{
+                background: 'rgba(255, 255, 255, 0.2)',
+                color: 'white',
+                border: '1px solid rgba(255, 255, 255, 0.3)',
+                borderRadius: '8px',
+                padding: '0.75rem 1.5rem',
+                fontSize: '1rem',
+                fontWeight: '600',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem'
+              }}
+            >
+              <Microscope style={{ width: '1.25rem', height: '1.25rem' }} />
+              Medical Report
+            </button>
+          </div>
         </div>
       </div>
 

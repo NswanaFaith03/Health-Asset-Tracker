@@ -14,10 +14,17 @@ import {
   LogOut,
   Menu,
   X,
-  ChevronRight
+  ChevronRight,
+  Users,
+  Activity,
+  Thermometer,
+  Shield,
+  BarChart3,
+  Settings,
+  UserPlus
 } from 'lucide-react';
 
-export function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+export function Sidebar({ isOpen, onClose, role }: { isOpen: boolean; onClose: () => void; role?: string }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { logout, user } = useAuth();
@@ -37,18 +44,64 @@ export function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => v
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
-  const navItems = [
-    { id: 'student-home', label: 'Home', path: '/student/home', icon: Home },
-    { id: 'student-profile', label: 'Profile', path: '/student/profile', icon: User },
-    { id: 'student-consultations', label: 'Consultations', path: '/student/consultations', icon: Stethoscope },
-    { id: 'student-prescriptions', label: 'Prescriptions', path: '/student/prescriptions', icon: Pill },
-    { id: 'student-lab', label: 'Lab Tests', path: '/student/lab', icon: FlaskConical },
-    { id: 'student-lab-results', label: 'Lab Results', path: '/student/lab-results', icon: FileText },
-    { id: 'student-queue', label: 'Queue', path: '/student/queue', icon: ClipboardList },
-    { id: 'student-mental-buddy', label: 'Mental Health', path: '/student/mental-buddy', icon: Heart },
-    { id: 'student-hiv-aids', label: 'HIV Support', path: '/student/hiv-aids', icon: Heart },
-    { id: 'student-notifications', label: 'Notifications', path: '/student/notifications', icon: Bell },
-  ];
+  const getNavItems = () => {
+    const currentRole = role || user?.role || 'student';
+    
+    switch (currentRole) {
+      case 'doctor':
+        return [
+          { id: 'doctor-queue', label: 'Queue', path: '/doctor/queue', icon: Users },
+          { id: 'doctor-consultations', label: 'Consultations', path: '/doctor/consultations', icon: Activity },
+          { id: 'doctor-prescriptions', label: 'Prescriptions', path: '/doctor/prescriptions', icon: Pill },
+          { id: 'doctor-lab-requests', label: 'Lab Requests', path: '/doctor/lab-requests', icon: Thermometer },
+        ];
+      case 'pharmacist':
+        return [
+          { id: 'pharmacist-prescriptions', label: 'Prescriptions', path: '/pharmacist/prescriptions', icon: Pill },
+          { id: 'pharmacist-history', label: 'History', path: '/pharmacist/history', icon: FileText },
+        ];
+      case 'lab_technician':
+        return [
+          { id: 'lab-requests', label: 'Requests', path: '/lab/requests', icon: ClipboardList },
+          { id: 'lab-results', label: 'Results', path: '/lab/results', icon: FileText },
+        ];
+      case 'mental_health_counselor':
+        return [
+          { id: 'counselor-sessions', label: 'Sessions', path: '/counselor/sessions', icon: Heart },
+        ];
+      case 'hiv_professional':
+        return [
+          { id: 'hiv-sessions', label: 'Sessions', path: '/hiv/sessions', icon: Shield },
+          { id: 'hiv-resources', label: 'Resources', path: '/hiv/resources', icon: FileText },
+        ];
+      case 'admin':
+        return [
+          { id: 'admin-analytics', label: 'Analytics', path: '/admin/analytics', icon: BarChart3 },
+          { id: 'admin-users', label: 'Users', path: '/admin/users', icon: Users },
+          { id: 'admin-audit', label: 'Audit', path: '/admin/audit', icon: Settings },
+        ];
+      case 'nurse':
+        return [
+          { id: 'nurse-queue', label: 'Queue Management', path: '/nurse/queue', icon: UserPlus },
+          { id: 'nurse-reports', label: 'Medical Reports', path: '/nurse/reports', icon: FileText },
+        ];
+      default: // student
+        return [
+          { id: 'student-home', label: 'Home', path: '/student/home', icon: Home },
+          { id: 'student-profile', label: 'Profile', path: '/student/profile', icon: User },
+          { id: 'student-consultations', label: 'Consultations', path: '/student/consultations', icon: Stethoscope },
+          { id: 'student-prescriptions', label: 'Prescriptions', path: '/student/prescriptions', icon: Pill },
+          { id: 'student-lab', label: 'Lab Tests', path: '/student/lab', icon: FlaskConical },
+          { id: 'student-lab-results', label: 'Lab Results', path: '/student/lab-results', icon: FileText },
+          { id: 'student-queue', label: 'Queue', path: '/student/queue', icon: ClipboardList },
+          { id: 'student-mental-buddy', label: 'Mental Health', path: '/student/mental-buddy', icon: Heart },
+          { id: 'student-hiv-aids', label: 'HIV Support', path: '/student/hiv-aids', icon: Heart },
+          { id: 'student-notifications', label: 'Notifications', path: '/student/notifications', icon: Bell },
+        ];
+    }
+  };
+
+  const navItems = getNavItems();
 
   const currentPage = location.pathname;
 
@@ -95,7 +148,18 @@ export function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => v
           alignItems: 'center',
           justifyContent: 'space-between',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }} onClick={() => navigate('/student/home')}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }} onClick={() => {
+            const currentRole = role || user?.role || 'student';
+            const homePath = currentRole === 'student' ? '/student/home' : 
+                            currentRole === 'doctor' ? '/doctor/queue' :
+                            currentRole === 'pharmacist' ? '/pharmacist/prescriptions' :
+                            currentRole === 'lab_technician' ? '/lab/requests' :
+                            currentRole === 'mental_health_counselor' ? '/counselor/sessions' :
+                            currentRole === 'hiv_professional' ? '/hiv/sessions' :
+                            currentRole === 'admin' ? '/admin/analytics' :
+                            currentRole === 'nurse' ? '/nurse/queue' : '/student/home';
+            navigate(homePath);
+          }}>
             <img 
               src="/images/uzamainlogo.jpg" 
               alt="UNZA Logo" 
@@ -207,7 +271,16 @@ export function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => v
               transition: 'background 0.2s ease',
             }}
             onClick={() => {
-              navigate('/student/profile');
+              const currentRole = role || user?.role || 'student';
+              const profilePath = currentRole === 'student' ? '/student/profile' : 
+                                currentRole === 'doctor' ? '/doctor/queue' :
+                                currentRole === 'pharmacist' ? '/pharmacist/prescriptions' :
+                                currentRole === 'lab_technician' ? '/lab/requests' :
+                                currentRole === 'mental_health_counselor' ? '/counselor/sessions' :
+                                currentRole === 'hiv_professional' ? '/hiv/sessions' :
+                                currentRole === 'admin' ? '/admin/analytics' :
+                                currentRole === 'nurse' ? '/nurse/queue' : '/student/home';
+              navigate(profilePath);
               onClose();
             }}
             onMouseEnter={e => {

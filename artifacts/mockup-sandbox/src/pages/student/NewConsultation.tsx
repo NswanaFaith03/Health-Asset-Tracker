@@ -1,31 +1,46 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, Send } from 'lucide-react';
-import { useCreateConsultation } from '@/lib/api-client';
+import { ArrowLeft, Send } from 'lucide-react';
+import { useCreateConsultation, getListConsultationsQueryKey } from '@/lib/api-client';
+import { useQueryClient } from '@tanstack/react-query';
+
+const SEVERITIES = [
+  { key: 'low', label: 'Low', color: '#10b981', desc: 'Minor symptoms' },
+  { key: 'medium', label: 'Medium', color: '#f59e0b', desc: 'Moderate discomfort' },
+  { key: 'high', label: 'High', color: '#f97316', desc: 'Significant concern' },
+  { key: 'critical', label: 'Critical', color: '#ef4444', desc: 'Urgent care needed' },
+];
 
 export default function NewConsultation() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { mutate: createConsultation, isPending } = useCreateConsultation();
   
-  const [formData, setFormData] = useState({
-    symptoms: '',
-    severity: 'medium' as 'low' | 'medium' | 'high' | 'critical',
-    description: '',
-  });
+  const [symptoms, setSymptoms] = useState('');
+  const [severity, setSeverity] = useState('low');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!symptoms.trim()) {
+      alert('Please describe your symptoms');
+      return;
+    }
+    
     createConsultation(
       {
-        symptoms: formData.symptoms,
-        severity: formData.severity,
-        description: formData.description,
+        data: { symptoms: symptoms.trim(), severity }
       },
       {
         onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: getListConsultationsQueryKey() });
+          alert('Your consultation has been submitted successfully.');
           navigate('/student/consultations');
         },
+        onError: (error) => {
+          console.error('Failed to create consultation:', error);
+          alert('Failed to submit consultation. Please try again.');
+        }
       }
     );
   };
@@ -81,103 +96,28 @@ export default function NewConsultation() {
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: '1.5rem' }}>
             <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#1e293b', marginBottom: '0.5rem' }}>
-              Symptoms *
+              Describe your symptoms *
             </label>
-            <input
-              type="text"
-              value={formData.symptoms}
-              onChange={(e) => setFormData({ ...formData, symptoms: e.target.value })}
-              placeholder="e.g., Headache, fever, stomach pain"
+            <textarea
+              value={symptoms}
+              onChange={(e) => setSymptoms(e.target.value)}
+              placeholder="Describe what you are experiencing..."
+              rows={6}
               required
               style={{
                 width: '100%',
-                padding: '0.75rem 1rem',
-                borderRadius: '8px',
+                padding: '0.875rem 1rem',
+                borderRadius: '12px',
                 border: '1px solid #e2e8f0',
                 fontSize: '1rem',
-                transition: 'all 0.2s ease',
-                outline: 'none',
-                boxSizing: 'border-box',
-              }}
-              onFocus={e => {
-                (e.target as HTMLInputElement).style.borderColor = '#10b981';
-                (e.target as HTMLInputElement).style.boxShadow = '0 0 0 3px rgba(16, 185, 129, 0.1)';
-              }}
-              onBlur={e => {
-                (e.target as HTMLInputElement).style.borderColor = '#e2e8f0';
-                (e.target as HTMLInputElement).style.boxShadow = 'none';
-              }}
-            />
-          </div>
-
-          <div style={{ marginBottom: '1.5rem' }}>
-            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#1e293b', marginBottom: '0.5rem' }}>
-              Severity Level *
-            </label>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem' }}>
-              {(['low', 'medium', 'high', 'critical'] as const).map((severity) => (
-                <button
-                  key={severity}
-                  type="button"
-                  onClick={() => setFormData({ ...formData, severity })}
-                  style={{
-                    padding: '0.75rem 1rem',
-                    borderRadius: '8px',
-                    border: '2px solid',
-                    fontSize: '0.875rem',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    background: formData.severity === severity 
-                      ? `${severity === 'low' ? '#10b981' : severity === 'medium' ? '#f59e0b' : severity === 'high' ? '#f97316' : '#ef4444'}20`
-                      : '#ffffff',
-                    borderColor: formData.severity === severity
-                      ? severity === 'low' ? '#10b981' : severity === 'medium' ? '#f59e0b' : severity === 'high' ? '#f97316' : '#ef4444'
-                      : '#e2e8f0',
-                    color: formData.severity === severity
-                      ? severity === 'low' ? '#10b981' : severity === 'medium' ? '#f59e0b' : severity === 'high' ? '#f97316' : '#ef4444'
-                      : '#64748b',
-                    minHeight: '44px',
-                  }}
-                  onMouseEnter={e => {
-                    if (formData.severity !== severity) {
-                      (e.currentTarget as HTMLElement).style.borderColor = '#10b981';
-                      (e.currentTarget as HTMLElement).style.color = '#10b981';
-                    }
-                  }}
-                  onMouseLeave={e => {
-                    if (formData.severity !== severity) {
-                      (e.currentTarget as HTMLElement).style.borderColor = '#e2e8f0';
-                      (e.currentTarget as HTMLElement).style.color = '#64748b';
-                    }
-                  }}
-                >
-                  {severity.charAt(0).toUpperCase() + severity.slice(1)}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ marginBottom: '2rem' }}>
-            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#1e293b', marginBottom: '0.5rem' }}>
-              Detailed Description
-            </label>
-            <textarea
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="Please provide more details about your symptoms, when they started, and any other relevant information..."
-              rows={6}
-              style={{
-                width: '100%',
-                padding: '0.75rem 1rem',
-                borderRadius: '8px',
-                border: '1px solid #e2e8f0',
-                fontSize: '1rem',
+                color: '#1e293b',
+                background: '#ffffff',
                 fontFamily: 'inherit',
                 resize: 'vertical',
                 transition: 'all 0.2s ease',
                 outline: 'none',
                 boxSizing: 'border-box',
+                minHeight: '120px',
               }}
               onFocus={e => {
                 (e.target as HTMLTextAreaElement).style.borderColor = '#10b981';
@@ -190,92 +130,135 @@ export default function NewConsultation() {
             />
           </div>
 
-          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
-            <button
-              type="button"
-              onClick={() => navigate('/student/consultations')}
-              style={{
-                padding: '0.75rem 1.5rem',
-                borderRadius: '8px',
-                border: '1px solid #e2e8f0',
-                background: '#ffffff',
-                color: '#64748b',
-                fontSize: '1rem',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                flex: 1,
-                minWidth: '120px',
-              }}
-              onMouseEnter={e => {
-                (e.currentTarget as HTMLElement).style.borderColor = '#10b981';
-                (e.currentTarget as HTMLElement).style.color = '#10b981';
-              }}
-              onMouseLeave={e => {
-                (e.currentTarget as HTMLElement).style.borderColor = '#e2e8f0';
-                (e.currentTarget as HTMLElement).style.color = '#64748b';
-              }}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isPending}
-              style={{
-                padding: '0.75rem 1.5rem',
-                borderRadius: '8px',
-                border: 'none',
-                background: '#10b981',
-                color: '#ffffff',
-                fontSize: '1rem',
-                fontWeight: '600',
-                cursor: isPending ? 'not-allowed' : 'pointer',
-                transition: 'all 0.2s ease',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                opacity: isPending ? 0.7 : 1,
-                flex: 1,
-                minWidth: '120px',
-                justifyContent: 'center',
-              }}
-              onMouseEnter={e => {
-                if (!isPending) {
-                  (e.currentTarget as HTMLElement).style.background = '#059669';
-                }
-              }}
-              onMouseLeave={e => {
-                if (!isPending) {
-                  (e.currentTarget as HTMLElement).style.background = '#10b981';
-                }
-              }}
-            >
-              {isPending ? (
-                <>
+          <div style={{ marginBottom: '2rem' }}>
+            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#1e293b', marginBottom: '0.5rem' }}>
+              Severity level
+            </label>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem' }}>
+              {SEVERITIES.map((s) => (
+                <button
+                  key={s.key}
+                  type="button"
+                  onClick={() => setSeverity(s.key)}
+                  style={{
+                    padding: '0.875rem 1rem',
+                    borderRadius: '12px',
+                    border: '1.5px solid',
+                    fontSize: '0.875rem',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    background: severity === s.key 
+                      ? `${s.color}15`
+                      : '#ffffff',
+                    borderColor: severity === s.key
+                      ? s.color
+                      : '#e2e8f0',
+                    minHeight: '52px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                  }}
+                  onMouseEnter={e => {
+                    if (severity !== s.key) {
+                      (e.currentTarget as HTMLElement).style.borderColor = '#10b981';
+                    }
+                  }}
+                  onMouseLeave={e => {
+                    if (severity !== s.key) {
+                      (e.currentTarget as HTMLElement).style.borderColor = '#e2e8f0';
+                    }
+                  }}
+                >
                   <div style={{
-                    width: '1rem',
-                    height: '1rem',
+                    width: '10px',
+                    height: '10px',
                     borderRadius: '50%',
-                    border: '2px solid #ffffff',
-                    borderTopColor: 'transparent',
-                    animation: 'spin 1s linear infinite'
+                    background: s.color,
+                    flexShrink: 0
                   }} />
-                  Submitting...
-                </>
-              ) : (
-                <>
-                  <Send style={{ width: '1rem', height: '1rem' }} />
-                  Submit Consultation
-                </>
-              )}
-            </button>
+                  <div style={{ textAlign: 'left', flex: 1 }}>
+                    <div style={{ 
+                      color: severity === s.key ? s.color : '#1e293b',
+                      fontSize: '0.875rem',
+                      fontWeight: '700',
+                      marginBottom: '2px'
+                    }}>
+                      {s.label}
+                    </div>
+                    <div style={{ 
+                      color: '#64748b',
+                      fontSize: '0.75rem'
+                    }}>
+                      {s.desc}
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
           </div>
+
+          <button
+            type="submit"
+            disabled={isPending}
+            style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.5rem',
+              padding: '0.875rem 1.5rem',
+              borderRadius: '12px',
+              border: 'none',
+              background: '#10b981',
+              color: '#ffffff',
+              fontSize: '1rem',
+              fontWeight: '700',
+              cursor: isPending ? 'not-allowed' : 'pointer',
+              transition: 'all 0.2s ease',
+              opacity: isPending ? 0.7 : 1,
+              height: '52px',
+              boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)'
+            }}
+            onMouseEnter={e => {
+              if (!isPending) {
+                (e.currentTarget as HTMLElement).style.background = '#059669';
+              }
+            }}
+            onMouseLeave={e => {
+              if (!isPending) {
+                (e.currentTarget as HTMLElement).style.background = '#10b981';
+              }
+            }}
+          >
+            {isPending ? (
+              <>
+                <div style={{
+                  width: '1rem',
+                  height: '1rem',
+                  borderRadius: '50%',
+                  border: '2px solid #ffffff',
+                  borderTopColor: 'transparent',
+                  animation: 'spin 1s linear infinite'
+                }} />
+                Submitting...
+              </>
+            ) : (
+              <>
+                <Send style={{ width: '1.125rem', height: '1.125rem' }} />
+                Submit Consultation
+              </>
+            )}
+          </button>
         </form>
       </div>
 
       <style>{`
         @keyframes spin {
           to { transform: rotate(360deg); }
+        }
+        textarea::placeholder {
+          color: #94a3b8;
         }
       `}</style>
     </div>

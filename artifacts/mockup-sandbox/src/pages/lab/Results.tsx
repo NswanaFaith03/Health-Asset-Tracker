@@ -1,179 +1,103 @@
-import { useState } from 'react';
-import { FileText, Upload, Search, Filter } from 'lucide-react';
-
-interface LabResult {
-  id: number;
-  patientName: string;
-  patientNumber: string;
-  testType: string;
-  results: string;
-  attachment?: string;
-  uploadedAt: string;
-  uploadedBy: string;
-}
+import { useListLabRequests } from '@/lib/api-client';
+import { FileText, Search } from 'lucide-react';
 
 export default function LabResults() {
-  const [labResults, setLabResults] = useState<LabResult[]>([
-    {
-      id: 1,
-      patientName: 'John Banda',
-      patientNumber: 'STU001',
-      testType: 'Complete Blood Count',
-      results: 'Normal ranges: RBC 4.5-5.5, WBC 4-10, Platelets 150-400',
-      uploadedAt: '2024-01-15T12:00:00Z',
-      uploadedBy: 'Lab Tech. Mwamba'
-    },
-    {
-      id: 2,
-      patientName: 'Mary Phiri',
-      patientNumber: 'STU002',
-      testType: 'Malaria Smear',
-      results: 'Positive for Plasmodium falciparum',
-      uploadedAt: '2024-01-14T16:30:00Z',
-      uploadedBy: 'Lab Tech. Mwamba'
-    },
-    {
-      id: 3,
-      patientName: 'Joseph Mwamba',
-      patientNumber: 'STU003',
-      testType: 'Urinalysis',
-      results: 'Normal: Clear appearance, pH 6.0, no protein, no glucose',
-      uploadedAt: '2024-01-13T14:00:00Z',
-      uploadedBy: 'Lab Tech. Mwamba'
-    }
-  ]);
+  const { data: labRequests = [], isLoading, refetch } = useListLabRequests({ status: 'completed' });
+
+  if (isLoading) {
+    return (
+      <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
+        <div style={{ color: '#64748b' }}>Loading lab results...</div>
+      </div>
+    );
+  }
 
   return (
-    <div>
+    <div style={{ padding: '1rem', maxWidth: '1200px', margin: '0 auto' }}>
       <div style={{ marginBottom: '2rem' }}>
-        <h1 style={{ color: 'white', fontSize: '1.875rem', fontWeight: '700', marginBottom: '0.5rem' }}>
+        <h1 style={{ color: '#1e293b', fontSize: '1.875rem', fontWeight: '700', marginBottom: '0.5rem' }}>
           Lab Results
         </h1>
-        <p style={{ color: 'hsl(215, 20%, 65%)', marginBottom: 0 }}>
+        <p style={{ color: '#64748b', marginBottom: 0 }}>
           View and manage test results
         </p>
       </div>
 
-      {/* Search and Filter */}
-      <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
-        <div style={{ flex: 1, position: 'relative' }}>
-          <Search size={20} style={{
-            position: 'absolute',
-            left: '1rem',
-            top: '50%',
-            transform: 'translateY(-50%)',
-            color: 'hsl(215, 20%, 65%)'
-          }} />
-          <input
-            type="text"
-            placeholder="Search results..."
-            style={{
-              width: '100%',
-              padding: '0.75rem 1rem 0.75rem 3rem',
-              background: 'hsl(217, 33%, 17%)',
-              border: '1px solid hsl(217, 33%, 25%)',
-              borderRadius: '8px',
-              color: 'white',
-              fontSize: '0.875rem'
-            }}
-          />
-        </div>
-        <button style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.5rem',
-          padding: '0.75rem 1.5rem',
-          background: 'hsl(217, 33%, 17%)',
-          border: '1px solid hsl(217, 33%, 25%)',
-          borderRadius: '8px',
-          color: 'white',
-          cursor: 'pointer',
-          fontSize: '0.875rem',
-          fontWeight: '600'
-        }}>
-          <Filter size={16} />
-          Filter
-        </button>
-        <button style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.5rem',
-          padding: '0.75rem 1.5rem',
-          background: 'hsl(142, 76%, 36%)',
-          border: 'none',
-          borderRadius: '8px',
-          color: 'white',
-          cursor: 'pointer',
-          fontSize: '0.875rem',
-          fontWeight: '600'
-        }}>
-          <Upload size={16} />
-          Upload Result
-        </button>
-      </div>
-
       {/* Lab Results List */}
-      <div style={{
-        background: 'hsl(217, 33%, 17%)',
-        borderRadius: '12px',
-        border: '1px solid hsl(217, 33%, 25%)',
-        overflow: 'hidden'
-      }}>
-        {labResults.map((result) => (
-          <div
-            key={result.id}
-            style={{
-              padding: '1.5rem',
-              borderBottom: '1px solid hsl(217, 33%, 25%)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '1.5rem'
-            }}
-          >
-            <div style={{ flex: 1 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.25rem' }}>
-                <h3 style={{ color: 'white', fontSize: '1rem', fontWeight: '600', margin: 0 }}>
-                  {result.patientName}
-                </h3>
-              </div>
-              <p style={{ color: 'hsl(215, 20%, 65%)', fontSize: '0.875rem', margin: '0.25rem 0' }}>
-                {result.patientNumber}
-              </p>
-              <p style={{ color: 'white', fontSize: '0.875rem', margin: 0 }}>
-                {result.testType}
-              </p>
-              <p style={{ color: 'hsl(215, 20%, 65%)', fontSize: '0.875rem', margin: '0.25rem 0' }}>
-                {result.results}
-              </p>
-              <p style={{ color: 'hsl(215, 20%, 65%)', fontSize: '0.875rem', margin: '0.25rem 0' }}>
-                Uploaded by: {result.uploadedBy}
-              </p>
-            </div>
-
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ color: 'hsl(215, 20%, 65%)', fontSize: '0.875rem', marginBottom: '0.5rem' }}>
-                {new Date(result.uploadedAt).toLocaleDateString()}
-              </div>
-              <button style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                padding: '0.5rem 1rem',
-                background: 'hsl(217, 33%, 25%)',
-                border: '1px solid hsl(217, 33%, 25%)',
-                borderRadius: '8px',
-                color: 'white',
-                cursor: 'pointer',
-                fontSize: '0.875rem',
-                fontWeight: '600'
-              }}>
-                <FileText size={16} />
-                View Details
-              </button>
-            </div>
+      {labRequests.length === 0 ? (
+        <div style={{
+          textAlign: 'center',
+          padding: '4rem 2rem',
+          background: '#ffffff',
+          borderRadius: '12px',
+          border: '1px solid #e2e8f0',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+        }}>
+          <div style={{ marginBottom: '1rem' }}>
+            <FileText size={48} style={{ color: '#64748b' }} />
           </div>
-        ))}
-      </div>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#1e293b', marginBottom: '0.5rem' }}>
+            No lab results
+          </h2>
+          <p style={{ color: '#64748b', margin: 0 }}>
+            Lab results will appear here
+          </p>
+        </div>
+      ) : (
+        <div style={{ display: 'grid', gap: '1rem' }}>
+          {labRequests.map((request) => (
+            <div
+              key={request.id}
+              style={{
+                background: '#ffffff',
+                borderRadius: '12px',
+                border: '1px solid #e2e8f0',
+                padding: '1.5rem',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '0.75rem' }}>
+                <div style={{ flex: 1 }}>
+                  <h3 style={{ color: '#1e293b', fontSize: '1rem', fontWeight: '600', margin: '0 0 0.25rem 0' }}>
+                    {request.patient?.name ?? 'Patient'}
+                  </h3>
+                  <p style={{ color: '#10b981', fontSize: '0.875rem', fontWeight: '600', margin: 0 }}>
+                    {request.testType}
+                  </p>
+                </div>
+              </div>
+
+              {request.result && (
+                <p style={{ color: '#1e293b', fontSize: '0.875rem', margin: '0.5rem 0' }}>
+                  {request.result}
+                </p>
+              )}
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1rem' }}>
+                <div style={{ color: '#64748b', fontSize: '0.875rem' }}>
+                  {new Date(request.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                </div>
+                <button style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.5rem 1rem',
+                  background: '#f8fafc',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '8px',
+                  color: '#64748b',
+                  cursor: 'pointer',
+                  fontSize: '0.875rem',
+                  fontWeight: '600'
+                }}>
+                  <FileText size={16} />
+                  View Details
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

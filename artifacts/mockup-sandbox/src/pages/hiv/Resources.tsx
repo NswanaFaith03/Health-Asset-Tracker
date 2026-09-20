@@ -1,45 +1,18 @@
 import { useState } from 'react';
-import { BookOpen, Plus, Search, Edit, Trash2 } from 'lucide-react';
+import { useListHivResources, getListHivResourcesQueryKey } from '@/lib/api-client';
+import { BookOpen, Search } from 'lucide-react';
 
-interface HivResource {
-  id: number;
-  title: string;
-  content: string;
-  category: string;
-  createdAt: string;
-}
+const CATEGORY_COLORS: Record<string, string> = {
+  Prevention: '#10b981',
+  Treatment: '#3b82f6',
+  'Mental Health': '#8b5cf6',
+  Testing: '#f59e0b',
+};
 
 export default function HivResources() {
-  const [resources, setResources] = useState<HivResource[]>([
-    {
-      id: 1,
-      title: 'Understanding HIV Prevention',
-      content: 'Comprehensive guide on HIV prevention methods including PrEP, PEP, and safe practices.',
-      category: 'Prevention',
-      createdAt: '2024-01-15T10:00:00Z'
-    },
-    {
-      id: 2,
-      title: 'ART Medication Guide',
-      content: 'Information about antiretroviral therapy, adherence, and side effects management.',
-      category: 'Treatment',
-      createdAt: '2024-01-14T15:00:00Z'
-    },
-    {
-      id: 3,
-      title: 'Living with HIV - Mental Health',
-      content: 'Resources for maintaining mental health and wellbeing while living with HIV.',
-      category: 'Mental Health',
-      createdAt: '2024-01-13T09:00:00Z'
-    },
-    {
-      id: 4,
-      title: 'HIV Testing Information',
-      content: 'Types of HIV tests, when to get tested, and understanding your results.',
-      category: 'Testing',
-      createdAt: '2024-01-12T14:00:00Z'
-    }
-  ]);
+  const { data: resources = [], isLoading, refetch } = useListHivResources(undefined, {
+    query: { queryKey: getListHivResourcesQueryKey() }
+  });
 
   const categories = ['All', 'Prevention', 'Treatment', 'Mental Health', 'Testing'];
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -48,43 +21,23 @@ export default function HivResources() {
     ? resources 
     : resources.filter(r => r.category === selectedCategory);
 
-  const getCategoryColor = (category: string) => {
-    switch (category) {
-      case 'Prevention': return 'hsl(142, 76%, 36%)';
-      case 'Treatment': return 'hsl(217, 91%, 60%)';
-      case 'Mental Health': return 'hsl(280, 67%, 55%)';
-      case 'Testing': return 'hsl(45, 93%, 47%)';
-      default: return 'hsl(217, 33%, 17%)';
-    }
-  };
+  if (isLoading) {
+    return (
+      <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
+        <div style={{ color: '#64748b' }}>Loading resources...</div>
+      </div>
+    );
+  }
 
   return (
-    <div>
-      <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div>
-          <h1 style={{ color: 'white', fontSize: '1.875rem', fontWeight: '700', marginBottom: '0.5rem' }}>
-            HIV Resources
-          </h1>
-          <p style={{ color: 'hsl(215, 20%, 65%)', marginBottom: 0 }}>
-            Educational resources and information
-          </p>
-        </div>
-        <button style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.5rem',
-          padding: '0.75rem 1.5rem',
-          background: 'hsl(142, 76%, 36%)',
-          border: 'none',
-          borderRadius: '8px',
-          color: 'white',
-          cursor: 'pointer',
-          fontSize: '0.875rem',
-          fontWeight: '600'
-        }}>
-          <Plus size={16} />
-          Add Resource
-        </button>
+    <div style={{ padding: '1rem', maxWidth: '1200px', margin: '0 auto' }}>
+      <div style={{ marginBottom: '2rem' }}>
+        <h1 style={{ color: '#1e293b', fontSize: '1.875rem', fontWeight: '700', marginBottom: '0.5rem' }}>
+          HIV Resources
+        </h1>
+        <p style={{ color: '#64748b', marginBottom: 0 }}>
+          Educational resources and information
+        </p>
       </div>
 
       {/* Search */}
@@ -94,7 +47,7 @@ export default function HivResources() {
           left: '1rem',
           top: '50%',
           transform: 'translateY(-50%)',
-          color: 'hsl(215, 20%, 65%)'
+          color: '#64748b'
         }} />
         <input
           type="text"
@@ -102,11 +55,12 @@ export default function HivResources() {
           style={{
             width: '100%',
             padding: '0.75rem 1rem 0.75rem 3rem',
-            background: 'hsl(217, 33%, 17%)',
-            border: '1px solid hsl(217, 33%, 25%)',
+            background: '#ffffff',
+            border: '1px solid #e2e8f0',
             borderRadius: '8px',
-            color: 'white',
-            fontSize: '0.875rem'
+            color: '#1e293b',
+            fontSize: '0.875rem',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
           }}
         />
       </div>
@@ -119,13 +73,14 @@ export default function HivResources() {
             onClick={() => setSelectedCategory(category)}
             style={{
               padding: '0.5rem 1rem',
-              background: selectedCategory === category ? 'hsl(142, 76%, 36%)' : 'hsl(217, 33%, 17%)',
-              border: selectedCategory === category ? 'none' : '1px solid hsl(217, 33%, 25%)',
+              background: selectedCategory === category ? '#10b981' : '#ffffff',
+              border: selectedCategory === category ? 'none' : '1px solid #e2e8f0',
               borderRadius: '8px',
-              color: 'white',
+              color: selectedCategory === category ? 'white' : '#64748b',
               cursor: 'pointer',
               fontSize: '0.875rem',
-              fontWeight: '600'
+              fontWeight: '600',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
             }}
           >
             {category}
@@ -134,84 +89,66 @@ export default function HivResources() {
       </div>
 
       {/* Resources List */}
-      <div style={{
-        background: 'hsl(217, 33%, 17%)',
-        borderRadius: '12px',
-        border: '1px solid hsl(217, 33%, 25%)',
-        overflow: 'hidden'
-      }}>
-        {filteredResources.map((resource) => (
-          <div
-            key={resource.id}
-            style={{
-              padding: '1.5rem',
-              borderBottom: '1px solid hsl(217, 33%, 25%)',
-              display: 'flex',
-              alignItems: 'flex-start',
-              gap: '1.5rem'
-            }}
-          >
-            <div style={{ flex: 1 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
-                <h3 style={{ color: 'white', fontSize: '1rem', fontWeight: '600', margin: 0 }}>
-                  {resource.title}
-                </h3>
-                <span style={{
-                  padding: '0.25rem 0.5rem',
-                  borderRadius: '4px',
-                  fontSize: '0.75rem',
-                  fontWeight: '600',
-                  background: getCategoryColor(resource.category),
-                  color: 'white'
-                }}>
-                  {resource.category}
-                </span>
-              </div>
-              <p style={{ color: 'hsl(215, 20%, 65%)', fontSize: '0.875rem', margin: 0 }}>
-                {resource.content}
-              </p>
-              <p style={{ color: 'hsl(215, 20%, 65%)', fontSize: '0.875rem', margin: '0.5rem 0 0 0' }}>
-                Added: {new Date(resource.createdAt).toLocaleDateString()}
-              </p>
-            </div>
-
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
-              <button style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                padding: '0.5rem 1rem',
-                background: 'hsl(217, 33%, 25%)',
-                border: '1px solid hsl(217, 33%, 25%)',
-                borderRadius: '8px',
-                color: 'white',
-                cursor: 'pointer',
-                fontSize: '0.875rem',
-                fontWeight: '600'
-              }}>
-                <Edit size={16} />
-                Edit
-              </button>
-              <button style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                padding: '0.5rem 1rem',
-                background: 'hsl(0, 72%, 51%)',
-                border: 'none',
-                borderRadius: '8px',
-                color: 'white',
-                cursor: 'pointer',
-                fontSize: '0.875rem',
-                fontWeight: '600'
-              }}>
-                <Trash2 size={16} />
-                Delete
-              </button>
-            </div>
+      {filteredResources.length === 0 ? (
+        <div style={{
+          textAlign: 'center',
+          padding: '4rem 2rem',
+          background: '#ffffff',
+          borderRadius: '12px',
+          border: '1px solid #e2e8f0',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+        }}>
+          <div style={{ marginBottom: '1rem' }}>
+            <BookOpen size={48} style={{ color: '#64748b' }} />
           </div>
-        ))}
-      </div>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#1e293b', marginBottom: '0.5rem' }}>
+            No resources
+          </h2>
+          <p style={{ color: '#64748b', margin: 0 }}>
+            HIV resources will appear here
+          </p>
+        </div>
+      ) : (
+        <div style={{ display: 'grid', gap: '1rem' }}>
+          {filteredResources.map((resource) => {
+            const categoryColor = CATEGORY_COLORS[resource.category] || CATEGORY_COLORS.Prevention;
+            return (
+              <div
+                key={resource.id}
+                style={{
+                  background: '#ffffff',
+                  borderRadius: '12px',
+                  border: '1px solid #e2e8f0',
+                  padding: '1.5rem',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+                  <h3 style={{ color: '#1e293b', fontSize: '1rem', fontWeight: '600', margin: 0 }}>
+                    {resource.title}
+                  </h3>
+                  <span style={{
+                    padding: '0.25rem 0.5rem',
+                    borderRadius: '4px',
+                    fontSize: '0.75rem',
+                    fontWeight: '600',
+                    background: categoryColor,
+                    color: 'white'
+                  }}>
+                    {resource.category}
+                  </span>
+                </div>
+                <p style={{ color: '#64748b', fontSize: '0.875rem', margin: '0.5rem 0' }}>
+                  {resource.content}
+                </p>
+                <div style={{ color: '#64748b', fontSize: '0.875rem', marginTop: '0.5rem' }}>
+                  Added: {new Date(resource.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

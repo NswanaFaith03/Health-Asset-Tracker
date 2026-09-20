@@ -1,200 +1,154 @@
-import { useState } from 'react';
-import { List, Search, Filter, Calendar, User as UserIcon } from 'lucide-react';
+import { useListAuditLogs, getListAuditLogsQueryKey } from '@/lib/api-client';
+import { List, Search, Calendar, User as UserIcon } from 'lucide-react';
 
-interface AuditLog {
-  id: number;
-  userId?: number;
-  userName?: string;
-  action: string;
-  resource: string;
-  resourceId?: string;
-  details?: string;
-  ipAddress?: string;
-  createdAt: string;
-}
+const ACTION_COLORS: Record<string, string> = {
+  CREATE: '#10b981',
+  UPDATE: '#3b82f6',
+  DELETE: '#ef4444',
+  DISPENSE: '#f59e0b',
+  LOGIN: '#8b5cf6',
+  LOGOUT: '#6b7280',
+};
 
 export default function AdminAudit() {
-  const [auditLogs, setAuditLogs] = useState<AuditLog[]>([
-    {
-      id: 1,
-      userId: 1,
-      userName: 'John Banda',
-      action: 'CREATE',
-      resource: 'Consultation',
-      resourceId: 'CONS-001',
-      details: 'Created new consultation',
-      ipAddress: '192.168.1.100',
-      createdAt: '2024-01-15T10:30:00Z'
-    },
-    {
-      id: 2,
-      userId: 2,
-      userName: 'Dr. Mary Phiri',
-      action: 'UPDATE',
-      resource: 'Prescription',
-      resourceId: 'RX-002',
-      details: 'Updated prescription dosage',
-      ipAddress: '192.168.1.101',
-      createdAt: '2024-01-15T09:15:00Z'
-    },
-    {
-      id: 3,
-      action: 'DELETE',
-      resource: 'User',
-      resourceId: 'USER-003',
-      details: 'Deleted user account',
-      ipAddress: '192.168.1.102',
-      createdAt: '2024-01-14T16:00:00Z'
-    },
-    {
-      id: 4,
-      userId: 4,
-      userName: 'Pharm. Grace Nkoma',
-      action: 'DISPENSE',
-      resource: 'Prescription',
-      resourceId: 'RX-004',
-      details: 'Dispensed medication',
-      ipAddress: '192.168.1.103',
-      createdAt: '2024-01-14T14:30:00Z'
-    }
-  ]);
+  const { data: auditLogs = [], isLoading, refetch } = useListAuditLogs(undefined, {
+    query: { queryKey: getListAuditLogsQueryKey() }
+  });
 
-  const getActionColor = (action: string) => {
-    switch (action) {
-      case 'CREATE': return 'hsl(142, 76%, 36%)';
-      case 'UPDATE': return 'hsl(217, 91%, 60%)';
-      case 'DELETE': return 'hsl(0, 72%, 51%)';
-      case 'DISPENSE': return 'hsl(45, 93%, 47%)';
-      default: return 'hsl(217, 33%, 17%)';
-    }
-  };
+  if (isLoading) {
+    return (
+      <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
+        <div style={{ color: '#64748b' }}>Loading audit logs...</div>
+      </div>
+    );
+  }
 
   return (
-    <div>
+    <div style={{ padding: '1rem', maxWidth: '1200px', margin: '0 auto' }}>
       <div style={{ marginBottom: '2rem' }}>
-        <h1 style={{ color: 'white', fontSize: '1.875rem', fontWeight: '700', marginBottom: '0.5rem' }}>
+        <h1 style={{ color: '#1e293b', fontSize: '1.875rem', fontWeight: '700', marginBottom: '0.5rem' }}>
           Audit Logs
         </h1>
-        <p style={{ color: 'hsl(215, 20%, 65%)', marginBottom: 0 }}>
+        <p style={{ color: '#64748b', marginBottom: 0 }}>
           Track system activity and changes
         </p>
       </div>
 
-      {/* Search and Filter */}
-      <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
-        <div style={{ flex: 1, position: 'relative' }}>
-          <Search size={20} style={{
-            position: 'absolute',
-            left: '1rem',
-            top: '50%',
-            transform: 'translateY(-50%)',
-            color: 'hsl(215, 20%, 65%)'
-          }} />
-          <input
-            type="text"
-            placeholder="Search audit logs..."
-            style={{
-              width: '100%',
-              padding: '0.75rem 1rem 0.75rem 3rem',
-              background: 'hsl(217, 33%, 17%)',
-              border: '1px solid hsl(217, 33%, 25%)',
-              borderRadius: '8px',
-              color: 'white',
-              fontSize: '0.875rem'
-            }}
-          />
-        </div>
-        <button style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.5rem',
-          padding: '0.75rem 1.5rem',
-          background: 'hsl(217, 33%, 17%)',
-          border: '1px solid hsl(217, 33%, 25%)',
-          borderRadius: '8px',
-          color: 'white',
-          cursor: 'pointer',
-          fontSize: '0.875rem',
-          fontWeight: '600'
-        }}>
-          <Filter size={16} />
-          Filter
-        </button>
+      {/* Search */}
+      <div style={{ marginBottom: '2rem', position: 'relative' }}>
+        <Search size={20} style={{
+          position: 'absolute',
+          left: '1rem',
+          top: '50%',
+          transform: 'translateY(-50%)',
+          color: '#64748b'
+        }} />
+        <input
+          type="text"
+          placeholder="Search audit logs..."
+          style={{
+            width: '100%',
+            padding: '0.75rem 1rem 0.75rem 3rem',
+            background: '#ffffff',
+            border: '1px solid #e2e8f0',
+            borderRadius: '8px',
+            color: '#1e293b',
+            fontSize: '0.875rem',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+          }}
+        />
       </div>
 
       {/* Audit Logs List */}
-      <div style={{
-        background: 'hsl(217, 33%, 17%)',
-        borderRadius: '12px',
-        border: '1px solid hsl(217, 33%, 25%)',
-        overflow: 'hidden'
-      }}>
-        {auditLogs.map((log) => (
-          <div
-            key={log.id}
-            style={{
-              padding: '1.5rem',
-              borderBottom: '1px solid hsl(217, 33%, 25%)',
-              display: 'flex',
-              alignItems: 'flex-start',
-              gap: '1.5rem'
-            }}
-          >
-            <div style={{ flex: 1 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
-                <span style={{
-                  padding: '0.25rem 0.5rem',
-                  borderRadius: '4px',
-                  fontSize: '0.75rem',
-                  fontWeight: '600',
-                  background: getActionColor(log.action),
-                  color: 'white'
-                }}>
-                  {log.action}
-                </span>
-                <span style={{ color: 'white', fontSize: '0.875rem', fontWeight: '600' }}>
-                  {log.resource}
-                </span>
-                {log.resourceId && (
-                  <span style={{ color: 'hsl(215, 20%, 65%)', fontSize: '0.875rem' }}>
-                    ({log.resourceId})
+      {auditLogs.length === 0 ? (
+        <div style={{
+          textAlign: 'center',
+          padding: '4rem 2rem',
+          background: '#ffffff',
+          borderRadius: '12px',
+          border: '1px solid #e2e8f0',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+        }}>
+          <div style={{ marginBottom: '1rem' }}>
+            <List size={48} style={{ color: '#64748b' }} />
+          </div>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#1e293b', marginBottom: '0.5rem' }}>
+            No audit logs
+          </h2>
+          <p style={{ color: '#64748b', margin: 0 }}>
+            System activity will appear here
+          </p>
+        </div>
+      ) : (
+        <div style={{ display: 'grid', gap: '1rem' }}>
+          {auditLogs.map((log) => {
+            const actionColor = ACTION_COLORS[log.action] || ACTION_COLORS.LOGIN;
+            return (
+              <div
+                key={log.id}
+                style={{
+                  background: '#ffffff',
+                  borderRadius: '12px',
+                  border: '1px solid #e2e8f0',
+                  padding: '1.5rem',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+                  <span style={{
+                    padding: '0.25rem 0.5rem',
+                    borderRadius: '4px',
+                    fontSize: '0.75rem',
+                    fontWeight: '600',
+                    background: actionColor,
+                    color: 'white'
+                  }}>
+                    {log.action}
                   </span>
-                )}
-              </div>
-              
-              {log.userName && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-                  <UserIcon size={14} style={{ color: 'hsl(215, 20%, 65%)' }} />
-                  <p style={{ color: 'hsl(215, 20%, 65%)', fontSize: '0.875rem', margin: 0 }}>
-                    {log.userName}
-                  </p>
+                  <span style={{ color: '#1e293b', fontSize: '0.875rem', fontWeight: '600' }}>
+                    {log.resource}
+                  </span>
+                  {log.resourceId && (
+                    <span style={{ color: '#64748b', fontSize: '0.875rem' }}>
+                      ({log.resourceId})
+                    </span>
+                  )}
                 </div>
-              )}
-              
-              {log.details && (
-                <p style={{ color: 'white', fontSize: '0.875rem', margin: '0.25rem 0' }}>
-                  {log.details}
-                </p>
-              )}
-              
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '0.5rem' }}>
-                {log.ipAddress && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <span style={{ color: 'hsl(215, 20%, 65%)', fontSize: '0.75rem' }}>IP:</span>
-                    <span style={{ color: 'hsl(215, 20%, 65%)', fontSize: '0.875rem' }}>{log.ipAddress}</span>
+
+                {log.userName && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                    <UserIcon size={14} style={{ color: '#64748b' }} />
+                    <p style={{ color: '#64748b', fontSize: '0.875rem', margin: 0 }}>
+                      {log.userName}
+                    </p>
                   </div>
                 )}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <Calendar size={14} style={{ color: 'hsl(215, 20%, 65%)' }} />
-                  <span style={{ color: 'hsl(215, 20%, 65%)', fontSize: '0.875rem' }}>
-                    {new Date(log.createdAt).toLocaleString()}
-                  </span>
+
+                {log.details && (
+                  <p style={{ color: '#1e293b', fontSize: '0.875rem', margin: '0.25rem 0' }}>
+                    {log.details}
+                  </p>
+                )}
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '0.5rem' }}>
+                  {log.ipAddress && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <span style={{ color: '#64748b', fontSize: '0.75rem' }}>IP:</span>
+                      <span style={{ color: '#64748b', fontSize: '0.875rem' }}>{log.ipAddress}</span>
+                    </div>
+                  )}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <Calendar size={14} style={{ color: '#64748b' }} />
+                    <span style={{ color: '#64748b', fontSize: '0.875rem' }}>
+                      {new Date(log.createdAt).toLocaleString()}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-        ))}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
