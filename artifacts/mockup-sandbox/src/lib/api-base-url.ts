@@ -4,6 +4,6 @@
  * Following the Expo Android app's backend connection
  */
 export function getApiBaseUrl(): string {
-  // Use local backend for development
-  return "http://localhost:5000";
+  // Use production backend
+  return "https://health-asset-tracker.vercel.app";
 }
