@@ -294,13 +294,13 @@ export function Sidebar({ isOpen, onClose, role }: { isOpen: boolean; onClose: (
               width: 40,
               height: 40,
               borderRadius: 8,
-              background: profilePhoto ? 'transparent' : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+              background: profilePhoto ? 'transparent' : 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontSize: 14,
               fontWeight: 800,
-              color: '#0a1a12',
+              color: '#ffffff',
               overflow: 'hidden',
               border: '2px solid #e2e8f0',
               flexShrink: 0,
@@ -312,7 +312,10 @@ export function Sidebar({ isOpen, onClose, role }: { isOpen: boolean; onClose: (
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 />
               ) : (
-                <span>{user?.name?.charAt(0).toUpperCase() || 'S'}</span>
+                <div style={{ textAlign: 'center', lineHeight: 1 }}>
+                  <div style={{ fontSize: 8, fontWeight: 'bold', marginBottom: 0 }}>UNZA</div>
+                  <div style={{ fontSize: 14, fontWeight: 'bold' }}>{user?.name?.charAt(0).toUpperCase() || 'S'}</div>
+                </div>
               )}
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>

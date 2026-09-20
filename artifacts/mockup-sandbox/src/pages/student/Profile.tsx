@@ -1,9 +1,17 @@
 import { useAuth } from '../../contexts/AuthContext';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function StudentProfile() {
   const { user } = useAuth();
   const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Load saved profile photo from localStorage
+    const savedPhoto = localStorage.getItem('profilePhoto');
+    if (savedPhoto) {
+      setProfilePhoto(savedPhoto);
+    }
+  }, []);
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -16,6 +24,11 @@ export default function StudentProfile() {
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const handleRemovePhoto = () => {
+    setProfilePhoto(null);
+    localStorage.removeItem('profilePhoto');
   };
 
   return (
@@ -63,7 +76,7 @@ export default function StudentProfile() {
             width: '120px',
             height: '120px',
             borderRadius: '50%',
-            background: profilePhoto ? 'transparent' : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+            background: profilePhoto ? 'transparent' : 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -72,7 +85,8 @@ export default function StudentProfile() {
             color: '#ffffff',
             overflow: 'hidden',
             border: '4px solid #e2e8f0',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+            position: 'relative'
           }}>
             {profilePhoto ? (
               <img 
@@ -81,11 +95,14 @@ export default function StudentProfile() {
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
             ) : (
-              <span>{user?.name?.charAt(0).toUpperCase() || 'S'}</span>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '2px' }}>UNZA</div>
+                <div style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{user?.name?.charAt(0).toUpperCase() || 'S'}</div>
+              </div>
             )}
           </div>
           <div style={{ flex: 1 }}>
-            <div style={{ marginBottom: '1rem' }}>
+            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
               <label style={{
                 display: 'inline-block',
                 padding: '0.75rem 1.5rem',
@@ -115,6 +132,34 @@ export default function StudentProfile() {
                   style={{ display: 'none' }}
                 />
               </label>
+              
+              {profilePhoto && (
+                <button
+                  onClick={handleRemovePhoto}
+                  style={{
+                    padding: '0.75rem 1.5rem',
+                    background: '#ef4444',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    fontSize: '1rem',
+                    fontWeight: '600',
+                    boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)';
+                    (e.currentTarget as HTMLElement).style.boxShadow = '0 6px 16px rgba(239, 68, 68, 0.4)';
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
+                    (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 12px rgba(239, 68, 68, 0.3)';
+                  }}
+                >
+                  Remove Photo
+                </button>
+              )}
             </div>
             <p style={{ color: '#64748b', fontSize: '0.875rem', marginBottom: '0.5rem' }}>
               Recommended: Square image, at least 200x200px

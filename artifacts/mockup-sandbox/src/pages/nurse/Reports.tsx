@@ -7,7 +7,7 @@ export default function NurseReports() {
   const [isGenerating, setIsGenerating] = useState(false);
   
   const { data: labRequests = [], isLoading: labsLoading } = useListLabRequests(undefined, {
-    query: { queryKey: getListLabRequestsQueryKey() } }
+    query: { queryKey: getListLabRequestsQueryKey() }
   });
   
   const { data: consultations = [], isLoading: consultsLoading } = useListConsultations(undefined, {
