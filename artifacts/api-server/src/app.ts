@@ -6,6 +6,14 @@ import { logger } from "./lib/logger";
 
 const app: Express = express();
 
+// CORS middleware - must be first
+app.use(cors({
+  origin: ['https://mockup-sandbox-zeta-lime.vercel.app', 'https://health-asset-tracker.vercel.app', 'http://localhost:3000'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(
   pinoHttp({
     logger,
@@ -25,12 +33,6 @@ app.use(
     },
   }),
 );
-app.use(cors({
-  origin: ['https://mockup-sandbox-zeta-lime.vercel.app', 'https://health-asset-tracker.vercel.app', 'http://localhost:3000'],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
