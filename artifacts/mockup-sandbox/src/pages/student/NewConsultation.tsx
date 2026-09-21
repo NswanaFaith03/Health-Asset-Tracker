@@ -21,12 +21,12 @@ export default function NewConsultation() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!symptoms.trim()) {
       alert('Please describe your symptoms');
       return;
     }
-    
+
     createConsultation(
       { symptoms: symptoms.trim(), severity } as any,
       {
@@ -35,9 +35,10 @@ export default function NewConsultation() {
           alert('Your consultation has been submitted successfully.');
           navigate('/student/consultations');
         },
-        onError: (error) => {
+        onError: (error: any) => {
           console.error('Failed to create consultation:', error);
-          alert('Failed to submit consultation. Please try again.');
+          const message = error?.message || 'Failed to submit consultation. Please try again.';
+          alert(message);
         }
       }
     );
