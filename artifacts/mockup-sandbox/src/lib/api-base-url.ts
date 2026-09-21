@@ -5,5 +5,5 @@
  */
 export function getApiBaseUrl(): string {
   // Use production backend
-  return "https://health-asset-tracker.vercel.app";
+  return "https://api-server-five-beryl.vercel.app";
 }
