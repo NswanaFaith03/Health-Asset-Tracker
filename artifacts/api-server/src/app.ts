@@ -25,7 +25,12 @@ app.use(
     },
   }),
 );
-app.use(cors());
+app.use(cors({
+  origin: ['https://mockup-sandbox-zeta-lime.vercel.app', 'https://health-asset-tracker.vercel.app', 'http://localhost:3000'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
