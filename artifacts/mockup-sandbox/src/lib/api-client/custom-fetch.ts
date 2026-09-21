@@ -297,7 +297,8 @@ export async function customFetch<T = unknown>(
     headers.set("accept", DEFAULT_JSON_ACCEPT);
   }
 
-  if (_authTokenGetter && !headers.has("authorization")) {
+  // Always try to get and set auth token, even if Authorization header exists
+  if (_authTokenGetter) {
     const token = await _authTokenGetter();
     if (token) {
       headers.set("authorization", `Bearer ${token}`);
