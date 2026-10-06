@@ -149,11 +149,11 @@ export default function PaymentProcessing() {
   const getStatusIcon = (status) => {
     switch (status) {
       case 'paid':
-        return { icon: CheckCircle, color: 'text-green-400', bgColor: 'bg-green-500/20' }
+        return { icon: CheckCircle, color: 'text-emerald-400', bgColor: 'bg-emerald-500/20' }
       case 'pending':
-        return { icon: Clock, color: 'text-yellow-400', bgColor: 'bg-yellow-500/20' }
+        return { icon: Clock, color: 'text-amber-400', bgColor: 'bg-amber-500/20' }
       case 'overdue':
-        return { icon: AlertCircle, color: 'text-red-400', bgColor: 'bg-red-500/20' }
+        return { icon: AlertCircle, color: 'text-teal-400', bgColor: 'bg-red-500/20' }
       default:
         return { icon: Clock, color: 'text-slate-400', bgColor: 'bg-slate-500/20' }
     }
@@ -195,7 +195,7 @@ export default function PaymentProcessing() {
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div className="w-10 h-10 bg-purple-500/20 rounded-xl flex items-center justify-center">
-              <DollarSign className="w-6 h-6 text-purple-400" />
+              <DollarSign className="w-6 h-6 text-violet-400" />
             </div>
             <div>
               <h1 className="text-xl font-bold">Payment Processing</h1>
@@ -283,11 +283,11 @@ export default function PaymentProcessing() {
 
                   {/* Amount and Overdue Info */}
                   <div className="mb-4">
-                    <div className="text-2xl font-bold text-green-400 mb-2 tabular-nums">
+                    <div className="text-2xl font-bold text-emerald-400 mb-2 tabular-nums">
                       ₹{invoice.totalAmount?.toLocaleString()}
                     </div>
                     {daysOverdue > 0 && (
-                      <div className="text-red-400 text-sm tabular-nums">
+                      <div className="text-teal-400 text-sm tabular-nums">
                         {daysOverdue} day{daysOverdue > 1 ? 's' : ''} overdue
                       </div>
                     )}
@@ -297,14 +297,14 @@ export default function PaymentProcessing() {
                   <div className="flex space-x-2">
                     <button
                       onClick={() => openPaymentModal(invoice)}
-                      className="flex-1 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors flex items-center justify-center space-x-2"
+                      className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-slate-900 px-4 py-2 rounded-lg transition-colors flex items-center justify-center space-x-2"
                     >
                       <DollarSign className="w-4 h-4" />
                       <span>Process Payment</span>
                     </button>
                     <Link
                       to={`/receptionist/billing/invoices/${invoice.id}`}
-                      className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors flex items-center justify-center"
+                      className="px-4 py-2 bg-teal-600 hover:bg-teal-600 text-white rounded-lg transition-colors flex items-center justify-center"
                       title="View Invoice"
                     >
                       <FileText className="w-4 h-4" />
@@ -345,7 +345,7 @@ export default function PaymentProcessing() {
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-slate-300">Total Amount:</span>
-                <span className="text-xl font-bold text-green-400">₹{selectedInvoice.totalAmount?.toLocaleString()}</span>
+                <span className="text-xl font-bold text-emerald-400">₹{selectedInvoice.totalAmount?.toLocaleString()}</span>
               </div>
             </div>
 
@@ -354,9 +354,9 @@ export default function PaymentProcessing() {
               <label className="block text-sm font-medium text-slate-300 mb-2">Payment Method</label>
               <div className="grid grid-cols-3 gap-2">
                 {[
-                  { value: 'cash', label: 'Cash', icon: Banknote, color: 'text-green-400' },
-                  { value: 'card', label: 'Card', icon: CreditCard, color: 'text-blue-400' },
-                  { value: 'online', label: 'Online', icon: Globe, color: 'text-purple-400' }
+                  { value: 'cash', label: 'Cash', icon: Banknote, color: 'text-emerald-400' },
+                  { value: 'card', label: 'Card', icon: CreditCard, color: 'text-teal-400' },
+                  { value: 'online', label: 'Online', icon: Globe, color: 'text-violet-400' }
                 ].map((method) => {
                   const Icon = method.icon
                   return (
@@ -425,7 +425,7 @@ export default function PaymentProcessing() {
               <button
                 onClick={processPayment}
                 disabled={processingPayment}
-                className="flex-1 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-slate-900 px-4 py-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
               >
                 {processingPayment ? (
                   <>

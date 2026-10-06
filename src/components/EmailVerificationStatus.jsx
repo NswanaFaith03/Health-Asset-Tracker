@@ -62,7 +62,7 @@ export default function EmailVerificationStatus() {
           <button 
             onClick={handleRefreshStatus}
             disabled={isChecking}
-            className="text-xs bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 px-3 py-1 rounded transition-colors flex items-center space-x-1"
+            className="text-xs bg-teal-600 hover:bg-teal-600 disabled:bg-blue-300 px-3 py-1 rounded transition-colors flex items-center space-x-1"
           >
             {isChecking ? (
               <FaArrowsRotate className="w-3 h-3 animate-spin" />

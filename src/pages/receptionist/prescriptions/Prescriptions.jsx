@@ -195,10 +195,10 @@ export default function ReceptionistPrescriptions() {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'active': return 'text-green-400 bg-green-400/10'
-      case 'completed': return 'text-blue-400 bg-blue-400/10'
-      case 'discontinued': return 'text-red-400 bg-red-400/10'
-      case 'pending': return 'text-yellow-400 bg-yellow-400/10'
+      case 'active': return 'text-emerald-400 bg-emerald-400/10'
+      case 'completed': return 'text-teal-400 bg-blue-400/10'
+      case 'discontinued': return 'text-teal-400 bg-red-400/10'
+      case 'pending': return 'text-amber-400 bg-amber-400/10'
       default: return 'text-gray-400 bg-gray-400/10'
     }
   }
@@ -223,13 +223,13 @@ export default function ReceptionistPrescriptions() {
           <div className="flex items-center space-x-3">
             <Link 
               to="/receptionist"
-              className="flex items-center space-x-2 px-3 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-lg transition-colors"
+              className="flex items-center space-x-2 px-3 py-2 bg-teal-600/20 hover:bg-teal-600/30 text-teal-400 rounded-lg transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               <span className="text-sm font-medium">Back to Dashboard</span>
             </Link>
-            <div className="w-10 h-10 bg-green-500/20 rounded-xl flex items-center justify-center">
-              <FileText className="w-6 h-6 text-green-400" />
+            <div className="w-10 h-10 bg-emerald-500/20 rounded-xl flex items-center justify-center">
+              <FileText className="w-6 h-6 text-emerald-400" />
             </div>
             <div>
               <h1 className="text-xl font-bold">Prescriptions Management</h1>
@@ -240,7 +240,7 @@ export default function ReceptionistPrescriptions() {
 
             <button
               onClick={handleDownloadAllPDFs}
-              className="flex items-center space-x-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors"
+              className="flex items-center space-x-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-slate-900 rounded-lg transition-colors"
             >
               <FileDown className="w-4 h-4" />
               <span>Download All PDFs</span>
@@ -262,7 +262,7 @@ export default function ReceptionistPrescriptions() {
                 placeholder="Search patients, doctors, or diagnosis..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-slate-400 focus:border-blue-400 focus:outline-none"
+                className="pl-10 pr-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-slate-400 focus:border-teal-400 focus:outline-none"
               />
             </div>
             
@@ -271,7 +271,7 @@ export default function ReceptionistPrescriptions() {
                 onClick={() => setViewMode('today')}
                 className={`px-3 py-2 rounded-lg transition-colors flex items-center space-x-2 ${
                   viewMode === 'today' 
-                    ? 'bg-blue-500 text-white' 
+                    ? 'bg-teal-600 text-white' 
                     : 'bg-white/5 text-slate-300 hover:bg-white/10'
                 }`}
               >
@@ -282,7 +282,7 @@ export default function ReceptionistPrescriptions() {
                 onClick={() => setViewMode('week')}
                 className={`px-3 py-2 rounded-lg transition-colors flex items-center space-x-2 ${
                   viewMode === 'week' 
-                    ? 'bg-blue-500 text-white' 
+                    ? 'bg-teal-600 text-white' 
                     : 'bg-white/5 text-slate-300 hover:bg-white/10'
                 }`}
               >
@@ -293,7 +293,7 @@ export default function ReceptionistPrescriptions() {
                 onClick={() => setViewMode('month')}
                 className={`px-3 py-2 rounded-lg transition-colors flex items-center space-x-2 ${
                   viewMode === 'month' 
-                    ? 'bg-blue-500 text-white' 
+                    ? 'bg-teal-600 text-white' 
                     : 'bg-white/5 text-slate-300 hover:bg-white/10'
                 }`}
               >
@@ -304,7 +304,7 @@ export default function ReceptionistPrescriptions() {
                 onClick={() => setViewMode('all')}
                 className={`px-3 py-2 rounded-lg transition-colors flex items-center space-x-2 ${
                   viewMode === 'all' 
-                    ? 'bg-blue-500 text-white' 
+                    ? 'bg-teal-600 text-white' 
                     : 'bg-white/5 text-slate-300 hover:bg-white/10'
                 }`}
               >
@@ -316,7 +316,7 @@ export default function ReceptionistPrescriptions() {
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-black focus:border-blue-400 focus:outline-none"
+              className="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-black focus:border-teal-400 focus:outline-none"
             >
               <option value="all">All Status</option>
               <option value="active">Active</option>
@@ -328,7 +328,7 @@ export default function ReceptionistPrescriptions() {
             <select
               value={filterDoctor}
               onChange={(e) => setFilterDoctor(e.target.value)}
-                className="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-black focus:border-blue-400 focus:outline-none"
+                className="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-black focus:border-teal-400 focus:outline-none"
             >
               <option value="all">All Doctors</option>
               {doctors.map(doctor => (
@@ -343,20 +343,20 @@ export default function ReceptionistPrescriptions() {
             type="date"
             value={selectedDate}
             onChange={(e) => setSelectedDate(e.target.value)}
-            className="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:border-blue-400 focus:outline-none"
+            className="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:border-teal-400 focus:outline-none"
           />
         </div>
 
         {/* Today's Prescriptions */}
         <div className="mb-8">
           <h2 className="text-xl font-bold mb-4 flex items-center space-x-2">
-            <FileText className="w-5 h-5 text-green-400" />
+            <FileText className="w-5 h-5 text-emerald-400" />
             <span>Today's Prescriptions ({todayPrescriptions.length})</span>
           </h2>
           
           {loading ? (
             <div className="bg-white/5 border border-white/10 rounded-2xl p-8 text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400 mx-auto"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-400 mx-auto"></div>
               <p className="text-slate-400 mt-4">Loading prescriptions...</p>
             </div>
           ) : todayPrescriptions.length === 0 ? (
@@ -424,20 +424,20 @@ export default function ReceptionistPrescriptions() {
                   <div className="flex space-x-2">
                     <Link
                       to={`/receptionist/prescriptions/view/${prescription.id}`}
-                      className="flex-1 px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm transition-colors flex items-center justify-center space-x-2"
+                      className="flex-1 px-3 py-2 bg-teal-600 hover:bg-teal-600 text-white rounded-lg text-sm transition-colors flex items-center justify-center space-x-2"
                     >
                       <Eye className="w-4 h-4" />
                       <span>View</span>
                     </Link>
                     <button
                       onClick={() => handlePrintPrescription(prescription)}
-                      className="px-3 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg text-sm transition-colors"
+                      className="px-3 py-2 bg-amber-500 hover:bg-amber-600 text-slate-900 rounded-lg text-sm transition-colors"
                     >
                       <Printer className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleDownloadPDF(prescription)}
-                      className="px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm transition-colors"
+                      className="px-3 py-2 bg-emerald-500 hover:bg-emerald-600 text-slate-900 rounded-lg text-sm transition-colors"
                     >
                       <Download className="w-4 h-4" />
                     </button>
@@ -452,7 +452,7 @@ export default function ReceptionistPrescriptions() {
         {filteredPrescriptions.length > 0 && (
           <div>
             <h2 className="text-xl font-bold mb-4 flex items-center space-x-2">
-              <FileText className="w-5 h-5 text-blue-400" />
+              <FileText className="w-5 h-5 text-teal-400" />
               <span>All Prescriptions ({filteredPrescriptions.length})</span>
             </h2>
             
@@ -493,14 +493,14 @@ export default function ReceptionistPrescriptions() {
                           <div className="flex space-x-2">
                             <Link
                               to={`/receptionist/prescriptions/view/${prescription.id}`}
-                              className="px-2 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded text-xs transition-colors"
+                              className="px-2 py-1 bg-teal-600 hover:bg-teal-600 text-white rounded text-xs transition-colors"
                             >
                               View
                             </Link>
                             
                             <button
                               onClick={() => handleDownloadPDF(prescription)}
-                              className="px-2 py-1 bg-green-500 hover:bg-green-600 text-white rounded text-xs transition-colors"
+                              className="px-2 py-1 bg-emerald-500 hover:bg-emerald-600 text-slate-900 rounded text-xs transition-colors"
                             >
                               PDF
                             </button>

@@ -1,0 +1,57 @@
+{"users": [
+{
+  "localId": "5WwZOgY4kTSG9gECGi6EzVLwhbr2",
+  "email": "dalitso.zulu123@gmail.com",
+  "emailVerified": false,
+  "passwordHash": "3/HSHKM2reJ4HEsptlQp06OvvLFmvq4DH3c7McSmxBbsHx6fFQsn15MPog4gK5gmKXnCqjfN++qNKlhWcArPuQ==",
+  "salt": "fsJiQ3En2DOsMQ==",
+  "displayName": "Dalitso Zulu",
+  "lastSignedInAt": "1790338096360",
+  "createdAt": "1790338096360",
+  "providerUserInfo": []
+},
+{
+  "localId": "AXPe0DeyzPZxfHKCaPnBeBBe7NG2",
+  "email": "dalitsoz.ulu123@gmail.com",
+  "emailVerified": false,
+  "passwordHash": "9fNDLIWfo/tTpW9eiTTsvitygSQFMHQXnGAX1waxdGZ6Rp9Rkj2fR19J49se/W+C1f6Y33Wx4WRwrESEQtSgEQ==",
+  "salt": "jZMxBqUVzMLt9A==",
+  "displayName": "dee zulu",
+  "lastSignedInAt": "1790339661221",
+  "createdAt": "1790339661221",
+  "providerUserInfo": []
+},
+{
+  "localId": "Rwqgy9enoqUC8mIVp8EPMMWktqE2",
+  "email": "dalitsozulu123@gmail.com",
+  "emailVerified": true,
+  "passwordHash": "AMCD2q0Ob3E5nnWFSBRbX8Lpg4EC1kma7xjd7laXWEnWwH7jgjQGEB4Gm26SxXTw2+msfhAa2b8SLDY6Z4QsRQ==",
+  "salt": "bNd3yvpClYVWqA==",
+  "displayName": "Dalitso Zulu",
+  "lastSignedInAt": "1790336871906",
+  "createdAt": "1790179044027",
+  "providerUserInfo": []
+},
+{
+  "localId": "oqvu3b0LoycePqJs4lgCqmRYhBf1",
+  "email": "dalitso2ulu@cs.unza.zm",
+  "emailVerified": true,
+  "passwordHash": "COhwYsYN3VYFASsgz0Jycl9kgzMHZIxpHgG9myCHGl6ngJ0B6LNEWgGD8WUyJxJlu4pivVtTJ2McqeY8ihlt/Q==",
+  "salt": "uHviv1xCo+3yLA==",
+  "displayName": "Dalitso Zulu",
+  "lastSignedInAt": "1790177908645",
+  "createdAt": "1790128849232",
+  "providerUserInfo": []
+},
+{
+  "localId": "wEkYJtynWgfbmPRAfJbDxcCX52p1",
+  "email": "root@unza.zm",
+  "emailVerified": false,
+  "passwordHash": "p/R38Fjv9x9+cw8T6FkmdJJzWFfVb4ZftlIhBrgG5heFq1FBTIswYsQXM9N3eoHZXhLgfH2XjpE8TJBKujKCjA==",
+  "salt": "TZqsWOTJkEsYbw==",
+  "lastSignedInAt": "1790419339027",
+  "createdAt": "1790413081667",
+  "disabled": false,
+  "customAttributes": "{\"role\":\"admin\",\"isRootAdmin\":true}",
+  "providerUserInfo": []
+}]}

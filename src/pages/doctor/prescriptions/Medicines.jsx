@@ -229,21 +229,21 @@ export default function Medicines() {
 
   const getCategoryColor = (category) => {
     switch (category) {
-      case 'antibiotics': return 'text-red-400 bg-red-400/10'
+      case 'antibiotics': return 'text-teal-400 bg-red-400/10'
       case 'painkillers': return 'text-orange-400 bg-orange-400/10'
-      case 'vitamins': return 'text-yellow-400 bg-yellow-400/10'
-      case 'diabetes': return 'text-blue-400 bg-blue-400/10'
-      case 'cardiology': return 'text-purple-400 bg-purple-400/10'
-      case 'dermatology': return 'text-green-400 bg-green-400/10'
+      case 'vitamins': return 'text-amber-400 bg-amber-400/10'
+      case 'diabetes': return 'text-teal-400 bg-blue-400/10'
+      case 'cardiology': return 'text-violet-400 bg-purple-400/10'
+      case 'dermatology': return 'text-emerald-400 bg-emerald-400/10'
       case 'psychiatry': return 'text-pink-400 bg-pink-400/10'
       default: return 'text-gray-400 bg-gray-400/10'
     }
   }
 
   const getStockStatus = (quantity, reorderLevel) => {
-    if (quantity <= 0) return { status: 'out_of_stock', color: 'text-red-400 bg-red-400/10', text: 'Out of Stock' }
-    if (quantity <= reorderLevel) return { status: 'low_stock', color: 'text-yellow-400 bg-yellow-400/10', text: 'Low Stock' }
-    return { status: 'in_stock', color: 'text-green-400 bg-green-400/10', text: 'In Stock' }
+    if (quantity <= 0) return { status: 'out_of_stock', color: 'text-teal-400 bg-red-400/10', text: 'Out of Stock' }
+    if (quantity <= reorderLevel) return { status: 'low_stock', color: 'text-amber-400 bg-amber-400/10', text: 'Low Stock' }
+    return { status: 'in_stock', color: 'text-emerald-400 bg-emerald-400/10', text: 'In Stock' }
   }
 
   const categories = [
@@ -264,13 +264,13 @@ export default function Medicines() {
           <div className="flex items-center space-x-3">
             <Link 
               to="/doctor/prescriptions"
-              className="flex items-center space-x-2 px-3 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-lg transition-colors"
+              className="flex items-center space-x-2 px-3 py-2 bg-teal-600/20 hover:bg-teal-600/30 text-teal-400 rounded-lg transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               <span className="text-sm font-medium">Back to Prescriptions</span>
             </Link>
-            <div className="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center">
-              <Pill className="w-6 h-6 text-blue-400" />
+            <div className="w-10 h-10 bg-teal-600/20 rounded-xl flex items-center justify-center">
+              <Pill className="w-6 h-6 text-teal-400" />
             </div>
             <div>
               <h1 className="text-xl font-bold">Manage Medicines</h1>
@@ -280,7 +280,7 @@ export default function Medicines() {
           <div className="flex items-center space-x-3">
             <button
               onClick={handleCreateMedicine}
-              className="flex items-center space-x-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors"
+              className="flex items-center space-x-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-slate-900 rounded-lg transition-colors"
             >
               <Plus className="w-4 h-4" />
               <span>Add Medicine</span>
@@ -302,14 +302,14 @@ export default function Medicines() {
                 placeholder="Search medicines..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-slate-400 focus:border-blue-400 focus:outline-none"
+                className="pl-10 pr-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-slate-400 focus:border-teal-400 focus:outline-none"
               />
             </div>
             
             <select
               value={filterCategory}
               onChange={(e) => setFilterCategory(e.target.value)}
-              className="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:border-blue-400 focus:outline-none"
+              className="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:border-teal-400 focus:outline-none"
             >
               <option className="text-black" value="all">All Categories</option>
               {categories.map(category => (
@@ -328,7 +328,7 @@ export default function Medicines() {
         {/* Medicines Grid */}
         {loading ? (
           <div className="bg-white/5 border border-white/10 rounded-2xl p-8 text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400 mx-auto"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-400 mx-auto"></div>
             <p className="text-slate-400 mt-4">Loading medicines...</p>
           </div>
         ) : filteredMedicines.length === 0 ? (
@@ -383,7 +383,7 @@ export default function Medicines() {
                   <div className="flex space-x-2">
                     <button
                       onClick={() => handleEditMedicine(medicine)}
-                      className="flex-1 px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm transition-colors flex items-center justify-center space-x-2"
+                      className="flex-1 px-3 py-2 bg-teal-600 hover:bg-teal-600 text-white rounded-lg text-sm transition-colors flex items-center justify-center space-x-2"
                     >
                       <Edit className="w-4 h-4" />
                       <span>Edit</span>
@@ -430,7 +430,7 @@ export default function Medicines() {
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-slate-400 focus:border-blue-400 focus:outline-none"
+                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-slate-400 focus:border-teal-400 focus:outline-none"
                     placeholder="Enter medicine name"
                   />
                 </div>
@@ -440,7 +440,7 @@ export default function Medicines() {
                   <select
                     value={formData.category}
                     onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
-                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:border-blue-400 focus:outline-none"
+                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:border-teal-400 focus:outline-none"
                   >
                     <option className="text-black" value="">Select Category</option>
                     {categories.map(category => (
@@ -457,7 +457,7 @@ export default function Medicines() {
                     type="text"
                     value={formData.strength}
                     onChange={(e) => setFormData(prev => ({ ...prev, strength: e.target.value }))}
-                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-slate-400 focus:border-blue-400 focus:outline-none"
+                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-slate-400 focus:border-teal-400 focus:outline-none"
                     placeholder="e.g., 500mg, 10ml"
                   />
                 </div>
@@ -467,7 +467,7 @@ export default function Medicines() {
                   <select
                     value={formData.form}
                     onChange={(e) => setFormData(prev => ({ ...prev, form: e.target.value }))}
-                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:border-blue-400 focus:outline-none"
+                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:border-teal-400 focus:outline-none"
                   >
                     <option className="text-black" value="">Select Form</option>
                     {forms.map(form => (
@@ -484,7 +484,7 @@ export default function Medicines() {
                     type="text"
                     value={formData.manufacturer}
                     onChange={(e) => setFormData(prev => ({ ...prev, manufacturer: e.target.value }))}
-                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-slate-400 focus:border-blue-400 focus:outline-none"
+                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-slate-400 focus:border-teal-400 focus:outline-none"
                     placeholder="Enter manufacturer name"
                   />
                 </div>
@@ -496,7 +496,7 @@ export default function Medicines() {
                     step="0.01"
                     value={formData.price}
                     onChange={(e) => setFormData(prev => ({ ...prev, price: e.target.value }))}
-                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-slate-400 focus:border-blue-400 focus:outline-none"
+                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-slate-400 focus:border-teal-400 focus:outline-none"
                     placeholder="0.00"
                   />
                 </div>
@@ -507,7 +507,7 @@ export default function Medicines() {
                     type="number"
                     value={formData.stockQuantity}
                     onChange={(e) => setFormData(prev => ({ ...prev, stockQuantity: e.target.value }))}
-                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-slate-400 focus:border-blue-400 focus:outline-none"
+                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-slate-400 focus:border-teal-400 focus:outline-none"
                     placeholder="0"
                   />
                 </div>
@@ -518,7 +518,7 @@ export default function Medicines() {
                     type="number"
                     value={formData.reorderLevel}
                     onChange={(e) => setFormData(prev => ({ ...prev, reorderLevel: e.target.value }))}
-                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-slate-400 focus:border-blue-400 focus:outline-none"
+                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-slate-400 focus:border-teal-400 focus:outline-none"
                     placeholder="0"
                   />
                 </div>
@@ -530,7 +530,7 @@ export default function Medicines() {
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                  className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-slate-400 focus:border-blue-400 focus:outline-none"
+                  className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-slate-400 focus:border-teal-400 focus:outline-none"
                   rows="3"
                   placeholder="Enter medicine description..."
                 />
@@ -543,7 +543,7 @@ export default function Medicines() {
                   <textarea
                     value={formData.sideEffects}
                     onChange={(e) => setFormData(prev => ({ ...prev, sideEffects: e.target.value }))}
-                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-slate-400 focus:border-blue-400 focus:outline-none"
+                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-slate-400 focus:border-teal-400 focus:outline-none"
                     rows="3"
                     placeholder="Common side effects..."
                   />
@@ -554,7 +554,7 @@ export default function Medicines() {
                   <textarea
                     value={formData.contraindications}
                     onChange={(e) => setFormData(prev => ({ ...prev, contraindications: e.target.value }))}
-                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-slate-400 focus:border-blue-400 focus:outline-none"
+                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-slate-400 focus:border-teal-400 focus:outline-none"
                     rows="3"
                     placeholder="Contraindications..."
                   />
@@ -568,7 +568,7 @@ export default function Medicines() {
                   <textarea
                     value={formData.dosageInstructions}
                     onChange={(e) => setFormData(prev => ({ ...prev, dosageInstructions: e.target.value }))}
-                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-slate-400 focus:border-blue-400 focus:outline-none"
+                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-slate-400 focus:border-teal-400 focus:outline-none"
                     rows="3"
                     placeholder="Dosage instructions..."
                   />
@@ -579,7 +579,7 @@ export default function Medicines() {
                   <textarea
                     value={formData.storageInstructions}
                     onChange={(e) => setFormData(prev => ({ ...prev, storageInstructions: e.target.value }))}
-                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-slate-400 focus:border-blue-400 focus:outline-none"
+                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-slate-400 focus:border-teal-400 focus:outline-none"
                     rows="3"
                     placeholder="Storage instructions..."
                   />
@@ -593,7 +593,7 @@ export default function Medicines() {
                     type="checkbox"
                     checked={formData.isActive}
                     onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.checked }))}
-                    className="rounded border-white/20 bg-white/5 text-blue-400 focus:ring-blue-400"
+                    className="rounded border-white/20 bg-white/5 text-teal-400 focus:ring-blue-400"
                   />
                   <span className="text-sm font-medium text-slate-300">Active Medicine</span>
                 </label>
@@ -614,7 +614,7 @@ export default function Medicines() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex items-center space-x-2 px-6 py-3 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center space-x-2 px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-slate-900 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? (
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>

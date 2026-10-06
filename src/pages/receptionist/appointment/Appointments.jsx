@@ -247,10 +247,10 @@ export default function Appointments() {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'scheduled': return 'text-blue-400 bg-blue-400/10'
-      case 'completed': return 'text-green-400 bg-green-400/10'
-      case 'cancelled': return 'text-red-400 bg-red-400/10'
-      case 'rescheduled': return 'text-yellow-400 bg-yellow-400/10'
+      case 'scheduled': return 'text-teal-400 bg-blue-400/10'
+      case 'completed': return 'text-emerald-400 bg-emerald-400/10'
+      case 'cancelled': return 'text-teal-400 bg-red-400/10'
+      case 'rescheduled': return 'text-amber-400 bg-amber-400/10'
       default: return 'text-gray-400 bg-gray-400/10'
     }
   }
@@ -401,13 +401,13 @@ export default function Appointments() {
                     <div className="flex space-x-2">
                                              <button
                          onClick={() => handleEditAppointment(appointment)}
-                         className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded text-sm transition-colors"
+                         className="px-3 py-1 bg-teal-600 hover:bg-teal-600 text-white rounded text-sm transition-colors"
                        >
                          <Edit className="w-3 h-3" />
                        </button>
                        <button
                          onClick={() => handleRescheduleAppointment(appointment.id)}
-                         className="px-3 py-1 bg-yellow-500 hover:bg-yellow-600 text-white rounded text-sm transition-colors"
+                         className="px-3 py-1 bg-amber-500 hover:bg-amber-600 text-slate-900 rounded text-sm transition-colors"
                        >
                          <Calendar className="w-3 h-3" />
                        </button>
@@ -517,7 +517,7 @@ export default function Appointments() {
                     ))}
                   </select>
                   {doctors.length === 0 && (
-                    <p className="text-xs text-red-400 mt-1">
+                    <p className="text-xs text-teal-400 mt-1">
                       No doctors found. Please add doctors to the staffData collection with role: 'doctor'
                     </p>
                   )}

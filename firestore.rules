@@ -1,0 +1,494 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    function isVerifiedUser() {
+      return request.auth != null;
+    }
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function getUserRole() {
+      // Handle case where staffData document might not exist
+      return exists(/databases/$(database)/documents/staffData/$(request.auth.uid)) ? 
+        get(/databases/$(database)/documents/staffData/$(request.auth.uid)).data.role : 
+        null;
+    }
+
+    function isNurse() { return getUserRole() == 'nurse'; }
+    function isStudent() { return getUserRole() == 'student'; }
+    function isDoctor() { return getUserRole() == 'doctor'; }
+    function isReceptionist() { return getUserRole() == 'receptionist'; }
+    function isPharmacist() { return getUserRole() == 'pharmacist'; }
+    function isLabTechnician() { return getUserRole() == 'labTechnician'; }
+    function isAdmin() { return getUserRole() == 'admin'; }
+    function isRootAdmin() {
+      return request.auth != null && (
+        request.auth.token.email == 'root@unza.zm' ||
+        request.auth.token.email == 'nswana.faith@cs.unza.zm' ||
+        (
+          exists(/databases/$(database)/documents/staffData/$(request.auth.uid)) &&
+          (
+            get(/databases/$(database)/documents/staffData/$(request.auth.uid)).data.isRootAdmin == true ||
+            get(/databases/$(database)/documents/staffData/$(request.auth.uid)).data.role == 'admin'
+          )
+        )
+      );
+    }
+
+    function isMentalHealthCounselor() {
+      return getUserRole() == 'mentalHealthCounselor';
+    }
+
+    function isHIVProfessional() {
+      return getUserRole() == 'hivProfessional';
+    }
+
+    function ownsCounsellingAppointment(appointmentId) {
+      return appointmentId != null &&
+        appointmentId != '' &&
+        exists(/databases/$(database)/documents/appointments/$(appointmentId)) &&
+        get(/databases/$(database)/documents/appointments/$(appointmentId)).data.createdBy == request.auth.uid;
+    }
+
+    function canReadCounsellingSessionData(sessionData) {
+      return request.auth.uid == sessionData.get('studentUid', '') ||
+        request.auth.uid == sessionData.get('counselorUid', '') ||
+        (isStudent() && ownsCounsellingAppointment(sessionData.get('appointmentId', '')));
+    }
+
+    function canReadCounsellingSessionById(sessionId) {
+      return sessionId != null &&
+        sessionId != '' &&
+        exists(/databases/$(database)/documents/counsellingSessions/$(sessionId)) &&
+        canReadCounsellingSessionData(get(/databases/$(database)/documents/counsellingSessions/$(sessionId)).data);
+    }
+
+    function isAnonymousChat() {
+      // Check if this is an anonymous counselling session
+      return resource.data.get('anonymousChat', false) == true;
+    }
+
+    function isAnonymousMessage() {
+      // For messages, check if the parent session is anonymous
+      let sessionId = resource.data.sessionId;
+      return sessionId != null && exists(/databases/$(database)/documents/counsellingSessions/$(sessionId)) &&
+        get(/databases/$(database)/documents/counsellingSessions/$(sessionId)).data.get('anonymousChat', false) == true;
+    }
+
+    function canAccessConsultation() {
+      return isVerifiedUser() && (
+        (isStudent() && resource.data.createdBy == request.auth.uid) ||
+        (isDoctor() && (
+          exists(/databases/$(database)/documents/staffData/$(request.auth.uid)) &&
+          (
+            resource.data.doctorName == get(
+              /databases/$(database)/documents/staffData/$(request.auth.uid)
+            ).data.fullName ||
+            resource.data.doctorId == request.auth.uid ||
+            (
+              resource.data.source == 'student-portal' &&
+              (
+                resource.data.doctorName == 'Awaiting assignment' ||
+                resource.data.doctorName == null ||
+                resource.data.doctorName == '' ||
+                !resource.data.doctorName ||
+                resource.data.doctorId == ''
+              )
+            )
+          )
+        )) ||
+        isReceptionist() ||
+        isAdmin()
+      );
+    }
+
+    match /adminAccounts/{document=**} {
+      allow read: if isRootAdmin();
+      allow create: if isRootAdmin();
+      allow update: if isRootAdmin();
+      allow delete: if false;
+    }
+
+    match /systemSettings/{document=**} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && (isRootAdmin() || isAdmin());
+      allow update: if isAuthenticated() && (isRootAdmin() || isAdmin());
+      allow delete: if false;
+    }
+
+    match /staffData/{userId} {
+      allow read: if isAuthenticated();
+
+      allow create: if request.auth.uid == userId && request.resource.data.role == 'student';
+      allow create: if isRootAdmin() && request.resource.data.role in ['doctor', 'pharmacist', 'labTechnician', 'nurse', 'mentalHealthCounselor', 'hivProfessional', 'receptionist', 'admin'];
+
+      allow update: if isVerifiedUser() && request.auth.uid == userId &&
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'email', 'uid', 'isRootAdmin']);
+
+      allow update: if isRootAdmin() &&
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['uid', 'email']);
+
+      allow delete: if false;
+    }
+
+    match /auditLogs/{logId} {
+      allow read: if isVerifiedUser() && (isAdmin() || isRootAdmin());
+      allow create: if isVerifiedUser() && (
+        isAdmin() || isRootAdmin() || isDoctor() || isReceptionist() || isLabTechnician() || isPharmacist() || isStudent() || isNurse()
+      );
+      allow update, delete: if false;
+    }
+
+    match /appointments/{document} {
+      allow read: if isVerifiedUser() && (
+        request.auth.uid == resource.data.createdBy ||
+        isDoctor() ||
+        isReceptionist() ||
+        isAdmin() ||
+        isMentalHealthCounselor() ||
+        isHIVProfessional()
+      );
+
+      allow create: if isVerifiedUser() && isStudent() && request.resource.data.createdBy == request.auth.uid;
+      allow update: if isVerifiedUser() && (
+        (isDoctor()) ||
+        (isReceptionist()) ||
+        (isAdmin()) ||
+        (isMentalHealthCounselor()) ||
+        (isHIVProfessional())
+      ) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['createdBy']);
+      allow delete: if false;
+    }
+
+    // Counselling sessions and messages used by student mental buddy / HIV counselling flows
+    match /counsellingSessions/{sessionId} {
+      allow read: if isVerifiedUser() && (
+        resource.data.studentUid == request.auth.uid ||
+        resource.data.counselorUid == request.auth.uid ||
+        isReceptionist() || isAdmin() ||
+        isPharmacist() || isLabTechnician() || isMentalHealthCounselor() || isHIVProfessional()
+      );
+
+      allow create: if isVerifiedUser() && (
+        isStudent() && request.resource.data.studentUid == request.auth.uid
+      );
+
+      allow update: if isVerifiedUser() && (
+        isReceptionist() || isAdmin() ||
+        (isStudent() && resource.data.studentUid == request.auth.uid) ||
+        isMentalHealthCounselor() || isHIVProfessional()
+      );
+
+      allow delete: if false;
+    }
+
+    match /counsellingMessages/{messageId} {
+      // NOTE: For anonymous counselling sessions, the client app must mask studentName/studentNumber
+      // Firestore rules cannot perform field-level filtering on reads, only on writes.
+      // The isAnonymousMessage() check validates that anonymous sessions exist and are properly configured.
+      allow read: if isVerifiedUser() && (
+        resource.data.studentUid == request.auth.uid ||
+        resource.data.senderId == request.auth.uid ||
+        isStudent() && resource.data.studentUid == request.auth.uid ||
+        isReceptionist() || isAdmin() ||
+        isMentalHealthCounselor() || isHIVProfessional()
+      );
+
+      allow create: if isVerifiedUser() && (
+        request.resource.data.studentUid == request.auth.uid ||
+        request.resource.data.senderId == request.auth.uid ||
+        isStudent() && request.resource.data.studentUid == request.auth.uid ||
+        isMentalHealthCounselor() || isHIVProfessional()
+      );
+
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    // AI companion conversations for students
+    match /aiConversations/{conversationId} {
+      allow read: if isVerifiedUser() && (
+        resource.data.userId == request.auth.uid ||
+        isAdmin()
+      );
+
+      allow create: if isVerifiedUser() && request.resource.data.userId == request.auth.uid;
+
+      allow update: if false;
+      allow delete: if isVerifiedUser() && resource.data.userId == request.auth.uid;
+    }
+
+    // Student queue entries created when students submit consultations
+    match /studentQueue/{queueId} {
+      allow read: if isVerifiedUser() && (
+        request.auth.uid == resource.data.studentUid ||
+        isReceptionist() || isAdmin() || isDoctor() || isNurse()
+      );
+
+      allow create: if isVerifiedUser() && (
+        request.resource.data.studentUid == request.auth.uid ||
+        isDoctor() ||
+        isReceptionist() ||
+        isAdmin() ||
+        isNurse()
+      );
+
+      allow update: if isVerifiedUser() && (
+        isReceptionist() || isAdmin() || isDoctor() || isNurse()
+      );
+
+      allow delete: if false;
+    }
+
+    match /prescriptions/{document} {
+      allow read: if isVerifiedUser() && (
+        isDoctor() && resource.data.doctorId == request.auth.uid ||
+        isStudent() && resource.data.patientId == request.auth.uid ||
+        isPharmacist() ||
+        isReceptionist() ||
+        isAdmin()
+      );
+      allow create: if isVerifiedUser() && isDoctor() && request.resource.data.doctorId == request.auth.uid;
+      allow update: if isVerifiedUser() && (
+        (isDoctor() && resource.data.doctorId == request.auth.uid) ||
+        (isPharmacist() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'collectedAt', 'collectedBy', 'collectedByName', 'updatedAt']))
+      );
+      allow delete: if false;
+    }
+
+    match /informationRequests/{requestId} {
+      allow read: if isVerifiedUser() && (
+        (isDoctor() && resource.data.doctorId == request.auth.uid) ||
+        (isStudent() && resource.data.studentUid == request.auth.uid) ||
+        isReceptionist() ||
+        isAdmin()
+      );
+      allow create: if isVerifiedUser() && isDoctor() && request.resource.data.doctorId == request.auth.uid;
+      allow update: if isVerifiedUser() && (
+        (isDoctor() && resource.data.doctorId == request.auth.uid) ||
+        (isStudent() && resource.data.studentUid == request.auth.uid)
+      );
+      allow delete: if false;
+    }
+
+    match /medicines/{document} {
+      allow read: if isVerifiedUser();
+      allow write: if isVerifiedUser() && (isAdmin() || isPharmacist());
+    }
+
+    match /invoices/{document} {
+      allow read: if isVerifiedUser() && (
+        isStudent() && resource.data.patientId == request.auth.uid ||
+        isReceptionist() ||
+        isAdmin()
+      );
+      allow write: if isVerifiedUser() && (isReceptionist() || isAdmin());
+    }
+
+    match /payments/{document} {
+      allow read: if isVerifiedUser() && (
+        isStudent() && resource.data.patientId == request.auth.uid ||
+        isReceptionist() ||
+        isAdmin()
+      );
+      allow write: if isVerifiedUser() && (isReceptionist() || isAdmin());
+    }
+
+    match /patients/{document} {
+      allow read: if isVerifiedUser() && (
+        isStudent() && resource.data.userId == request.auth.uid ||
+        isDoctor() ||
+        isReceptionist() ||
+        isAdmin()
+      );
+      allow write: if isVerifiedUser() && (isReceptionist() || isAdmin() || isDoctor());
+    }
+
+    match /services/{document} {
+      allow read: if isVerifiedUser();
+      allow write: if isVerifiedUser() && isAdmin();
+    }
+
+    match /test/{document} {
+      allow read, write: if isVerifiedUser();
+    }
+
+    match /labRequests/{requestId} {
+      allow read: if isVerifiedUser() && (
+        isDoctor() || isReceptionist() || isAdmin() || isLabTechnician() || (isStudent() && resource.data.studentUid == request.auth.uid)
+      );
+      allow create: if isVerifiedUser() && (
+        (
+          isDoctor() && request.resource.data.doctorId == request.auth.uid
+        ) ||
+        (
+          isNurse() && request.resource.data.nurseId == request.auth.uid
+        ) ||
+        isReceptionist() ||
+        isAdmin() ||
+        isLabTechnician()
+      );
+      allow update: if isVerifiedUser() && (
+        (
+          isDoctor() && resource.data.doctorId == request.auth.uid
+        ) ||
+        isReceptionist() ||
+        isAdmin() ||
+        isLabTechnician()
+      );
+      allow delete: if false;
+    }
+
+    match /emergencyAlerts/{alertId} {
+      allow read: if isVerifiedUser() && (isAdmin() || isRootAdmin() || isReceptionist() || isDoctor() || isNurse() || isLabTechnician() || isStudent());
+      allow create: if isVerifiedUser() && (isStudent() || isDoctor() || isReceptionist() || isAdmin() || isLabTechnician() || isNurse() || isPharmacist());
+      allow update: if isVerifiedUser() && (isAdmin() || isRootAdmin() || isReceptionist());
+      allow delete: if false;
+    }
+
+    match /notifications/{notificationId} {
+      allow read: if isVerifiedUser() && (
+        resource.data.userId == request.auth.uid ||
+        isDoctor() || isReceptionist() || isAdmin() || isLabTechnician() || isPharmacist() || isMentalHealthCounselor() || isHIVProfessional()
+      );
+      allow create: if isVerifiedUser() && (
+        isDoctor() ||
+        isReceptionist() ||
+        isAdmin() ||
+        isLabTechnician() ||
+        isPharmacist() ||
+        isMentalHealthCounselor() ||
+        isHIVProfessional() ||
+        (isStudent() && request.resource.data.userId == request.auth.uid) ||
+        (isStudent() && request.resource.data.type == 'counselling_request')
+      );
+      allow update: if isVerifiedUser() && (
+        request.auth.uid == resource.data.userId ||
+        isAdmin() || isDoctor() || isReceptionist() || isLabTechnician() || isPharmacist() || isMentalHealthCounselor() || isHIVProfessional()
+      );
+      allow delete: if isVerifiedUser() && (
+        request.auth.uid == resource.data.userId ||
+        isAdmin() || isDoctor() || isReceptionist() || isMentalHealthCounselor() || isHIVProfessional()
+      );
+    }
+
+    match /auditLogs/{logId} {
+      allow read: if isVerifiedUser() && (isAdmin() || isRootAdmin());
+      allow create: if isVerifiedUser() && (
+        isAdmin() || isRootAdmin() || isDoctor() || isReceptionist() || isLabTechnician() || isPharmacist() || isStudent() || isNurse()
+      );
+      allow update, delete: if false;
+    }
+
+    match /labReports/{reportId} {
+      allow read: if isVerifiedUser() && (
+        isLabTechnician() || 
+        isDoctor() || 
+        isReceptionist() || 
+        isAdmin() || 
+        (isStudent() && resource.data.studentUid == request.auth.uid)
+      );
+      allow create: if isVerifiedUser() && (
+        isLabTechnician() || 
+        isDoctor() || 
+        isReceptionist() || 
+        isAdmin()
+      );
+      allow update: if isVerifiedUser() && (
+        isLabTechnician() || 
+        isDoctor() || 
+        isReceptionist() || 
+        isAdmin()
+      );
+      allow delete: if isVerifiedUser() && (
+        isLabTechnician() || 
+        isAdmin()
+      );
+    }
+
+    match /vitalSigns/{vitalId} {
+      allow read: if isVerifiedUser() && (
+        isNurse() ||
+        isDoctor() ||
+        isReceptionist() ||
+        isAdmin() ||
+        (isStudent() && resource.data.studentId == request.resource.data.studentId)
+      );
+      allow create: if isVerifiedUser() && (
+        isNurse() ||
+        isDoctor() ||
+        isAdmin()
+      );
+      allow update: if isVerifiedUser() && (
+        isNurse() ||
+        isDoctor() ||
+        isAdmin()
+      );
+      allow delete: if isVerifiedUser() && (
+        isNurse() ||
+        isAdmin()
+      );
+    }
+
+    match /careNotes/{noteId} {
+      allow read: if isVerifiedUser() && (
+        isNurse() ||
+        isDoctor() ||
+        isReceptionist() ||
+        isAdmin() ||
+        (isStudent() && resource.data.studentId == request.resource.data.studentId)
+      );
+      allow create: if isVerifiedUser() && (
+        isNurse() ||
+        isDoctor() ||
+        isAdmin()
+      );
+      allow update: if isVerifiedUser() && (
+        isNurse() ||
+        isDoctor() ||
+        isAdmin()
+      );
+      allow delete: if isVerifiedUser() && (
+        isNurse() ||
+        isAdmin()
+      );
+    }
+
+    match /referrals/{referralId} {
+      allow read: if isVerifiedUser() && (
+        isNurse() ||
+        isDoctor() ||
+        isPharmacist() ||
+        isLabTechnician() ||
+        isMentalHealthCounselor() ||
+        isHIVProfessional() ||
+        isReceptionist() ||
+        isAdmin() ||
+        (isStudent() && resource.data.studentId == request.resource.data.studentId)
+      );
+      allow create: if isVerifiedUser() && (
+        isNurse() ||
+        isDoctor() ||
+        isReceptionist() ||
+        isAdmin()
+      );
+      allow update: if isVerifiedUser() && (
+        isNurse() ||
+        isDoctor() ||
+        isReceptionist() ||
+        isAdmin()
+      );
+      allow delete: if isVerifiedUser() && (
+        isNurse() ||
+        isAdmin()
+      );
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

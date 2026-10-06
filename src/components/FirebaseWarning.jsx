@@ -27,7 +27,7 @@ export default function FirebaseWarning() {
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {/* Floating orbs */}
-        <div className="absolute top-20 left-20 w-72 h-72 bg-blue-500/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute top-20 left-20 w-72 h-72 bg-teal-600/20 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute top-40 right-20 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl animate-pulse animation-delay-1000"></div>
         <div className="absolute bottom-20 left-1/3 w-80 h-80 bg-sky-500/20 rounded-full blur-3xl animate-pulse animation-delay-2000"></div>
         
@@ -89,7 +89,7 @@ export default function FirebaseWarning() {
 
           <div className="space-y-4 bg-white/5 border border-white/10 rounded-2xl p-6">
             <h3 className="text-lg font-semibold text-slate-200 flex items-center">
-              <FileCode className="w-5 h-5 text-blue-400 mr-2" />
+              <FileCode className="w-5 h-5 text-teal-400 mr-2" />
               Setup Instructions
             </h3>
             <ol className="text-sm text-slate-300 space-y-3 pl-4 list-decimal">
@@ -109,7 +109,7 @@ export default function FirebaseWarning() {
         <div className="mt-8 pt-6 border-t border-white/10 flex flex-col sm:flex-row gap-4">
           <button
             onClick={handleCopyEnvTemplate}
-            className="flex-1 py-4 px-6 border-2 border-white/20 bg-white/5 hover:border-blue-400/40 hover:bg-blue-400/10 text-white font-medium rounded-2xl transition-all duration-300 hover:shadow-lg hover:shadow-blue-400/20 flex items-center justify-center space-x-2 cursor-pointer text-sm"
+            className="flex-1 py-4 px-6 border-2 border-white/20 bg-white/5 hover:border-teal-400/40 hover:bg-blue-400/10 text-white font-medium rounded-2xl transition-all duration-300 hover:shadow-lg hover:shadow-teal-400/20 flex items-center justify-center space-x-2 cursor-pointer text-sm"
           >
             <Copy className="w-5 h-5" />
             <span>Copy Env Template</span>
@@ -117,7 +117,7 @@ export default function FirebaseWarning() {
           
           <button
             onClick={() => window.location.reload()}
-            className="flex-1 py-4 px-6 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-slate-900 font-bold text-lg rounded-2xl shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/40 transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2 cursor-pointer"
+            className="flex-1 py-4 px-6 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-slate-900 font-bold text-lg rounded-2xl shadow-lg shadow-teal-500/25 hover:shadow-xl hover:shadow-teal-500/40 transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2 cursor-pointer"
           >
             <RefreshCw className="w-5 h-5" />
             <span>Check / Refresh</span>

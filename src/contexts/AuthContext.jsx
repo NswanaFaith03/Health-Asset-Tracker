@@ -8,6 +8,8 @@ import {
   resendUserVerificationEmail,
   fetchUserRoleFromFirestore
 } from '../utils/authUtils'
+import { initializeRootAdmin } from '../utils/adminSetup'
+import { initializeSystemSettings } from '../utils/databaseSetup'
 
 const AuthContext = createContext()
 
@@ -107,10 +109,22 @@ export function AuthProvider({ children }) {
       return
     }
 
+    const initializeApp = async () => {
+      try {
+        await initializeRootAdmin()
+        await initializeSystemSettings()
+      } catch (error) {
+        console.error('App initialization failed:', error)
+      }
+    }
+
+    initializeApp()
+
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         setCurrentUser(user)
         const role = await fetchUserRole(user.uid)
+        console.log(`[AuthContext] Setting userRole to '${role}' for uid: ${user.uid}, email: ${user.email}`)
         setUserRole(role)
       } else {
         setCurrentUser(null)

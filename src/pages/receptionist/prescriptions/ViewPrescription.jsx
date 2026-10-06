@@ -54,10 +54,10 @@ export default function ReceptionistViewPrescription() {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'active': return 'text-green-400 bg-green-400/10'
-      case 'completed': return 'text-blue-400 bg-blue-400/10'
-      case 'discontinued': return 'text-red-400 bg-red-400/10'
-      case 'pending': return 'text-yellow-400 bg-yellow-400/10'
+      case 'active': return 'text-emerald-400 bg-emerald-400/10'
+      case 'completed': return 'text-teal-400 bg-blue-400/10'
+      case 'discontinued': return 'text-teal-400 bg-red-400/10'
+      case 'pending': return 'text-amber-400 bg-amber-400/10'
       default: return 'text-gray-400 bg-gray-400/10'
     }
   }
@@ -129,7 +129,7 @@ export default function ReceptionistViewPrescription() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400 mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-400 mx-auto"></div>
           <p className="text-slate-400 mt-4">Loading prescription...</p>
         </div>
       </div>
@@ -144,7 +144,7 @@ export default function ReceptionistViewPrescription() {
           <p className="text-slate-400">Prescription not found</p>
           <Link
             to="/receptionist/prescriptions"
-            className="mt-4 inline-flex items-center space-x-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
+            className="mt-4 inline-flex items-center space-x-2 px-4 py-2 bg-teal-600 hover:bg-teal-600 text-white rounded-lg transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back to Prescriptions</span>
@@ -162,13 +162,13 @@ export default function ReceptionistViewPrescription() {
           <div className="flex items-center space-x-3">
             <Link 
               to="/receptionist/prescriptions"
-              className="flex items-center space-x-2 px-3 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-lg transition-colors"
+              className="flex items-center space-x-2 px-3 py-2 bg-teal-600/20 hover:bg-teal-600/30 text-teal-400 rounded-lg transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               <span className="text-sm font-medium">Back to Prescriptions</span>
             </Link>
-            <div className="w-10 h-10 bg-green-500/20 rounded-xl flex items-center justify-center">
-              <FileText className="w-6 h-6 text-green-400" />
+            <div className="w-10 h-10 bg-emerald-500/20 rounded-xl flex items-center justify-center">
+              <FileText className="w-6 h-6 text-emerald-400" />
             </div>
             <div>
               <h1 className="text-xl font-bold">Prescription Details</h1>
@@ -185,14 +185,14 @@ export default function ReceptionistViewPrescription() {
             </button>
             <button
               onClick={handlePrint}
-              className="flex items-center space-x-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
+              className="flex items-center space-x-2 px-4 py-2 bg-teal-600 hover:bg-teal-600 text-white rounded-lg transition-colors"
             >
               <Printer className="w-4 h-4" />
               <span>Print</span>
             </button>
             <button
               onClick={handleDownloadPDF}
-              className="flex items-center space-x-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors"
+              className="flex items-center space-x-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-slate-900 rounded-lg transition-colors"
             >
               <Download className="w-4 h-4" />
               <span>Download PDF</span>
@@ -235,7 +235,7 @@ export default function ReceptionistViewPrescription() {
           {/* Patient Information */}
           <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-xl">
             <h3 className="text-lg font-semibold mb-4 flex items-center space-x-2">
-              <User className="w-5 h-5 text-blue-400" />
+              <User className="w-5 h-5 text-teal-400" />
               <span>Patient Information</span>
             </h3>
             
@@ -266,7 +266,7 @@ export default function ReceptionistViewPrescription() {
           {/* Diagnosis and Symptoms */}
           <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-xl">
             <h3 className="text-lg font-semibold mb-4 flex items-center space-x-2">
-              <AlertTriangle className="w-5 h-5 text-yellow-400" />
+              <AlertTriangle className="w-5 h-5 text-amber-400" />
               <span>Diagnosis & Symptoms</span>
             </h3>
             
@@ -290,7 +290,7 @@ export default function ReceptionistViewPrescription() {
           {/* Medicines */}
           <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-xl">
             <h3 className="text-lg font-semibold mb-4 flex items-center space-x-2">
-              <Pill className="w-5 h-5 text-green-400" />
+              <Pill className="w-5 h-5 text-emerald-400" />
               <span>Prescribed Medicines ({prescription.medicines?.length || 0})</span>
             </h3>
             
@@ -338,7 +338,7 @@ export default function ReceptionistViewPrescription() {
           {/* Instructions and Follow-up */}
           <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-xl">
             <h3 className="text-lg font-semibold mb-4 flex items-center space-x-2">
-              <CheckCircle className="w-5 h-5 text-blue-400" />
+              <CheckCircle className="w-5 h-5 text-teal-400" />
               <span>Instructions & Follow-up</span>
             </h3>
             

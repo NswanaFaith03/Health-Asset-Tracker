@@ -4,6 +4,7 @@ import { FaEnvelope, FaCircleCheck, FaArrowRight, FaStar, FaUserDoctor, FaBellCo
 import { useAuth } from '../../hooks/useAuth'
 import { fetchUserRoleFromFirestore } from '../../utils/authUtils'
 import toast from 'react-hot-toast'
+import HeaderBanner from '../../components/HeaderBanner'
 
 export default function VerifyEmail() {
   const location = useLocation()
@@ -13,15 +14,15 @@ export default function VerifyEmail() {
   const [isRedirecting, setIsRedirecting] = useState(false)
   const [isResending, setIsResending] = useState(false)
   const [isChecking, setIsChecking] = useState(false)
-  
-  // Get data from signup form
-  const { role, email, fullName } = location.state || { role: 'staff', email: 'user@example.com', fullName: 'User' }
-  
+
+  // Get data from signup form or login redirect
+  const { role, email, fullName, isFromLogin } = location.state || { role: 'student', email: 'user@example.com', fullName: 'User', isFromLogin: false }
+
   const roleMeta = {
     doctor: { title: 'Doctor', icon: FaUserDoctor, color: 'blue' },
     receptionist: { title: 'Receptionist', icon: FaBellConcierge, color: 'cyan' }
   }
-  
+
   const currentRole = roleMeta[role] || { title: 'Staff', icon: FaUserDoctor, color: 'blue' }
   const IconComponent = currentRole.icon
 
@@ -65,14 +66,14 @@ export default function VerifyEmail() {
       navigate('/login')
       return
     }
-    
+
     setIsChecking(true)
     try {
       await currentUser.reload()
-      
+
       if (currentUser.emailVerified) {
         toast.success('Email verified successfully! Redirecting to dashboard...')
-        
+
         let targetRole = role
         if (!location.state || !location.state.role) {
           const fetchedRole = await fetchUserRoleFromFirestore(currentUser.uid)
@@ -86,6 +87,12 @@ export default function VerifyEmail() {
             navigate('/doctor')
           } else if (targetRole === 'receptionist') {
             navigate('/receptionist')
+          } else if (targetRole === 'nurse') {
+            navigate('/nurse')
+          } else if (targetRole === 'student') {
+            navigate('/student')
+          } else if (targetRole === 'admin') {
+            navigate('/admin')
           } else {
             navigate('/')
           }
@@ -102,92 +109,86 @@ export default function VerifyEmail() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white antialiased relative overflow-hidden">
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {/* Floating orbs */}
-        <div className="absolute top-20 left-20 w-72 h-72 bg-blue-500/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute top-40 right-20 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl animate-pulse animation-delay-1000"></div>
-        <div className="absolute bottom-20 left-1/3 w-80 h-80 bg-sky-500/20 rounded-full blur-3xl animate-pulse animation-delay-2000"></div>
-        
-        {/* Grid pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px]"></div>
-        
-        {/* Radial gradient overlay */}
-        <div className="absolute inset-0 bg-radial-gradient from-transparent via-slate-900/50 to-slate-900"></div>
-      </div>
+    <div className="min-h-screen bg-white px-4 py-10 text-slate-900 antialiased" style={{
+      backgroundImage: 'url("/images/nursing_students.jpg")',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundAttachment: 'fixed'
+    }}>
+      {/* Professional multi-layer overlay */}
+      <div className="fixed inset-0 bg-white/70" />
+      <div className="fixed inset-0 bg-gradient-to-b from-white/10 via-white/20 to-white/60" />
 
       {/* Main Content */}
-      <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
+      <div className="relative z-10 min-h-screen flex items-center justify-center">
         <div className="w-full max-w-md">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-2xl mb-6 shadow-2xl shadow-blue-500/25 animate-bounce">
-              <FaEnvelope className="w-10 h-10 text-slate-900" />
-            </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 via-cyan-400 to-sky-400 bg-clip-text text-transparent mb-3">
-              Verify Your Email
-            </h1>
-            <p className="text-lg text-slate-300 leading-relaxed">
-              We've sent a verification link to your email
-            </p>
-          </div>
+          <HeaderBanner title={isFromLogin ? "Verify Your Email" : "Verify Your Email"} subtitle={isFromLogin ? "Confirm your email to access your account" : "We've sent a verification link to your email"} icon={FaEnvelope} image="/images/students.jpg" />
 
           {/* Main Card */}
-          <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-3xl p-8 shadow-2xl shadow-black/20">
+          <div className="backdrop-blur-sm border border-slate-200 rounded-xl p-8 bg-white/90 shadow-xl shadow-slate-200/60">
             {/* Success Animation */}
             <div className="text-center mb-8">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-green-500/20 rounded-full mb-4 animate-pulse">
-                <FaCircleCheck className="w-8 h-8 text-green-400" />
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-teal-50 rounded-lg mb-4">
+                <FaEnvelope className="w-8 h-8 text-teal-600" />
               </div>
-              <h2 className="text-2xl font-bold text-green-400 mb-2">
-                Account Created Successfully!
+              <h2 className="text-2xl font-bold text-slate-900 mb-2">
+                {isFromLogin ? 'Email Verification Required' : 'Account Created!'}
               </h2>
-              <p className="text-slate-300">
-                Welcome to our healthcare team, <span className="text-blue-400 font-semibold">{fullName}</span>
+              <p className="text-slate-600 text-sm">
+                {isFromLogin ? 'Please verify your email to log in' : `Welcome, ${fullName}`}
               </p>
             </div>
 
-            {/* Role Display */}
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-6 mb-6">
-              <div className="flex items-center justify-center space-x-3 mb-3">
-                <div className="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center">
-                  <IconComponent className="w-5 h-5 text-blue-400" />
-                </div>
-                <span className="text-lg font-semibold text-blue-400">
-                  {currentRole.title}
-                </span>
+            {/* Email & Role Display */}
+            <div className="bg-slate-50 border border-slate-200 rounded-lg p-5 mb-6 shadow-sm">
+              <div className="text-center">
+                <p className="text-xs uppercase tracking-widest text-slate-500 mb-2">Verification sent to</p>
+                <p className="text-base font-semibold text-slate-900 mb-4 break-all">{email || 'your email'}</p>
+                {!isFromLogin && (
+                  <div className="flex items-center justify-center gap-3 pt-4 border-t border-slate-200">
+                    <div className="w-10 h-10 bg-teal-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <IconComponent className="w-5 h-5 text-teal-600" />
+                    </div>
+                    <span className="text-base font-semibold text-slate-800">
+                      {currentRole.title}
+                    </span>
+                  </div>
+                )}
               </div>
-              <p className="text-center text-slate-300 text-sm">
-                Your account has been created with {currentRole.title.toLowerCase()} privileges
+              <p className="text-center text-slate-500 text-xs mt-4">
+                {role === 'student' ? (
+                  'Your student account is created and pending administrator approval.'
+                ) : (
+                  `Your account has been created with ${currentRole.title.toLowerCase()} privileges`
+                )}
               </p>
             </div>
 
             {/* Email Info */}
-            <div className="bg-blue-500/10 border border-blue-500/20 rounded-2xl p-6 mb-6">
-              <div className="flex items-center space-x-3 mb-3">
-                <FaEnvelope className="w-5 h-5 text-blue-400" />
-                <span className="font-semibold text-blue-400">Verification Email Sent</span>
+            <div className="bg-teal-50 border border-teal-200 rounded-lg p-5 mb-6 shadow-sm">
+              <div className="flex items-center gap-3 mb-3">
+                <FaEnvelope className="w-5 h-5 text-teal-600 flex-shrink-0" />
+                <span className="font-semibold text-teal-700 text-sm">Verification Email Sent</span>
               </div>
-              <p className="text-slate-300 text-sm mb-3">
-                We've sent a verification link to:
+              <p className="text-slate-600 text-xs mb-3">
+                Check your inbox for the verification link:
               </p>
-              <div className="bg-white/10 rounded-lg p-3 text-center">
-                <span className="text-blue-300 font-mono text-sm break-all">{email}</span>
+              <div className="bg-white rounded-lg p-3 text-center border border-slate-200">
+                <span className="text-teal-700 font-mono text-xs break-all">{email}</span>
               </div>
             </div>
 
             {/* Countdown Timer */}
-            <div className="bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-blue-500/20 rounded-2xl p-6 mb-6">
-              <div className="flex items-center justify-center space-x-3 mb-3">
-                <FaClock className="w-5 h-5 text-blue-400" />
-                <span className="font-semibold text-blue-400">Auto-redirect in</span>
+            <div className="bg-gradient-to-r from-blue-50 to-cyan-50 border border-teal-200 rounded-lg p-5 mb-6 shadow-sm">
+              <div className="flex items-center justify-center gap-3 mb-3">
+                <FaClock className="w-5 h-5 text-teal-600 flex-shrink-0" />
+                <span className="font-semibold text-teal-700 text-sm">Auto-redirect in</span>
               </div>
               <div className="text-center">
-                <div className="text-4xl font-bold text-blue-400 mb-2">
+                <div className="text-4xl font-bold text-teal-700 mb-2">
                   {countdown}s
                 </div>
-                <p className="text-slate-300 text-sm">
+                <p className="text-slate-500 text-xs">
                   You'll be redirected to login automatically
                 </p>
               </div>
@@ -195,79 +196,63 @@ export default function VerifyEmail() {
 
             {/* Action Buttons */}
             <div className="space-y-3">
-              <button 
+              <button
                 onClick={handleCheckStatus}
                 disabled={isChecking || isRedirecting}
-                className="w-full py-4 px-6 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 disabled:from-slate-600 disabled:to-slate-700 disabled:cursor-not-allowed text-slate-900 font-bold text-lg rounded-2xl shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/40 transition-all duration-300 transform hover:scale-105 disabled:transform-none disabled:scale-100 cursor-pointer"
+                className="w-full py-2.5 px-6 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-slate-900 font-semibold text-sm rounded-lg shadow-sm hover:shadow-md transition-all duration-300 disabled:opacity-60"
               >
                 {isChecking ? (
-                  <div className="flex items-center justify-center space-x-2">
-                    <FaArrowsRotate className="w-5 h-5 animate-spin" />
-                    <span>Checking Status...</span>
+                  <div className="flex items-center justify-center gap-2">
+                    <FaArrowsRotate className="w-4 h-4 animate-spin" />
+                    <span>Checking...</span>
                   </div>
                 ) : (
-                  <div className="flex items-center justify-center space-x-2">
-                    <FaCircleCheck className="w-5 h-5" />
+                  <div className="flex items-center justify-center gap-2">
+                    <FaCircleCheck className="w-4 h-4" />
                     <span>Check Verification Status</span>
                   </div>
                 )}
               </button>
 
-              <button 
+              <button
                 onClick={handleManualRedirect}
                 disabled={isRedirecting || isChecking}
-                className="w-full py-3.5 px-6 border-2 border-white/20 bg-white/5 hover:border-blue-400/40 hover:bg-blue-400/10 disabled:cursor-not-allowed text-white font-medium rounded-2xl transition-all duration-300 hover:shadow-lg hover:shadow-blue-400/20 cursor-pointer"
+                className="w-full py-2.5 px-6 border border-slate-300 bg-white hover:border-teal-300 hover:bg-teal-50 disabled:cursor-not-allowed text-slate-800 font-semibold text-sm rounded-lg transition-all duration-300 disabled:opacity-60 shadow-sm"
               >
                 {isRedirecting ? (
-                  <div className="flex items-center justify-center space-x-2">
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-4 h-4 border-2 border-slate-800 border-t-transparent rounded-full animate-spin"></div>
                     <span>Redirecting...</span>
                   </div>
                 ) : (
-                  <div className="flex items-center justify-center space-x-2">
-                    <FaArrowRight className="w-5 h-5" />
-                    <span>Go to Login Now</span>
+                  <div className="flex items-center justify-center gap-2">
+                    <FaArrowRight className="w-4 h-4" />
+                    <span>Go to Login</span>
                   </div>
                 )}
-              </button>
-              
-              <button 
-                onClick={handleResendEmail}
-                disabled={isResending || isChecking}
-                className="w-full py-3 px-6 border-2 border-white/20 bg-white/5 hover:border-blue-400/40 hover:bg-blue-400/10 disabled:cursor-not-allowed text-white font-medium rounded-2xl transition-all duration-300 hover:shadow-lg hover:shadow-blue-400/20 cursor-pointer"
-              >
-                <FaShieldHalved className={`w-4 h-4 mr-2 inline ${isResending ? 'animate-spin' : ''}`} />
-                {isResending ? 'Sending...' : 'Resend Verification Email'}
               </button>
             </div>
           </div>
 
           {/* Instructions */}
           <div className="mt-8 text-center">
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-              <h3 className="text-lg font-semibold text-blue-400 mb-3">What to do next?</h3>
-              <div className="space-y-2 text-sm text-slate-300">
-                <div className="flex items-center space-x-2">
-                  <FaStar className="w-3 h-3 text-blue-400" />
+            <div className="bg-white/90 border border-slate-200 rounded-lg p-5 shadow-sm">
+              <h3 className="text-base font-semibold text-teal-700 mb-3">What to do next?</h3>
+              <div className="space-y-2 text-xs text-slate-600">
+                <div className="flex items-center gap-2">
+                  <FaStar className="w-3 h-3 text-teal-600 flex-shrink-0" />
                   <span>Check your email inbox (and spam folder)</span>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <FaStar className="w-3 h-3 text-blue-400" />
+                <div className="flex items-center gap-2">
+                  <FaStar className="w-3 h-3 text-teal-600 flex-shrink-0" />
                   <span>Click the verification link in the email</span>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <FaStar className="w-3 h-3 text-blue-400" />
-                  <span>Return here and sign in with your credentials</span>
+                <div className="flex items-center gap-2">
+                  <FaStar className="w-3 h-3 text-teal-600 flex-shrink-0" />
+                  <span>Return here to continue once it's confirmed</span>
                 </div>
               </div>
             </div>
-          </div>
-
-          {/* Footer */}
-          <div className="text-center mt-8">
-            <p className="text-sm text-slate-400">
-              Secure verification for your healthcare workspace
-            </p>
           </div>
         </div>
       </div>

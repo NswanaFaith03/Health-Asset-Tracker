@@ -3,7 +3,8 @@ import { useAuth } from '../../hooks/useAuth'
 import { Link } from 'react-router-dom'
 import LogoutButton from '../../components/LogoutButton'
 import EmailVerificationStatus from '../../components/EmailVerificationStatus'
-import { FaUserDoctor, FaCalendar, FaUserInjured, FaPills, FaCalendarDay, FaFileLines, FaPlus, FaHashtag } from 'react-icons/fa6'
+import { FaUserDoctor, FaCalendar, FaUserInjured, FaPills, FaCalendarDay, FaFileLines, FaPlus, FaHashtag, FaClipboardList } from 'react-icons/fa6'
+import HeaderBanner from '../../components/HeaderBanner'
 import { collection, query, where, onSnapshot, doc, getDoc } from 'firebase/firestore'
 import { db } from '../../firebase/config'
 
@@ -25,7 +26,7 @@ export default function Doctor() {
       try {
         const userDocRef = doc(db, 'staffData', currentUser.uid)
         const userDoc = await getDoc(userDocRef)
-        
+
         if (userDoc.exists()) {
           const userData = userDoc.data()
           const name = userData.fullName || currentUser.displayName || 'Unknown Doctor'
@@ -44,26 +45,32 @@ export default function Doctor() {
 
   // Fetch real-time stats
   useEffect(() => {
-    if (!doctorName) return
+    if (!currentUser) return
 
     const today = new Date().toISOString().split('T')[0]
     const weekStart = new Date()
     weekStart.setDate(weekStart.getDate() - 7)
 
-    // Query for today's appointments
+    let regularTodayCount = 0
+    let regularWaitingCount = 0
+    let weeklyPrescriptionCount = 0
+
+    const updateStatsState = () => {
+      setStats(prev => ({
+        ...prev,
+        todayAppointments: regularTodayCount,
+        waitingPatients: regularWaitingCount,
+        weeklyPrescriptions: weeklyPrescriptionCount,
+        loading: false
+      }))
+    }
+
+    // Query for today's regular patient appointments assigned to this doctor (use doctorId for reliability)
     const todayAppointmentsRef = collection(db, 'appointments')
     const todayQuery = query(
       todayAppointmentsRef,
       where('appointmentDate', '==', today),
-      where('doctorName', '==', doctorName)
-    )
-
-    // Query for waiting patients (tokens generated but not completed)
-    const waitingPatientsRef = collection(db, 'appointments')
-    const waitingQuery = query(
-      waitingPatientsRef,
-      where('appointmentDate', '==', today),
-      where('doctorName', '==', doctorName)
+      where('doctorId', '==', currentUser?.uid || '')
     )
 
     // Query for weekly prescriptions
@@ -73,186 +80,145 @@ export default function Doctor() {
       where('doctorId', '==', currentUser.uid)
     )
 
-    // Set up real-time listeners
     const unsubscribeToday = onSnapshot(todayQuery, (snapshot) => {
-      const todayCount = snapshot.docs.length
-      setStats(prev => ({ ...prev, todayAppointments: todayCount }))
-    })
+      regularTodayCount = snapshot.docs.filter(docSnap => {
+        const data = docSnap.data()
+        return data.source !== 'student-portal'
+      }).length
 
-    const unsubscribeWaiting = onSnapshot(waitingQuery, (snapshot) => {
-      const waitingCount = snapshot.docs.filter(doc => {
-        const data = doc.data()
+      regularWaitingCount = snapshot.docs.filter(docSnap => {
+        const data = docSnap.data()
         return data.status === 'token_generated' || data.status === 'in_progress'
       }).length
-      setStats(prev => ({ ...prev, waitingPatients: waitingCount }))
+
+      updateStatsState()
     })
 
     const unsubscribeWeekly = onSnapshot(weeklyQuery, (snapshot) => {
-      const weeklyCount = snapshot.docs.filter(doc => {
+      weeklyPrescriptionCount = snapshot.docs.filter(doc => {
         const data = doc.data()
         const createdAt = new Date(data.createdAt)
         return createdAt >= weekStart
       }).length
-      setStats(prev => ({ ...prev, weeklyPrescriptions: weeklyCount, loading: false }))
+      updateStatsState()
     })
 
     return () => {
       unsubscribeToday()
-      unsubscribeWaiting()
       unsubscribeWeekly()
     }
-  }, [doctorName, currentUser])
+  }, [currentUser])
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white">
-      {/* Header */}
-      <header className="bg-white/5 backdrop-blur-xl border-b border-white/10 p-4">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center">
-              <FaUserDoctor className="w-6 h-6 text-blue-400" />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold">Doctor Dashboard</h1>
-              <p className="text-sm text-slate-400">Welcome, {currentUser?.displayName || 'Doctor'}</p>
-            </div>
-          </div>
-          <LogoutButton />
-        </div>
-      </header>
+    <div className="text-slate-900">
+      <HeaderBanner title="Doctor Dashboard" subtitle={`Welcome, ${currentUser?.displayName || 'Doctor'}`} icon={FaUserDoctor} image="/images/doctor.jpg" />
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Quick Stats */}
-          <Link to="/doctor/appointments" className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-xl hover:bg-white/10 transition-colors cursor-pointer">
+          <Link to="/doctor/tokens" className="bg-slate-50 border border-slate-200 rounded-2xl p-6 hover:bg-slate-100 transition-colors cursor-pointer">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-3">
-                <FaCalendar className="w-6 h-6 text-blue-400" />
-                <h3 className="text-lg font-semibold">Today's Appointments</h3>
+                <FaHashtag className="w-6 h-6 text-amber-500" />
+                <h3 className="text-lg font-semibold text-slate-900">Patient Queue</h3>
               </div>
-              <FaCalendarDay className="w-4 h-4 text-blue-400" />
+              <FaHashtag className="w-4 h-4 text-amber-500" />
             </div>
             {stats.loading ? (
               <div className="flex items-center space-x-2">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-400"></div>
-                <p className="text-lg text-slate-400">Loading...</p>
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-amber-500"></div>
+                <p className="text-lg text-slate-500">Loading...</p>
               </div>
             ) : (
               <>
-                <p className="text-3xl font-bold text-blue-400">{stats.todayAppointments}</p>
-                <p className="text-sm text-slate-400 mt-2">
-                  {stats.todayAppointments === 0 ? 'No appointments today' : 
-                   stats.todayAppointments === 1 ? 'appointment scheduled' : 
-                   'appointments scheduled'}
-                </p>
-              </>
-            )}
-            <p className="text-xs text-blue-400 mt-2">Click to view all appointments →</p>
-          </Link>
-
-          <Link to="/doctor/tokens" className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-xl hover:bg-white/10 transition-colors cursor-pointer">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center space-x-3">
-                <FaHashtag className="w-6 h-6 text-yellow-400" />
-                <h3 className="text-lg font-semibold">Patient Queue</h3>
-              </div>
-              <FaHashtag className="w-4 h-4 text-yellow-400" />
-            </div>
-            {stats.loading ? (
-              <div className="flex items-center space-x-2">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-yellow-400"></div>
-                <p className="text-lg text-slate-400">Loading...</p>
-              </div>
-            ) : (
-              <>
-                <p className="text-3xl font-bold text-yellow-400">{stats.waitingPatients}</p>
-                <p className="text-sm text-slate-400 mt-2">
+                <p className="text-3xl font-bold text-amber-500">{stats.waitingPatients}</p>
+                <p className="text-sm text-slate-600 mt-2">
                   {stats.waitingPatients === 0 ? 'No patients waiting' :
-                   stats.waitingPatients === 1 ? 'patient waiting' :
-                   'patients waiting'}
+                    stats.waitingPatients === 1 ? 'patient waiting' :
+                      'patients waiting'}
                 </p>
               </>
             )}
-            <p className="text-xs text-yellow-400 mt-2">Click to view queue →</p>
+            <p className="text-xs text-amber-500 mt-2">Click to view queue →</p>
           </Link>
 
-          <Link to="/doctor/prescriptions" className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-xl hover:bg-white/10 transition-colors cursor-pointer">
+          <Link to="/doctor/prescriptions" className="bg-slate-50 border border-slate-200 rounded-2xl p-6 hover:bg-slate-100 transition-colors cursor-pointer">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-3">
-                <FaPills className="w-6 h-6 text-purple-400" />
-                <h3 className="text-lg font-semibold">Prescriptions</h3>
+                <FaPills className="w-6 h-6 text-violet-600" />
+                <h3 className="text-lg font-semibold text-slate-900">Prescriptions</h3>
               </div>
-              <FaFileLines className="w-4 h-4 text-purple-400" />
+              <FaFileLines className="w-4 h-4 text-violet-600" />
             </div>
             {stats.loading ? (
               <div className="flex items-center space-x-2">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-400"></div>
-                <p className="text-lg text-slate-400">Loading...</p>
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-600"></div>
+                <p className="text-lg text-slate-500">Loading...</p>
               </div>
             ) : (
               <>
-                <p className="text-3xl font-bold text-purple-400">{stats.weeklyPrescriptions}</p>
-                <p className="text-sm text-slate-400 mt-2">
+                <p className="text-3xl font-bold text-violet-600">{stats.weeklyPrescriptions}</p>
+                <p className="text-sm text-slate-600 mt-2">
                   {stats.weeklyPrescriptions === 0 ? 'No prescriptions this week' :
-                   'prescriptions this week'}
+                    'prescriptions this week'}
                 </p>
               </>
             )}
-            <p className="text-xs text-purple-400 mt-2">Click to manage prescriptions →</p>
+            <p className="text-xs text-violet-600 mt-2">Click to manage prescriptions →</p>
           </Link>
         </div>
 
         {/* Quick Actions */}
         <div className="mt-8">
-          <h2 className="text-xl font-bold mb-4">Quick Actions</h2>
+          <h2 className="text-xl font-bold mb-4 text-slate-900">Quick Actions</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Link to="/doctor/appointments" className="bg-white/5 border border-white/10 rounded-xl p-4 hover:bg-white/10 transition-colors">
+            <Link to="/doctor/prescriptions/create" className="bg-slate-50 border border-slate-200 rounded-xl p-4 hover:bg-slate-100 transition-colors">
               <div className="flex items-center space-x-3">
-                <FaCalendar className="w-5 h-5 text-blue-400" />
+                <FaPlus className="w-5 h-5 text-emerald-600" />
                 <div>
-                  <h3 className="font-semibold">View Appointments</h3>
-                  <p className="text-sm text-slate-400">Manage patient appointments</p>
+                  <h3 className="font-semibold text-slate-900">New Prescription</h3>
+                  <p className="text-sm text-slate-600">Create prescription for patient</p>
                 </div>
               </div>
             </Link>
 
-            <Link to="/doctor/prescriptions/create" className="bg-white/5 border border-white/10 rounded-xl p-4 hover:bg-white/10 transition-colors">
+            <Link to="/doctor/prescriptions" className="bg-slate-50 border border-slate-200 rounded-xl p-4 hover:bg-slate-100 transition-colors">
               <div className="flex items-center space-x-3">
-                <FaPlus className="w-5 h-5 text-green-400" />
+                <FaFileLines className="w-5 h-5 text-violet-600" />
                 <div>
-                  <h3 className="font-semibold">New Prescription</h3>
-                  <p className="text-sm text-slate-400">Create prescription for patient</p>
+                  <h3 className="font-semibold text-slate-900">View Prescriptions</h3>
+                  <p className="text-sm text-slate-600">Manage all prescriptions</p>
                 </div>
               </div>
             </Link>
 
-            <Link to="/doctor/prescriptions" className="bg-white/5 border border-white/10 rounded-xl p-4 hover:bg-white/10 transition-colors">
+            <Link to="/doctor/prescriptions/medicines" className="bg-slate-50 border border-slate-200 rounded-xl p-4 hover:bg-slate-100 transition-colors">
               <div className="flex items-center space-x-3">
-                <FaFileLines className="w-5 h-5 text-purple-400" />
+                <FaPills className="w-5 h-5 text-amber-500" />
                 <div>
-                  <h3 className="font-semibold">View Prescriptions</h3>
-                  <p className="text-sm text-slate-400">Manage all prescriptions</p>
+                  <h3 className="font-semibold text-slate-900">Manage Medicines</h3>
+                  <p className="text-sm text-slate-600">Add/edit medicine inventory</p>
                 </div>
               </div>
             </Link>
 
-            <Link to="/doctor/prescriptions/medicines" className="bg-white/5 border border-white/10 rounded-xl p-4 hover:bg-white/10 transition-colors">
+            <Link to="/doctor/tokens" className="bg-slate-50 border border-slate-200 rounded-xl p-4 hover:bg-slate-100 transition-colors">
               <div className="flex items-center space-x-3">
-                <FaPills className="w-5 h-5 text-yellow-400" />
+                <FaHashtag className="w-5 h-5 text-teal-600" />
                 <div>
-                  <h3 className="font-semibold">Manage Medicines</h3>
-                  <p className="text-sm text-slate-400">Add/edit medicine inventory</p>
+                  <h3 className="font-semibold text-slate-900">Patient Queue</h3>
+                  <p className="text-sm text-slate-600">View and manage patient tokens</p>
                 </div>
               </div>
             </Link>
 
-            <Link to="/doctor/tokens" className="bg-white/5 border border-white/10 rounded-xl p-4 hover:bg-white/10 transition-colors">
+            <Link to="/doctor/consultations" className="bg-slate-50 border border-slate-200 rounded-xl p-4 hover:bg-slate-100 transition-colors">
               <div className="flex items-center space-x-3">
-                <FaHashtag className="w-5 h-5 text-blue-400" />
+                <FaClipboardList className="w-5 h-5 text-teal-600" />
                 <div>
-                  <h3 className="font-semibold">Patient Queue</h3>
-                  <p className="text-sm text-slate-400">View and manage patient tokens</p>
+                  <h3 className="font-semibold text-slate-900">Consultation Queue</h3>
+                  <p className="text-sm text-slate-600">View student consultations</p>
                 </div>
               </div>
             </Link>
@@ -269,7 +235,7 @@ export default function Doctor() {
             </div>
             <div>
               <p className="text-slate-400 text-sm">Role</p>
-              <p className="text-blue-400 font-medium capitalize">{userRole}</p>
+              <p className="text-teal-400 font-medium capitalize">{userRole}</p>
             </div>
             <div>
               <p className="text-slate-400 text-sm">Full Name</p>

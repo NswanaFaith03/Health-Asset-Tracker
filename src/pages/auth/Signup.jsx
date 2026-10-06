@@ -1,7 +1,27 @@
 import { useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { FaHospital, FaUserDoctor, FaBellConcierge, FaIdCard, FaEnvelope, FaLock, FaEye, FaEyeSlash, FaArrowRight, FaStar, FaShieldHalved, FaUserTie } from 'react-icons/fa6'
+import { FaHospital, FaUserDoctor, FaBellConcierge, FaEye, FaEyeSlash, FaArrowRight, FaUserGroup, FaVial, FaPills, FaHeartPulse, FaUserNurse, FaShieldHalved, FaStar } from 'react-icons/fa6'
+import HeaderBanner from '../../components/HeaderBanner'
 import { useAuth } from '../../hooks/useAuth'
+import { ROLE_ORDER } from '../../config/roles'
+
+const STAFF_ROLES = ['doctor', 'pharmacist', 'labTechnician', 'nurse', 'mentalHealthCounselor', 'hivProfessional', 'receptionist', 'admin']
+const SELF_SIGNUP_ROLES = ['student']
+const ROOT_ADMIN_EMAILS = ['root@unza.zm', 'nswana.faith@cs.unza.zm']
+
+const roleMeta = {
+  student: { title: 'Student', icon: FaUserGroup, description: 'Access care, consultations, prescriptions, and health support from one portal.' },
+  doctor: { title: 'Doctor', icon: FaUserDoctor, description: 'Provide care with streamlined tools for appointments and records.' },
+  pharmacist: { title: 'Pharmacist', icon: FaPills, description: 'Dispense medication safely and manage prescription fulfillment.' },
+  labTechnician: { title: 'Lab Technician', icon: FaVial, description: 'Process lab requests and publish diagnostic results.' },
+  nurse: { title: 'Nurse', icon: FaUserNurse, description: 'Support patient intake, triage, and queue coordination.' },
+  mentalHealthCounselor: { title: 'Mental Health Counselor', icon: FaHeartPulse, description: 'Provide counseling sessions and patient follow-up messaging.' },
+  hivProfessional: { title: 'HIV Professional', icon: FaShieldHalved, description: 'Coordinate HIV support, resources, and session tracking.' },
+  receptionist: { title: 'Receptionist', icon: FaBellConcierge, description: 'Coordinate patient intake, scheduling, and front-desk operations.' },
+  admin: { title: 'Admin', icon: FaShieldHalved, description: 'Monitor system performance, access analytics, and manage users.' }
+}
+
+const SIGNUP_ROLES = SELF_SIGNUP_ROLES.map(role => roleMeta[role]).filter(Boolean)
 
 export default function Signup() {
   const { role: initialRole } = useParams()
@@ -9,7 +29,9 @@ export default function Signup() {
   const { signup } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [selectedRole, setSelectedRole] = useState(initialRole || '')
+  const [selectedRole, setSelectedRole] = useState(
+    SELF_SIGNUP_ROLES.includes(initialRole) ? initialRole : 'student'
+  )
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -18,19 +40,13 @@ export default function Signup() {
   })
   const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState({})
-  
-  const roleMeta = {
-    doctor: { title: 'Doctor', icon: FaUserDoctor, description: 'Provide care with streamlined tools for appointments and records' },
-    receptionist: { title: 'Receptionist', icon: FaBellConcierge, description: 'Coordinate patient intake, scheduling, and front-desk operations' }
-  }
 
-  const currentRole = roleMeta[selectedRole] || null
+  const currentRole = roleMeta[selectedRole] || roleMeta.student
   const IconComponent = currentRole?.icon || FaHospital
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }))
     }
@@ -38,71 +54,72 @@ export default function Signup() {
 
   const validateForm = () => {
     const newErrors = {}
-    
+
     if (!selectedRole) {
-      newErrors.role = 'Please select a professional role'
+      newErrors.role = 'Please select a role'
     }
-    
+
     if (!formData.fullName.trim()) {
       newErrors.fullName = 'Full name is required'
     }
-    
+
     if (!formData.email.trim()) {
       newErrors.email = 'Email is required'
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = 'Please enter a valid email address'
+    } else if (ROOT_ADMIN_EMAILS.includes(formData.email.trim().toLowerCase())) {
+      newErrors.email = 'This is the reserved system administrator account. Please use the configured root admin login credentials.'
     }
-    
+
     if (!formData.password) {
       newErrors.password = 'Password is required'
     } else if (formData.password.length < 6) {
       newErrors.password = 'Password must be at least 6 characters'
     }
-    
+
     if (!formData.confirmPassword) {
       newErrors.confirmPassword = 'Please confirm your password'
     } else if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match'
     }
-    
+
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    
+
     if (!validateForm()) {
       return
     }
-    
+
     setIsLoading(true)
-    
+
     try {
-      // Use Firebase authentication
       await signup(formData.email, formData.password, formData.fullName, selectedRole)
-      
-      // Redirect to verify email page with role and email data
-      navigate('/verify-email', { 
-        state: { 
-          role: selectedRole, 
+
+      navigate('/verify-email', {
+        state: {
+          role: selectedRole,
           email: formData.email,
           fullName: formData.fullName
-        } 
+        }
       })
     } catch (error) {
       console.error('Signup error:', error)
-      // Handle specific Firebase errors
       let errorMessage = 'Failed to create account. Please try again.'
-      
-      if (error.code === 'auth/email-already-in-use') {
+
+      if (error.code === 'auth/root-admin-forbidden') {
+        errorMessage = 'The system administrator account is preconfigured and cannot be created from this form.'
+      } else if (error.code === 'auth/email-already-in-use') {
         errorMessage = 'An account with this email already exists.'
       } else if (error.code === 'auth/weak-password') {
         errorMessage = 'Password should be at least 6 characters long.'
       } else if (error.code === 'auth/invalid-email') {
         errorMessage = 'Please enter a valid email address.'
       }
-      
+
       setErrors(prev => ({ ...prev, general: errorMessage }))
     } finally {
       setIsLoading(false)
@@ -110,281 +127,164 @@ export default function Signup() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white antialiased relative overflow-hidden">
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {/* Floating orbs */}
-        <div className="absolute top-20 left-20 w-72 h-72 bg-blue-500/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute top-40 right-20 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl animate-pulse animation-delay-1000"></div>
-        <div className="absolute bottom-20 left-1/3 w-80 h-80 bg-sky-500/20 rounded-full blur-3xl animate-pulse animation-delay-2000"></div>
-        
-        {/* Grid pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px]"></div>
-        
-        {/* Radial gradient overlay */}
-        <div className="absolute inset-0 bg-radial-gradient from-transparent via-slate-900/50 to-slate-900"></div>
-      </div>
+    <div className="min-h-screen bg-white px-4 py-6 sm:py-10 text-slate-900" style={{
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundAttachment: 'fixed'
+    }}>
+      <div className="relative z-10 mx-auto flex min-h-[calc(100vh-3rem)] sm:min-h-[calc(100vh-5rem)] max-w-5xl items-center justify-center">
+        <div className="w-full max-w-4xl overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl shadow-slate-200/60">
+          <HeaderBanner title={currentRole ? `Create Your ${currentRole.title} Account` : 'Join Us'} subtitle={currentRole ? currentRole.description : 'Student accounts available for self-registration.'} icon={IconComponent} />
 
-      {/* Main Content */}
-      <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
-        <div className="w-full max-w-md">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-2xl mb-6 shadow-2xl shadow-blue-500/25">
-              <IconComponent className="w-10 h-10 text-slate-900" />
+          <div className="bg-white p-4 sm:p-6 md:p-8 lg:p-10">
+            <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-lg border border-teal-200 bg-teal-50 p-4 shadow-sm">
+              <div>
+                <div className="text-xs font-semibold uppercase tracking-widest text-teal-700">Registration</div>
+                <div className="mt-1 text-base sm:text-lg font-semibold text-slate-900">Choose your access role</div>
+              </div>
+              <div className="rounded-lg border border-teal-200 bg-white px-3.5 py-2 text-xs font-semibold uppercase tracking-widest text-teal-700 self-start sm:self-auto">
+                Self-Service
+              </div>
             </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 via-cyan-400 to-sky-400 bg-clip-text text-transparent mb-3">
-              Join Our Team
-            </h1>
-            <p className="text-lg text-slate-300 leading-relaxed">
-              {currentRole ? `Create your ${currentRole.title} account` : 'Choose your role and create your account'}
-            </p>
-            {currentRole && (
-              <p className="text-sm text-slate-400 mt-2">
-                {currentRole.description}
-              </p>
-            )}
-          </div>
 
-          {/* Form Card */}
-          <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-3xl p-8 shadow-2xl shadow-black/20">
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Professional Role Selection */}
+            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
               <div className="space-y-3">
-                <label className="block text-sm font-semibold text-slate-200">
-                  Professional Role
-                </label>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setSelectedRole('doctor')}
-                    className={`relative p-4 rounded-2xl border-2 transition-all duration-300 ${
-                      selectedRole === 'doctor'
-                        ? 'border-blue-400 bg-blue-400/10 shadow-lg shadow-blue-400/20'
-                        : 'border-white/20 bg-white/5 hover:border-white/40 hover:bg-white/10'
-                    }`}
-                  >
-                    <div className="flex flex-col items-center space-y-2">
-                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 ${
-                        selectedRole === 'doctor'
-                          ? 'bg-blue-400 text-slate-900'
-                          : 'bg-white/10 text-slate-300'
-                      }`}>
-                        <FaUserDoctor className="w-6 h-6" />
-                      </div>
-                      <span className="text-sm font-medium">Doctor</span>
-                    </div>
-                  </button>
-                  
-                  <button
-                    type="button"
-                    onClick={() => setSelectedRole('receptionist')}
-                    className={`relative p-4 rounded-2xl border-2 transition-all duration-300 ${
-                      selectedRole === 'receptionist'
-                        ? 'border-blue-400 bg-blue-400/10 shadow-lg shadow-blue-400/20'
-                        : 'border-white/20 bg-white/5 hover:border-white/40 hover:bg-white/10'
-                    }`}
-                  >
-                    <div className="flex flex-col items-center space-y-2">
-                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 ${
-                        selectedRole === 'receptionist'
-                          ? 'bg-blue-400 text-slate-900'
-                          : 'bg-white/10 text-slate-300'
-                      }`}>
-                        <FaBellConcierge className="w-6 h-6" />
-                      </div>
-                      <span className="text-sm font-medium">Receptionist</span>
-                    </div>
-                  </button>
+                <div className="grid grid-cols-1 gap-3">
+                  {SIGNUP_ROLES.map(role => {
+                    const RoleIcon = role.icon
+                    const isSelected = selectedRole === role.title.toLowerCase().replace(/\s+/g, '').replace(/[^a-z]/g, '')
+
+                    return (
+                      <button
+                        key={role.title}
+                        type="button"
+                        onClick={() => setSelectedRole(Object.keys(roleMeta).find(key => roleMeta[key].title === role.title))}
+                        className={`flex items-center justify-between rounded-lg border p-3 sm:p-4 text-left transition touch-manipulation ${isSelected ? 'border-sky-500 bg-sky-50 shadow-sm' : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'}`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className={`flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-lg flex-shrink-0 ${isSelected ? 'bg-teal-600 text-white' : 'bg-slate-100 text-slate-700'}`}>
+                            <RoleIcon className="h-4 w-4 sm:h-5 sm:w-5" />
+                          </div>
+                          <div>
+                            <div className="font-semibold text-slate-900 text-sm sm:text-base">{role.title}</div>
+                            <div className="text-xs sm:text-sm text-slate-600 line-clamp-2">{role.description}</div>
+                          </div>
+                        </div>
+                        {isSelected && <FaArrowRight className="h-4 w-4 text-teal-700 flex-shrink-0" />}
+                      </button>
+                    )
+                  })}
                 </div>
-                {errors.role && (
-                  <p className="text-sm text-red-400">{errors.role}</p>
-                )}
               </div>
 
-              {/* Full Name Field */}
-              <div className="space-y-3">
-                <label className="block text-sm font-semibold text-slate-200">
-                  Full Name
-                </label>
-                <div className="relative group">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-400 transition-colors duration-300">
-                    <FaIdCard className="w-4 h-4" />
-                  </div>
-                  <input 
-                    type="text" 
-                    name="fullName"
-                    placeholder="Enter your full name"
-                    value={formData.fullName}
-                    onChange={handleInputChange}
-                    className={`w-full pl-12 pr-4 py-4 bg-white/5 border-2 rounded-2xl text-white placeholder-slate-400 outline-none transition-all duration-300 ${
-                      errors.fullName 
-                        ? 'border-red-400 focus:border-red-400 focus:bg-red-400/10' 
-                        : 'border-white/10 focus:border-blue-400 focus:bg-white/10 focus:shadow-lg focus:shadow-blue-400/20'
-                    }`}
-                    required
-                  />
-                </div>
-                {errors.fullName && (
-                  <p className="text-sm text-red-400">{errors.fullName}</p>
-                )}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-slate-700">Full Name</label>
+                <input
+                  type="text"
+                  name="fullName"
+                  placeholder="John Doe"
+                  value={formData.fullName}
+                  onChange={handleInputChange}
+                  className={`w-full rounded-lg border bg-white py-2.5 px-4 text-slate-900 placeholder:text-slate-500 focus:outline-none transition ${errors.fullName ? 'border-teal-300 focus:border-red-500' : 'border-slate-300 focus:border-sky-500'}`}
+                  required
+                />
+                {errors.fullName && <p className="text-xs text-teal-600">{errors.fullName}</p>}
               </div>
 
-              {/* Email Field */}
-              <div className="space-y-3">
-                <label className="block text-sm font-semibold text-slate-200">
-                  Email Address
-                </label>
-                <div className="relative group">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-400 transition-colors duration-300">
-                    <FaEnvelope className="w-4 h-4" />
-                  </div>
-                  <input 
-                    type="email" 
-                    name="email"
-                    placeholder="Enter your email address"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    className={`w-full pl-12 pr-4 py-4 bg-white/5 border-2 rounded-2xl text-white placeholder-slate-400 outline-none transition-all duration-300 ${
-                      errors.email 
-                        ? 'border-red-400 focus:border-red-400 focus:bg-red-400/10' 
-                        : 'border-white/10 focus:border-blue-400 focus:bg-white/10 focus:shadow-lg focus:shadow-blue-400/20'
-                    }`}
-                    required
-                  />
-                </div>
-                {errors.email && (
-                  <p className="text-sm text-red-400">{errors.email}</p>
-                )}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-slate-700">Email Address</label>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="you@example.com"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className={`w-full rounded-lg border bg-white py-2.5 px-4 text-slate-900 placeholder:text-slate-500 focus:outline-none transition ${errors.email ? 'border-teal-300 focus:border-red-500' : 'border-slate-300 focus:border-sky-500'}`}
+                  required
+                />
+                {errors.email && <p className="text-xs text-teal-600">{errors.email}</p>}
               </div>
 
-              {/* Password Field */}
-              <div className="space-y-3">
-                <label className="block text-sm font-semibold text-slate-200">
-                  Password
-                </label>
-                <div className="relative group">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-400 transition-colors duration-300">
-                    <FaLock className="w-4 h-4" />
-                  </div>
-                  <input 
-                    type={showPassword ? "text" : "password"}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-slate-700">Password</label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
                     name="password"
-                    placeholder="Create a strong password"
+                    placeholder="••••••••"
                     value={formData.password}
                     onChange={handleInputChange}
-                    className={`w-full pl-12 pr-12 py-4 bg-white/5 border-2 rounded-2xl text-white placeholder-slate-400 outline-none transition-all duration-300 ${
-                      errors.password 
-                        ? 'border-red-400 focus:border-red-400 focus:bg-red-400/10' 
-                        : 'border-white/10 focus:border-blue-400 focus:bg-white/10 focus:shadow-lg focus:shadow-blue-400/20'
-                    }`}
+                    className={`w-full rounded-lg border bg-white py-2.5 px-4 pr-11 text-slate-900 placeholder:text-slate-500 focus:outline-none transition ${errors.password ? 'border-teal-300 focus:border-red-500' : 'border-slate-300 focus:border-sky-500'}`}
                     required
                   />
-                  <button 
-                    type="button" 
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-400 transition-colors duration-300"
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-500 hover:text-teal-700 transition"
                     onClick={() => setShowPassword(!showPassword)}
                   >
-                    {showPassword ? <FaEyeSlash className="w-4 h-4" /> : <FaEye className="w-4 h-4" />}
+                    {showPassword ? <FaEyeSlash className="h-4 w-4" /> : <FaEye className="h-4 w-4" />}
                   </button>
                 </div>
-                {errors.password && (
-                  <p className="text-sm text-red-400">{errors.password}</p>
-                )}
-                <p className="text-xs text-slate-400">Minimum 6 characters required</p>
+                {errors.password && <p className="text-xs text-teal-600">{errors.password}</p>}
+                <p className="text-xs text-slate-500">Minimum 6 characters</p>
               </div>
 
-              {/* Confirm Password Field */}
-              <div className="space-y-3">
-                <label className="block text-sm font-semibold text-slate-200">
-                  Confirm Password
-                </label>
-                <div className="relative group">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-400 transition-colors duration-300">
-                    <FaLock className="w-4 h-4" />
-                  </div>
-                  <input 
-                    type={showConfirmPassword ? "text" : "password"}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-slate-700">Confirm Password</label>
+                <div className="relative">
+                  <input
+                    type={showConfirmPassword ? 'text' : 'password'}
                     name="confirmPassword"
-                    placeholder="Confirm your password"
+                    placeholder="••••••••"
                     value={formData.confirmPassword}
                     onChange={handleInputChange}
-                    className={`w-full pl-12 pr-12 py-4 bg-white/5 border-2 rounded-2xl text-white placeholder-slate-400 outline-none transition-all duration-300 ${
-                      errors.confirmPassword 
-                        ? 'border-red-400 focus:border-red-400 focus:bg-red-400/10' 
-                        : 'border-white/10 focus:border-blue-400 focus:bg-white/10 focus:shadow-lg focus:shadow-blue-400/20'
-                    }`}
+                    className={`w-full rounded-lg border bg-white py-2.5 px-4 pr-11 text-slate-900 placeholder:text-slate-500 focus:outline-none transition ${errors.confirmPassword ? 'border-teal-300 focus:border-red-500' : 'border-slate-300 focus:border-sky-500'}`}
                     required
                   />
-                  <button 
-                    type="button" 
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-400 transition-colors duration-300"
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-500 hover:text-teal-700 transition"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   >
-                    {showConfirmPassword ? <FaEyeSlash className="w-4 h-4" /> : <FaEye className="w-4 h-4" />}
+                    {showConfirmPassword ? <FaEyeSlash className="h-4 w-4" /> : <FaEye className="h-4 w-4" />}
                   </button>
                 </div>
-                {errors.confirmPassword && (
-                  <p className="text-sm text-red-400">{errors.confirmPassword}</p>
-                )}
+                {errors.confirmPassword && <p className="text-xs text-teal-600">{errors.confirmPassword}</p>}
               </div>
 
-              {/* Submit Button */}
-              <button 
-                type="submit"
-                disabled={isLoading}
-                className="w-full py-4 px-6 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 disabled:from-slate-600 disabled:to-slate-700 disabled:cursor-not-allowed text-slate-900 font-bold text-lg rounded-2xl shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/40 transition-all duration-300 transform hover:scale-105 disabled:transform-none disabled:scale-100"
-              >
-                {isLoading ? (
-                  <div className="flex items-center justify-center space-x-2">
-                    <div className="w-5 h-5 border-2 border-slate-900 border-t-transparent rounded-full animate-spin"></div>
-                    <span>Creating Account...</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-center space-x-2">
-                    <FaShieldHalved className="w-5 h-5" />
-                    <span>Create Account</span>
-                    <FaArrowRight className="w-4 h-4" />
-                  </div>
-                )}
-              </button>
-
-              {/* General Error Display */}
               {errors.general && (
-                <div className="flex items-center p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400">
-                  <FaStar className="w-4 h-4 mr-2" />
-                  <span className="text-sm">{errors.general}</span>
+                <div className="rounded-lg border border-teal-200 bg-teal-50 px-4 py-3 text-sm text-teal-700">
+                  {errors.general}
                 </div>
               )}
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="flex w-full items-center justify-center gap-2 rounded-lg bg-teal-600 px-4 py-2.5 text-base font-semibold text-white transition hover:bg-teal-700 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500 shadow-sm touch-manipulation"
+              >
+                {isLoading ? (
+                  <>
+                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                    Creating account...
+                  </>
+                ) : (
+                  <>
+                    Create Account
+                    <FaArrowRight className="h-4 w-4" />
+                  </>
+                )}
+              </button>
             </form>
 
-            {/* Divider */}
-            <div className="relative my-8">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-white/10"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-white/5 text-slate-400">Already have an account?</span>
-              </div>
+            <div className="mt-4 sm:mt-6 text-center">
+              <p className="text-sm text-slate-600">
+                Already have an account?{' '}
+                <Link to="/login" className="font-semibold text-teal-700 hover:text-teal-800 hover:underline">
+                  Sign in
+                </Link>
+              </p>
             </div>
-
-            {/* Sign In Link */}
-            <div className="text-center">
-              <Link 
-                to="/login" 
-                className="inline-flex items-center justify-center w-full py-3 px-6 border-2 border-white/20 bg-white/5 hover:border-blue-400/40 hover:bg-blue-400/10 text-white font-medium rounded-2xl transition-all duration-300 hover:shadow-lg hover:shadow-blue-400/20"
-              >
-                <FaStar className="w-4 h-4 mr-2" />
-                Sign in here
-              </Link>
-            </div>
-          </div>
-
-          {/* Footer */}
-          <div className="text-center mt-8">
-            <p className="text-sm text-slate-400">
-              Join our healthcare team and make a difference
-            </p>
           </div>
         </div>
       </div>

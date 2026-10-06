@@ -145,11 +145,11 @@ export default function InvoiceList() {
   const getStatusIcon = (status) => {
     switch (status) {
       case 'paid':
-        return { icon: CheckCircle, color: 'text-green-400', bgColor: 'bg-green-500/20' }
+        return { icon: CheckCircle, color: 'text-emerald-400', bgColor: 'bg-emerald-500/20' }
       case 'pending':
-        return { icon: Clock, color: 'text-yellow-400', bgColor: 'bg-yellow-500/20' }
+        return { icon: Clock, color: 'text-amber-400', bgColor: 'bg-amber-500/20' }
       case 'overdue':
-        return { icon: AlertCircle, color: 'text-red-400', bgColor: 'bg-red-500/20' }
+        return { icon: AlertCircle, color: 'text-teal-400', bgColor: 'bg-red-500/20' }
       default:
         return { icon: Clock, color: 'text-slate-400', bgColor: 'bg-slate-500/20' }
     }
@@ -159,11 +159,11 @@ export default function InvoiceList() {
   const getPaymentMethodIcon = (method) => {
     switch (method) {
              case 'cash':
-         return { icon: Banknote, color: 'text-green-400' }
+         return { icon: Banknote, color: 'text-emerald-400' }
       case 'card':
-        return { icon: CreditCard, color: 'text-blue-400' }
+        return { icon: CreditCard, color: 'text-teal-400' }
       case 'online':
-        return { icon: Globe, color: 'text-purple-400' }
+        return { icon: Globe, color: 'text-violet-400' }
       default:
         return { icon: DollarSign, color: 'text-slate-400' }
     }
@@ -192,8 +192,8 @@ export default function InvoiceList() {
             >
               <ArrowLeft className="w-5 h-5" />
             </Link>
-            <div className="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center">
-              <FileText className="w-6 h-6 text-blue-400" />
+            <div className="w-10 h-10 bg-teal-600/20 rounded-xl flex items-center justify-center">
+              <FileText className="w-6 h-6 text-teal-400" />
             </div>
             <div>
               <h1 className="text-xl font-bold">Invoice Management</h1>
@@ -202,7 +202,7 @@ export default function InvoiceList() {
           </div>
           <Link
             to="/receptionist/billing/create"
-            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors"
+            className="bg-emerald-500 hover:bg-emerald-600 text-slate-900 px-4 py-2 rounded-lg transition-colors"
           >
             Create New Invoice
           </Link>
@@ -333,7 +333,7 @@ export default function InvoiceList() {
                           </div>
                         </td>
                         <td className="py-3 px-4">
-                          <span className="font-bold text-green-400">₹{invoice.totalAmount?.toLocaleString()}</span>
+                          <span className="font-bold text-emerald-400">₹{invoice.totalAmount?.toLocaleString()}</span>
                         </td>
                         <td className="py-3 px-4">
                           <div className="flex items-center space-x-2">
@@ -360,14 +360,14 @@ export default function InvoiceList() {
                           <div className="flex space-x-2">
                             <Link
                               to={`/receptionist/billing/invoices/${invoice.id}`}
-                              className="text-blue-400 hover:text-blue-300 p-1 hover:bg-blue-500/20 rounded transition-colors"
+                              className="text-teal-400 hover:text-blue-300 p-1 hover:bg-teal-600/20 rounded transition-colors"
                               title="View Invoice"
                             >
                               <Eye className="w-4 h-4" />
                             </Link>
                             <Link
                               to={`/receptionist/billing/invoices/${invoice.id}/edit`}
-                              className="text-yellow-400 hover:text-yellow-300 p-1 hover:bg-yellow-500/20 rounded transition-colors"
+                              className="text-amber-400 hover:text-yellow-300 p-1 hover:bg-amber-500/20 rounded transition-colors"
                               title="Edit Invoice"
                             >
                               <Edit className="w-4 h-4" />

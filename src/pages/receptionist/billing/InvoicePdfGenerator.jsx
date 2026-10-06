@@ -54,11 +54,11 @@ export default function InvoicePdfGenerator() {
   const getStatusIcon = (status) => {
     switch (status) {
       case 'paid':
-        return { icon: CheckCircle, color: 'text-green-400', bgColor: 'bg-green-500/20' }
+        return { icon: CheckCircle, color: 'text-emerald-400', bgColor: 'bg-emerald-500/20' }
       case 'pending':
-        return { icon: Clock, color: 'text-yellow-400', bgColor: 'bg-yellow-500/20' }
+        return { icon: Clock, color: 'text-amber-400', bgColor: 'bg-amber-500/20' }
       case 'overdue':
-        return { icon: AlertCircle, color: 'text-red-400', bgColor: 'bg-red-500/20' }
+        return { icon: AlertCircle, color: 'text-teal-400', bgColor: 'bg-red-500/20' }
       default:
         return { icon: Clock, color: 'text-slate-400', bgColor: 'bg-slate-500/20' }
     }
@@ -529,8 +529,8 @@ export default function InvoicePdfGenerator() {
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
-            <div className="w-10 h-10 bg-green-500/20 rounded-xl flex items-center justify-center">
-              <FileText className="w-6 h-6 text-green-400" />
+            <div className="w-10 h-10 bg-emerald-500/20 rounded-xl flex items-center justify-center">
+              <FileText className="w-6 h-6 text-emerald-400" />
             </div>
             <div>
               <h1 className="text-xl font-bold">Invoice Preview</h1>
@@ -541,7 +541,7 @@ export default function InvoicePdfGenerator() {
             <button
               onClick={generatePDF}
               disabled={generatingPdf}
-              className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-emerald-500 hover:bg-emerald-600 text-slate-900 px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {generatingPdf ? (
                 <>
@@ -566,9 +566,9 @@ export default function InvoicePdfGenerator() {
           {/* Invoice Header */}
           <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-8 text-center">
             <h1 className="text-3xl font-bold mb-2">City Medical Center</h1>
-            <p className="text-blue-100">123 Healthcare Avenue, Medical District</p>
-            <p className="text-blue-100">Phone: +91 98765 43210 | Email: info@citymedical.com</p>
-            <p className="text-blue-100 text-sm">GSTIN: 27ABCDE1234F1Z5</p>
+            <p className="text-teal-100">123 Healthcare Avenue, Medical District</p>
+            <p className="text-teal-100">Phone: +91 98765 43210 | Email: info@citymedical.com</p>
+            <p className="text-teal-100 text-sm">GSTIN: 27ABCDE1234F1Z5</p>
           </div>
 
           {/* Invoice Content */}
@@ -576,7 +576,7 @@ export default function InvoicePdfGenerator() {
             {/* Invoice Details */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
               <div>
-                <h2 className="text-lg font-semibold text-blue-600 mb-4 flex items-center space-x-2">
+                <h2 className="text-lg font-semibold text-teal-600 mb-4 flex items-center space-x-2">
                   <User className="w-5 h-5" />
                   <span>Bill To</span>
                 </h2>
@@ -589,21 +589,21 @@ export default function InvoicePdfGenerator() {
               </div>
 
               <div>
-                <h2 className="text-lg font-semibold text-blue-600 mb-4 flex items-center space-x-2">
+                <h2 className="text-lg font-semibold text-teal-600 mb-4 flex items-center space-x-2">
                   <FileText className="w-5 h-5" />
                   <span>Invoice Details</span>
                 </h2>
                 <div className="space-y-2">
-                  <p><span className="font-medium">Invoice #:</span> <span className="font-mono text-blue-600">{invoice.invoiceNumber}</span></p>
+                  <p><span className="font-medium">Invoice #:</span> <span className="font-mono text-teal-600">{invoice.invoiceNumber}</span></p>
                   <p><span className="font-medium">Date:</span> {invoice.invoiceDate ? new Date(invoice.invoiceDate).toLocaleDateString() : 'N/A'}</p>
                   <p><span className="font-medium">Due Date:</span> {invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString() : 'N/A'}</p>
                   <p>
                     <span className="font-medium">Status:</span>
                     <span className={`ml-2 px-3 py-1 rounded-full text-xs font-medium ${invoice.status === 'paid'
-                      ? 'bg-green-100 text-green-800'
+                      ? 'bg-emerald-100 text-green-800'
                       : invoice.status === 'pending'
-                        ? 'bg-yellow-100 text-yellow-800'
-                        : 'bg-red-100 text-red-800'
+                        ? 'bg-amber-100 text-yellow-800'
+                        : 'bg-teal-100 text-red-800'
                       }`}>
                       {invoice.status?.charAt(0).toUpperCase() + invoice.status?.slice(1)}
                     </span>
@@ -614,7 +614,7 @@ export default function InvoicePdfGenerator() {
 
             {/* Invoice Items */}
             <div className="mb-8">
-              <h2 className="text-lg font-semibold text-blue-600 mb-4">Invoice Items</h2>
+              <h2 className="text-lg font-semibold text-teal-600 mb-4">Invoice Items</h2>
               <div className="overflow-x-auto">
                 <table className="w-full border-collapse border border-gray-300">
                   <thead>
@@ -657,13 +657,13 @@ export default function InvoicePdfGenerator() {
                   <span>₹{invoice.taxAmount?.toLocaleString() || '0'}</span>
                 </div>
                 {invoice.discount > 0 && (
-                  <div className="flex justify-between text-red-600">
+                  <div className="flex justify-between text-teal-600">
                     <span className="font-medium">Discount:</span>
                     <span>-₹{invoice.discount?.toLocaleString() || '0'}</span>
                   </div>
                 )}
                 <div className="border-t border-gray-300 pt-3">
-                  <div className="flex justify-between text-xl font-bold text-green-600">
+                  <div className="flex justify-between text-xl font-bold text-emerald-600">
                     <span>Total Amount:</span>
                     <span>₹{invoice.totalAmount?.toLocaleString() || '0'}</span>
                   </div>
@@ -698,7 +698,7 @@ export default function InvoicePdfGenerator() {
           </button>
           <button
             onClick={() => navigate('/receptionist/billing/invoices')}
-            className="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
+            className="px-6 py-3 bg-teal-600 hover:bg-teal-600 text-white rounded-lg transition-colors"
           >
             View Invoice List
           </button>

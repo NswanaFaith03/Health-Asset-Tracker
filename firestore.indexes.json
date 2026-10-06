@@ -1,0 +1,371 @@
+{
+    "indexes": [
+        {
+            "collectionGroup": "appointments",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "doctorName",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "createdAt",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collectionGroup": "appointments",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "status",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "createdAt",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collectionGroup": "appointments",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "appointmentDate",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "createdAt",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collectionGroup": "appointments",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "appointmentDate",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "doctorName",
+                    "order": "ASCENDING"
+                }
+            ]
+        },
+        {
+            "collectionGroup": "appointments",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "appointmentDate",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "status",
+                    "order": "ASCENDING"
+                }
+            ]
+        },
+        {
+            "collectionGroup": "appointments",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "appointmentType",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "createdAt",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collectionGroup": "invoices",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "status",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "createdAt",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collectionGroup": "staffData",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "role",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "createdAt",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collectionGroup": "payments",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "processedAt",
+                    "order": "DESCENDING"
+                },
+                {
+                    "fieldPath": "status",
+                    "order": "ASCENDING"
+                }
+            ]
+        },
+        {
+            "collectionGroup": "notifications",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "userId",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "createdAt",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collectionGroup": "counsellingSessions",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "appointmentId",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "createdAt",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collectionGroup": "counsellingSessions",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "appointmentId",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "studentUid",
+                    "order": "ASCENDING"
+                }
+            ]
+        },
+        {
+            "collectionGroup": "studentQueue",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "studentUid",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "createdAt",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collectionGroup": "counsellingMessages",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "sessionId",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "createdAt",
+                    "order": "ASCENDING"
+                }
+            ]
+        },
+        {
+            "collectionGroup": "appointments",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "source",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "createdAt",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collectionGroup": "labRequests",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "status",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "createdAt",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collectionGroup": "appointments",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "createdBy",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "createdAt",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collectionGroup": "studentQueue",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "studentId",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "createdAt",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collectionGroup": "notifications",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "userId",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "createdAt",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collectionGroup": "appointments",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "doctorId",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "createdAt",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collectionGroup": "appointments",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "appointmentDate",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "doctorId",
+                    "order": "ASCENDING"
+                }
+            ]
+        },
+        {
+            "collectionGroup": "prescriptions",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "doctorId",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "createdAt",
+                    "order": "ASCENDING"
+                }
+            ]
+        },
+        {
+            "collectionGroup": "aiConversations",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "userId",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "conversationType",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "createdAt",
+                    "order": "ASCENDING"
+                }
+            ]
+        },
+        {
+            "collectionGroup": "aiConversations",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "userId",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "conversationType",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "createdAt",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collectionGroup": "aiConversations",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "userId",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "conversationType",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "conversationId",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "createdAt",
+                    "order": "ASCENDING"
+                }
+            ]
+        }
+    ],
+    "fieldOverrides": []
+}

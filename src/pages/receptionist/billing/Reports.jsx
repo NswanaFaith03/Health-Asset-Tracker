@@ -575,7 +575,7 @@ export default function Reports() {
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div className="w-10 h-10 bg-purple-500/20 rounded-xl flex items-center justify-center">
-              <BarChart3 className="w-6 h-6 text-purple-400" />
+              <BarChart3 className="w-6 h-6 text-violet-400" />
             </div>
             <div>
               <h1 className="text-xl font-bold">Generate Billing Report</h1>
@@ -683,45 +683,45 @@ export default function Reports() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
           <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-xl">
             <div className="flex items-center space-x-3 mb-4">
-              <div className="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center">
-                <FileText className="w-5 h-5 text-blue-400" />
+              <div className="w-10 h-10 bg-teal-600/20 rounded-xl flex items-center justify-center">
+                <FileText className="w-5 h-5 text-teal-400" />
               </div>
               <h3 className="text-sm font-medium text-slate-400">Total Invoices</h3>
             </div>
-            <p className="text-3xl font-bold text-blue-400 tabular-nums">{stats.totalInvoices}</p>
+            <p className="text-3xl font-bold text-teal-400 tabular-nums">{stats.totalInvoices}</p>
             <p className="text-sm text-slate-500 mt-1">In selected period</p>
           </div>
 
           <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-xl">
             <div className="flex items-center space-x-3 mb-4">
-              <div className="w-10 h-10 bg-green-500/20 rounded-xl flex items-center justify-center">
-                <DollarSign className="w-5 h-5 text-green-400" />
+              <div className="w-10 h-10 bg-emerald-500/20 rounded-xl flex items-center justify-center">
+                <DollarSign className="w-5 h-5 text-emerald-400" />
               </div>
               <h3 className="text-sm font-medium text-slate-400">Total Revenue</h3>
             </div>
-            <p className="text-3xl font-bold text-green-400 tabular-nums">₹{stats.totalAmount.toLocaleString()}</p>
+            <p className="text-3xl font-bold text-emerald-400 tabular-nums">₹{stats.totalAmount.toLocaleString()}</p>
             <p className="text-sm text-slate-500 mt-1">Invoice value</p>
           </div>
 
           <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-xl">
             <div className="flex items-center space-x-3 mb-4">
-              <div className="w-10 h-10 bg-yellow-500/20 rounded-xl flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-yellow-400" />
+              <div className="w-10 h-10 bg-amber-500/20 rounded-xl flex items-center justify-center">
+                <TrendingUp className="w-5 h-5 text-amber-400" />
               </div>
               <h3 className="text-sm font-medium text-slate-400">Collection Rate</h3>
             </div>
-            <p className="text-3xl font-bold text-yellow-400 tabular-nums">{stats.collectionRate.toFixed(1)}%</p>
+            <p className="text-3xl font-bold text-amber-400 tabular-nums">{stats.collectionRate.toFixed(1)}%</p>
             <p className="text-sm text-slate-500 mt-1">Paid invoices ratio</p>
           </div>
 
           <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-xl">
             <div className="flex items-center space-x-3 mb-4">
               <div className="w-10 h-10 bg-purple-500/20 rounded-xl flex items-center justify-center">
-                <CheckCircle className="w-5 h-5 text-purple-400" />
+                <CheckCircle className="w-5 h-5 text-violet-400" />
               </div>
               <h3 className="text-sm font-medium text-slate-400">Amount Collected</h3>
             </div>
-            <p className="text-3xl font-bold text-purple-400 tabular-nums">₹{stats.totalPaymentAmount.toLocaleString()}</p>
+            <p className="text-3xl font-bold text-violet-400 tabular-nums">₹{stats.totalPaymentAmount.toLocaleString()}</p>
             <p className="text-sm text-slate-500 mt-1">{stats.totalPayments} payments</p>
           </div>
         </div>
@@ -735,31 +735,31 @@ export default function Reports() {
               <span>Invoice Status Breakdown</span>
             </h3>
             <div className="space-y-4">
-              <div className="flex justify-between items-center p-3 bg-green-500/10 rounded-xl border border-green-500/20">
+              <div className="flex justify-between items-center p-3 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
                 <div className="flex items-center space-x-3">
-                  <CheckCircle className="w-5 h-5 text-green-400" />
+                  <CheckCircle className="w-5 h-5 text-emerald-400" />
                   <div>
                     <span className="font-medium">Paid</span>
                     <p className="text-xs text-slate-400">{stats.paidCount} invoices</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className="font-bold text-green-400 tabular-nums">₹{stats.paidAmount.toLocaleString()}</span>
+                  <span className="font-bold text-emerald-400 tabular-nums">₹{stats.paidAmount.toLocaleString()}</span>
                   <p className="text-xs text-slate-400 tabular-nums">
                     {stats.totalInvoices > 0 ? ((stats.paidCount / stats.totalInvoices) * 100).toFixed(1) : 0}%
                   </p>
                 </div>
               </div>
-              <div className="flex justify-between items-center p-3 bg-yellow-500/10 rounded-xl border border-yellow-500/20">
+              <div className="flex justify-between items-center p-3 bg-amber-500/10 rounded-xl border border-amber-500/20">
                 <div className="flex items-center space-x-3">
-                  <Clock className="w-5 h-5 text-yellow-400" />
+                  <Clock className="w-5 h-5 text-amber-400" />
                   <div>
                     <span className="font-medium">Pending</span>
                     <p className="text-xs text-slate-400">{stats.pendingCount} invoices</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className="font-bold text-yellow-400 tabular-nums">₹{stats.pendingAmount.toLocaleString()}</span>
+                  <span className="font-bold text-amber-400 tabular-nums">₹{stats.pendingAmount.toLocaleString()}</span>
                   <p className="text-xs text-slate-400 tabular-nums">
                     {stats.totalInvoices > 0 ? ((stats.pendingCount / stats.totalInvoices) * 100).toFixed(1) : 0}%
                   </p>
@@ -767,14 +767,14 @@ export default function Reports() {
               </div>
               <div className="flex justify-between items-center p-3 bg-red-500/10 rounded-xl border border-red-500/20">
                 <div className="flex items-center space-x-3">
-                  <AlertCircle className="w-5 h-5 text-red-400" />
+                  <AlertCircle className="w-5 h-5 text-teal-400" />
                   <div>
                     <span className="font-medium">Overdue</span>
                     <p className="text-xs text-slate-400">{stats.overdueCount} invoices</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className="font-bold text-red-400 tabular-nums">₹{stats.overdueAmount.toLocaleString()}</span>
+                  <span className="font-bold text-teal-400 tabular-nums">₹{stats.overdueAmount.toLocaleString()}</span>
                   <p className="text-xs text-slate-400 tabular-nums">
                     {stats.totalInvoices > 0 ? ((stats.overdueCount / stats.totalInvoices) * 100).toFixed(1) : 0}%
                   </p>
@@ -786,35 +786,35 @@ export default function Reports() {
           {/* Payment Methods Breakdown */}
           <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-xl">
             <h3 className="text-lg font-semibold mb-4 flex items-center space-x-2">
-              <Activity className="w-5 h-5 text-purple-400" />
+              <Activity className="w-5 h-5 text-violet-400" />
               <span>Payment Methods</span>
             </h3>
             <div className="space-y-4">
-              <div className="flex justify-between items-center p-3 bg-green-500/10 rounded-xl border border-green-500/20">
+              <div className="flex justify-between items-center p-3 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
                 <div className="flex items-center space-x-3">
-                  <Banknote className="w-5 h-5 text-green-400" />
+                  <Banknote className="w-5 h-5 text-emerald-400" />
                   <div>
                     <span className="font-medium">Cash</span>
                     <p className="text-xs text-slate-400">{stats.cashCount} transactions</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className="font-bold text-green-400 tabular-nums">₹{stats.cashAmount.toLocaleString()}</span>
+                  <span className="font-bold text-emerald-400 tabular-nums">₹{stats.cashAmount.toLocaleString()}</span>
                   <p className="text-xs text-slate-400 tabular-nums">
                     {stats.totalPaymentAmount > 0 ? ((stats.cashAmount / stats.totalPaymentAmount) * 100).toFixed(1) : 0}%
                   </p>
                 </div>
               </div>
-              <div className="flex justify-between items-center p-3 bg-blue-500/10 rounded-xl border border-blue-500/20">
+              <div className="flex justify-between items-center p-3 bg-teal-600/10 rounded-xl border border-teal-500/20">
                 <div className="flex items-center space-x-3">
-                  <CreditCard className="w-5 h-5 text-blue-400" />
+                  <CreditCard className="w-5 h-5 text-teal-400" />
                   <div>
                     <span className="font-medium">Card</span>
                     <p className="text-xs text-slate-400">{stats.cardCount} transactions</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className="font-bold text-blue-400 tabular-nums">₹{stats.cardAmount.toLocaleString()}</span>
+                  <span className="font-bold text-teal-400 tabular-nums">₹{stats.cardAmount.toLocaleString()}</span>
                   <p className="text-xs text-slate-400 tabular-nums">
                     {stats.totalPaymentAmount > 0 ? ((stats.cardAmount / stats.totalPaymentAmount) * 100).toFixed(1) : 0}%
                   </p>
@@ -822,14 +822,14 @@ export default function Reports() {
               </div>
               <div className="flex justify-between items-center p-3 bg-purple-500/10 rounded-xl border border-purple-500/20">
                 <div className="flex items-center space-x-3">
-                  <Globe className="w-5 h-5 text-purple-400" />
+                  <Globe className="w-5 h-5 text-violet-400" />
                   <div>
                     <span className="font-medium">Online</span>
                     <p className="text-xs text-slate-400">{stats.onlineCount} transactions</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className="font-bold text-purple-400 tabular-nums">₹{stats.onlineAmount.toLocaleString()}</span>
+                  <span className="font-bold text-violet-400 tabular-nums">₹{stats.onlineAmount.toLocaleString()}</span>
                   <p className="text-xs text-slate-400 tabular-nums">
                     {stats.totalPaymentAmount > 0 ? ((stats.onlineAmount / stats.totalPaymentAmount) * 100).toFixed(1) : 0}%
                   </p>
@@ -874,15 +874,15 @@ export default function Reports() {
                         <p className="font-medium">{invoice.patientName}</p>
                       </td>
                       <td className="py-3 px-4">
-                        <span className="font-bold text-green-400 tabular-nums">₹{invoice.totalAmount?.toLocaleString()}</span>
+                        <span className="font-bold text-emerald-400 tabular-nums">₹{invoice.totalAmount?.toLocaleString()}</span>
                       </td>
                       <td className="py-3 px-4">
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                           invoice.status === 'paid' 
-                            ? 'bg-green-500/20 text-green-400' 
+                            ? 'bg-emerald-500/20 text-emerald-400' 
                             : invoice.status === 'pending'
-                            ? 'bg-yellow-500/20 text-yellow-400'
-                            : 'bg-red-500/20 text-red-400'
+                            ? 'bg-amber-500/20 text-amber-400'
+                            : 'bg-red-500/20 text-teal-400'
                         }`}>
                           {invoice.status?.charAt(0).toUpperCase() + invoice.status?.slice(1)}
                         </span>

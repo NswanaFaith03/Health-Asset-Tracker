@@ -361,8 +361,8 @@ export default function CreateInvoice() {
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
-            <div className="w-10 h-10 bg-green-500/20 rounded-xl flex items-center justify-center">
-              <FileText className="w-6 h-6 text-green-400" />
+            <div className="w-10 h-10 bg-emerald-500/20 rounded-xl flex items-center justify-center">
+              <FileText className="w-6 h-6 text-emerald-400" />
             </div>
             <div>
               <h1 className="text-xl font-bold">{isEditing ? 'Edit Invoice' : 'Create New Invoice'}</h1>
@@ -391,7 +391,7 @@ export default function CreateInvoice() {
                 <button
                   type="button"
                   onClick={() => setShowPatientModal(true)}
-                  className="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-lg transition-colors flex items-center justify-center space-x-2"
+                  className="flex-1 bg-teal-600 hover:bg-teal-600 text-white px-4 py-3 rounded-lg transition-colors flex items-center justify-center space-x-2"
                 >
                   <User className="w-4 h-4" />
                   <span>Select Patient</span>
@@ -424,7 +424,7 @@ export default function CreateInvoice() {
                         <div className="text-sm text-slate-400 mt-1">{selectedPatient.address}</div>
                       )}
                     </div>
-                    <div className="text-blue-400">
+                    <div className="text-teal-400">
                       <User className="w-6 h-6" />
                     </div>
                   </div>
@@ -492,7 +492,7 @@ export default function CreateInvoice() {
           {/* Invoice Details */}
           <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-xl">
             <h2 className="text-lg font-semibold mb-4 flex items-center space-x-2">
-              <Calendar className="w-5 h-5 text-purple-400" />
+              <Calendar className="w-5 h-5 text-violet-400" />
               <span>Invoice Details</span>
             </h2>
             
@@ -527,13 +527,13 @@ export default function CreateInvoice() {
           <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-xl">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-semibold flex items-center space-x-2">
-                <Zap className="w-5 h-5 text-yellow-400" />
+                <Zap className="w-5 h-5 text-amber-400" />
                 <span>Quick Service Selection</span>
               </h2>
               <button
                 type="button"
                 onClick={() => setShowQuickServices(!showQuickServices)}
-                className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-2 rounded-lg flex items-center space-x-2 transition-colors"
+                className="bg-amber-500 hover:bg-amber-600 text-slate-900 px-3 py-2 rounded-lg flex items-center space-x-2 transition-colors"
               >
                 <Filter className="w-4 h-4" />
                 <span>{showQuickServices ? 'Hide' : 'Show'} Quick Services</span>
@@ -547,21 +547,21 @@ export default function CreateInvoice() {
                   <button
                     type="button"
                     onClick={() => addCommonServices('consultation')}
-                    className="bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30 text-blue-400 px-3 py-2 rounded-lg transition-colors text-sm"
+                    className="bg-teal-600/20 hover:bg-teal-600/30 border border-teal-500/30 text-teal-400 px-3 py-2 rounded-lg transition-colors text-sm"
                   >
                     + Consultation Services
                   </button>
                   <button
                     type="button"
                     onClick={() => addCommonServices('lab')}
-                    className="bg-green-500/20 hover:bg-green-500/30 border border-green-500/30 text-green-400 px-3 py-2 rounded-lg transition-colors text-sm"
+                    className="bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/30 text-emerald-400 px-3 py-2 rounded-lg transition-colors text-sm"
                   >
                     + Lab Services
                   </button>
                   <button
                     type="button"
                     onClick={() => addCommonServices('imaging')}
-                    className="bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/30 text-purple-400 px-3 py-2 rounded-lg transition-colors text-sm"
+                    className="bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/30 text-violet-400 px-3 py-2 rounded-lg transition-colors text-sm"
                   >
                     + Imaging Services
                   </button>
@@ -608,14 +608,14 @@ export default function CreateInvoice() {
           <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-xl">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-semibold flex items-center space-x-2">
-                <DollarSign className="w-5 h-5 text-green-400" />
+                <DollarSign className="w-5 h-5 text-emerald-400" />
                 <span>Invoice Items</span>
               </h2>
               <div className="flex space-x-2">
                 <button
                   type="button"
                   onClick={clearAllItems}
-                  className="bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 text-red-400 px-3 py-2 rounded-lg transition-colors text-sm"
+                  className="bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 text-teal-400 px-3 py-2 rounded-lg transition-colors text-sm"
                 >
                   Clear All
                 </button>
@@ -678,7 +678,7 @@ export default function CreateInvoice() {
                     <label className="block text-sm font-medium text-slate-300 mb-2">
                       Amount (₹)
                     </label>
-                    <div className="px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-green-400 font-medium">
+                    <div className="px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-emerald-400 font-medium">
                       {item.amount?.toLocaleString() || '0'}
                     </div>
                   </div>
@@ -688,7 +688,7 @@ export default function CreateInvoice() {
                       type="button"
                       onClick={() => removeItem(index)}
                       disabled={invoiceData.items.length === 1}
-                      className="p-2 text-red-400 hover:text-red-300 hover:bg-red-500/20 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="p-2 text-teal-400 hover:text-teal-300 hover:bg-red-500/20 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       title="Remove item"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -759,12 +759,12 @@ export default function CreateInvoice() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-300">Discount:</span>
-                  <span className="font-medium text-red-400 tabular-nums">-₹{invoiceData.discount.toLocaleString()}</span>
+                  <span className="font-medium text-teal-400 tabular-nums">-₹{invoiceData.discount.toLocaleString()}</span>
                 </div>
                 <div className="border-t border-white/20 pt-3">
                   <div className="flex justify-between text-lg font-bold">
                     <span>Total Amount:</span>
-                    <span className="text-green-400 tabular-nums">₹{totalAmount.toLocaleString()}</span>
+                    <span className="text-emerald-400 tabular-nums">₹{totalAmount.toLocaleString()}</span>
                   </div>
                 </div>
               </div>
@@ -783,7 +783,7 @@ export default function CreateInvoice() {
             <button
               type="submit"
               disabled={loading}
-              className="px-6 py-3 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+              className="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-slate-900 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
             >
               {loading ? (
                 <>
@@ -826,7 +826,7 @@ export default function CreateInvoice() {
                 placeholder="Search patients by name, phone, or email..."
                 value={patientSearchTerm}
                 onChange={(e) => setPatientSearchTerm(e.target.value)}
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-slate-400 focus:border-blue-400 focus:outline-none"
+                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-slate-400 focus:border-teal-400 focus:outline-none"
                 autoFocus
               />
             </div>
@@ -853,7 +853,7 @@ export default function CreateInvoice() {
                           Last visit: {patient.lastVisit}
                         </div>
                       </div>
-                      <div className="text-blue-400">
+                      <div className="text-teal-400">
                         <User className="w-5 h-5" />
                       </div>
                     </div>

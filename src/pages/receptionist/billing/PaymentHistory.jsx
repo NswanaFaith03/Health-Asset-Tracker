@@ -222,11 +222,11 @@ export default function PaymentHistory() {
   const getPaymentMethodIcon = (method) => {
     switch (method) {
              case 'cash':
-         return { icon: Banknote, color: 'text-green-400', bgColor: 'bg-green-500/20' }
+         return { icon: Banknote, color: 'text-emerald-400', bgColor: 'bg-emerald-500/20' }
       case 'card':
-        return { icon: CreditCard, color: 'text-blue-400', bgColor: 'bg-blue-500/20' }
+        return { icon: CreditCard, color: 'text-teal-400', bgColor: 'bg-teal-600/20' }
       case 'online':
-        return { icon: Globe, color: 'text-purple-400', bgColor: 'bg-purple-500/20' }
+        return { icon: Globe, color: 'text-violet-400', bgColor: 'bg-purple-500/20' }
       default:
         return { icon: DollarSign, color: 'text-slate-400', bgColor: 'bg-slate-500/20' }
     }
@@ -256,7 +256,7 @@ export default function PaymentHistory() {
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div className="w-10 h-10 bg-purple-500/20 rounded-xl flex items-center justify-center">
-              <Receipt className="w-6 h-6 text-purple-400" />
+              <Receipt className="w-6 h-6 text-violet-400" />
             </div>
             <div>
               <h1 className="text-xl font-bold">Payment History</h1>
@@ -272,37 +272,37 @@ export default function PaymentHistory() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-xl">
             <div className="flex items-center space-x-3 mb-4">
-              <DollarSign className="w-6 h-6 text-green-400" />
+              <DollarSign className="w-6 h-6 text-emerald-400" />
               <h3 className="text-lg font-semibold">Total Payments</h3>
             </div>
-            <p className="text-3xl font-bold text-green-400">{analytics.totalPayments}</p>
+            <p className="text-3xl font-bold text-emerald-400">{analytics.totalPayments}</p>
             <p className="text-sm text-slate-400 mt-2">₹{analytics.totalAmount.toLocaleString()}</p>
           </div>
 
           <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-xl">
             <div className="flex items-center space-x-3 mb-4">
-              <Calendar className="w-6 h-6 text-blue-400" />
+              <Calendar className="w-6 h-6 text-teal-400" />
               <h3 className="text-lg font-semibold">Today</h3>
             </div>
-            <p className="text-3xl font-bold text-blue-400">{analytics.todayPayments}</p>
+            <p className="text-3xl font-bold text-teal-400">{analytics.todayPayments}</p>
             <p className="text-sm text-slate-400 mt-2">₹{analytics.todayAmount.toLocaleString()}</p>
           </div>
 
           <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-xl">
             <div className="flex items-center space-x-3 mb-4">
-              <TrendingUp className="w-6 h-6 text-purple-400" />
+              <TrendingUp className="w-6 h-6 text-violet-400" />
               <h3 className="text-lg font-semibold">This Week</h3>
             </div>
-            <p className="text-3xl font-bold text-purple-400">{analytics.weekPayments}</p>
+            <p className="text-3xl font-bold text-violet-400">{analytics.weekPayments}</p>
             <p className="text-sm text-slate-400 mt-2">₹{analytics.weekAmount.toLocaleString()}</p>
           </div>
 
           <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-xl">
             <div className="flex items-center space-x-3 mb-4">
-              <BarChart3 className="w-6 h-6 text-yellow-400" />
+              <BarChart3 className="w-6 h-6 text-amber-400" />
               <h3 className="text-lg font-semibold">This Month</h3>
             </div>
-            <p className="text-3xl font-bold text-yellow-400">{analytics.monthPayments}</p>
+            <p className="text-3xl font-bold text-amber-400">{analytics.monthPayments}</p>
             <p className="text-sm text-slate-400 mt-2">₹{analytics.monthAmount.toLocaleString()}</p>
           </div>
         </div>
@@ -311,28 +311,28 @@ export default function PaymentHistory() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-xl">
             <div className="flex items-center space-x-3 mb-4">
-                             <Banknote className="w-6 h-6 text-green-400" />
+                             <Banknote className="w-6 h-6 text-emerald-400" />
                <h3 className="text-lg font-semibold">Cash Payments</h3>
             </div>
-            <p className="text-2xl font-bold text-green-400">₹{analytics.cashPayments.toLocaleString()}</p>
+            <p className="text-2xl font-bold text-emerald-400">₹{analytics.cashPayments.toLocaleString()}</p>
             <p className="text-sm text-slate-400 mt-2">Total cash received</p>
           </div>
 
           <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-xl">
             <div className="flex items-center space-x-3 mb-4">
-              <CreditCard className="w-6 h-6 text-blue-400" />
+              <CreditCard className="w-6 h-6 text-teal-400" />
               <h3 className="text-lg font-semibold">Card Payments</h3>
             </div>
-            <p className="text-2xl font-bold text-blue-400">₹{analytics.cardPayments.toLocaleString()}</p>
+            <p className="text-2xl font-bold text-teal-400">₹{analytics.cardPayments.toLocaleString()}</p>
             <p className="text-sm text-slate-400 mt-2">Total card payments</p>
           </div>
 
           <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-xl">
             <div className="flex items-center space-x-3 mb-4">
-              <Globe className="w-6 h-6 text-purple-400" />
+              <Globe className="w-6 h-6 text-violet-400" />
               <h3 className="text-lg font-semibold">Online Payments</h3>
             </div>
-            <p className="text-2xl font-bold text-purple-400">₹{analytics.onlinePayments.toLocaleString()}</p>
+            <p className="text-2xl font-bold text-violet-400">₹{analytics.onlinePayments.toLocaleString()}</p>
             <p className="text-sm text-slate-400 mt-2">Total online payments</p>
           </div>
         </div>
@@ -449,7 +449,7 @@ export default function PaymentHistory() {
                     return (
                       <tr key={payment.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                         <td className="py-3 px-4">
-                          <span className="font-mono text-purple-400">#{payment.id.slice(-8)}</span>
+                          <span className="font-mono text-violet-400">#{payment.id.slice(-8)}</span>
                         </td>
                         <td className="py-3 px-4">
                           <div>
@@ -461,7 +461,7 @@ export default function PaymentHistory() {
                           <span className="font-mono text-cyan-400">#{payment.invoiceNumber}</span>
                         </td>
                         <td className="py-3 px-4">
-                          <span className="font-bold text-green-400">₹{payment.amount?.toLocaleString()}</span>
+                          <span className="font-bold text-emerald-400">₹{payment.amount?.toLocaleString()}</span>
                         </td>
                         <td className="py-3 px-4">
                           <div className="flex items-center space-x-2">
@@ -483,7 +483,7 @@ export default function PaymentHistory() {
                           <div className="flex space-x-2">
                             <Link
                               to={`/receptionist/billing/invoices/${payment.invoiceId}`}
-                              className="text-blue-400 hover:text-blue-300 p-1 hover:bg-blue-500/20 rounded transition-colors"
+                              className="text-teal-400 hover:text-blue-300 p-1 hover:bg-teal-600/20 rounded transition-colors"
                               title="View Invoice"
                             >
                               <Eye className="w-4 h-4" />

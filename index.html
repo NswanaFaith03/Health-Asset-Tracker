@@ -1,38 +1,79 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/doctor.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    
-    <!-- Primary Meta Tags -->
-    <title>Life Clinic Management System - Streamline Healthcare Operations</title>
-    <meta name="title" content="Life Clinic Management System - Streamline Healthcare Operations" />
-    <meta name="description" content="A modern, secure clinic management system built with React and Firebase. Features role-based access control, patient management, and email verification." />
-    
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://life-clinic-management-system.vercel.app/" />
-    <meta property="og:title" content="Life Clinic Management System - Streamline Healthcare Operations" />
-    <meta property="og:description" content="A modern, secure clinic management system built with React and Firebase. Features role-based access control, patient management, and email verification." />
-    <meta property="og:image" content="https://life-clinic-management-system.vercel.app/og-image.png" />
-    
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content="https://life-clinic-management-system.vercel.app/" />
-    <meta property="twitter:title" content="Life Clinic Management System - Streamline Healthcare Operations" />
-    <meta property="twitter:description" content="A modern, secure clinic management system built with React and Firebase. Features role-based access control, patient management, and email verification." />
-    <meta property="twitter:image" content="https://life-clinic-management-system.vercel.app/og-image.png" />
-    
-    <!-- Keywords -->
-    <meta name="keywords" content="clinic management, healthcare, patient management, doctor dashboard, receptionist, firebase, react, medical software" />
-    <meta name="author" content="Life Clinic Management System" />
-    
-    <!-- Theme Color -->
-    <meta name="theme-color" content="#1e293b" />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/jpeg" href="/images/uzamainlogo.jpg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Primary Meta Tags -->
+  <title>Life Clinic Management System - Streamline Healthcare Operations</title>
+  <meta name="title" content="Life Clinic Management System - Streamline Healthcare Operations" />
+  <meta name="description"
+    content="A modern, secure clinic management system built with React and Firebase. Features role-based access control, patient management, and email verification." />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://life-clinic-management-system.vercel.app/" />
+  <meta property="og:title" content="Life Clinic Management System - Streamline Healthcare Operations" />
+  <meta property="og:description"
+    content="A modern, secure clinic management system built with React and Firebase. Features role-based access control, patient management, and email verification." />
+  <meta property="og:image" content="https://life-clinic-management-system.vercel.app/og-image.png" />
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image" />
+  <meta property="twitter:url" content="https://life-clinic-management-system.vercel.app/" />
+  <meta property="twitter:title" content="Life Clinic Management System - Streamline Healthcare Operations" />
+  <meta property="twitter:description"
+    content="A modern, secure clinic management system built with React and Firebase. Features role-based access control, patient management, and email verification." />
+  <meta property="twitter:image" content="https://life-clinic-management-system.vercel.app/og-image.png" />
+
+  <!-- Keywords -->
+  <meta name="keywords"
+    content="clinic management, healthcare, patient management, doctor dashboard, receptionist, firebase, react, medical software" />
+  <meta name="author" content="Life Clinic Management System" />
+
+  <!-- Theme Color -->
+  <meta name="theme-color" content="#1e293b" />
+</head>
+
+<body>
+  <div id="root">
+    <div id="initial-loader" class="initial-loader" role="status" aria-live="polite">
+      <div class="initial-loader-content">
+        <div class="spinner" aria-hidden="true"></div>
+        <div class="loader-text">
+          <div class="flag-mask" style="font-size: clamp(24px, 6vw, 64px);">DigiHealth</div>
+          <div style="color:var(--app-text-soft); margin-top:8px; font-size:14px;">Starting app…</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Dev-only minimal console filter: suppress known extension noise early -->
+  <script>
+    (function () {
+      try {
+        var isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+        if (!isLocal) return;
+        var re = /contentscript|inpage|MetaMask|chrome-extension:\/\//i;
+        ['error', 'warn', 'info', 'log'].forEach(function (method) {
+          var orig = console[method] && console[method].bind(console);
+          if (!orig) return;
+          console[method] = function () {
+            try {
+              for (var i = 0; i < arguments.length; i++) {
+                var a = arguments[i];
+                if (typeof a === 'string' && re.test(a)) return;
+                if (a && typeof a.message === 'string' && re.test(a.message)) return;
+              }
+            } catch (e) { }
+            orig.apply(console, arguments);
+          };
+        });
+      } catch (e) { }
+    })();
+  </script>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+
 </html>

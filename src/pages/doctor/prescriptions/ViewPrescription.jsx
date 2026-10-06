@@ -4,12 +4,12 @@ import { Link, useParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import LogoutButton from '../../../components/LogoutButton'
 import { downloadPrescriptionPDF, openPrescriptionPDF, printPrescriptionPDF } from '../../receptionist/prescriptions/PrescriptionPdfGenerator'
-import { 
-  User, 
-  Calendar, 
-  Clock, 
-  Phone, 
-  Mail, 
+import {
+  User,
+  Calendar,
+  Clock,
+  Phone,
+  Mail,
   ArrowLeft,
   Pill,
   FileText,
@@ -53,10 +53,10 @@ export default function ViewPrescription() {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'active': return 'text-green-400 bg-green-400/10'
-      case 'completed': return 'text-blue-400 bg-blue-400/10'
-      case 'discontinued': return 'text-red-400 bg-red-400/10'
-      case 'pending': return 'text-yellow-400 bg-yellow-400/10'
+      case 'active': return 'text-emerald-400 bg-emerald-400/10'
+      case 'completed': return 'text-teal-400 bg-blue-400/10'
+      case 'discontinued': return 'text-teal-400 bg-red-400/10'
+      case 'pending': return 'text-amber-400 bg-amber-400/10'
       default: return 'text-gray-400 bg-gray-400/10'
     }
   }
@@ -126,10 +126,10 @@ export default function ViewPrescription() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white flex items-center justify-center">
+      <div className="text-slate-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400 mx-auto"></div>
-          <p className="text-slate-400 mt-4">Loading prescription...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500 mx-auto"></div>
+          <p className="text-slate-600 mt-4">Loading prescription...</p>
         </div>
       </div>
     )
@@ -137,13 +137,13 @@ export default function ViewPrescription() {
 
   if (!prescription) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white flex items-center justify-center">
+      <div className="text-slate-900 flex items-center justify-center">
         <div className="text-center">
           <FileText className="w-16 h-16 text-slate-400 mx-auto mb-4" />
-          <p className="text-slate-400">Prescription not found</p>
+          <p className="text-slate-600">Prescription not found</p>
           <Link
             to="/doctor/prescriptions"
-            className="mt-4 inline-flex items-center space-x-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
+            className="mt-4 inline-flex items-center space-x-2 px-4 py-2 bg-teal-600 hover:bg-teal-600 text-white rounded-lg transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back to Prescriptions</span>
@@ -154,24 +154,24 @@ export default function ViewPrescription() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white">
+    <div className="min-h-screen bg-slate-50 text-slate-900">
       {/* Header */}
-      <header className="bg-white/5 backdrop-blur-xl border-b border-white/10 p-4">
+      <header className="bg-white border-b border-slate-200 p-4 shadow-sm">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center space-x-3">
-            <Link 
+            <Link
               to="/doctor/prescriptions"
-              className="flex items-center space-x-2 px-3 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-lg transition-colors"
+              className="flex items-center space-x-2 px-3 py-2 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded-lg transition-colors border border-teal-200"
             >
               <ArrowLeft className="w-4 h-4" />
               <span className="text-sm font-medium">Back to Prescriptions</span>
             </Link>
-            <div className="w-10 h-10 bg-green-500/20 rounded-xl flex items-center justify-center">
-              <FileText className="w-6 h-6 text-green-400" />
+            <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
+              <FileText className="w-6 h-6 text-emerald-700" />
             </div>
             <div>
-              <h1 className="text-xl font-bold">Prescription Details</h1>
-              <p className="text-sm text-slate-400">View prescription information</p>
+              <h1 className="text-xl font-bold text-slate-900">Prescription Details</h1>
+              <p className="text-sm text-slate-600">View prescription information</p>
             </div>
           </div>
           <div className="flex items-center space-x-3">
@@ -184,14 +184,14 @@ export default function ViewPrescription() {
             </button>
             <button
               onClick={handlePrint}
-              className="flex items-center space-x-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
+              className="flex items-center space-x-2 px-4 py-2 bg-teal-600 hover:bg-teal-600 text-white rounded-lg transition-colors"
             >
               <Printer className="w-4 h-4" />
               <span>Print</span>
             </button>
             <button
               onClick={handleDownload}
-              className="flex items-center space-x-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors"
+              className="flex items-center space-x-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-slate-900 rounded-lg transition-colors"
             >
               <Download className="w-4 h-4" />
               <span>Download PDF</span>
@@ -204,12 +204,11 @@ export default function ViewPrescription() {
       {/* Main Content */}
       <main className="max-w-4xl mx-auto p-6">
         <div className="space-y-6">
-          {/* Prescription Header */}
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-xl">
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
             <div className="flex justify-between items-start mb-4">
               <div>
-                <h2 className="text-2xl font-bold mb-2">Medical Prescription</h2>
-                <p className="text-slate-400">Prescription ID: {prescription.id}</p>
+                <h2 className="text-2xl font-bold mb-2 text-slate-900">Medical Prescription</h2>
+                <p className="text-slate-600">Prescription ID: {prescription.id}</p>
               </div>
               <div className="flex space-x-2">
                 <span className={`px-3 py-1 rounded-full text-sm font-medium flex items-center space-x-2 ${getStatusColor(prescription.status)}`}>
@@ -218,57 +217,40 @@ export default function ViewPrescription() {
                 </span>
               </div>
             </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-slate-700">
               <div>
-                <span className="text-slate-400">Date:</span>
-                <span className="ml-2 text-white">{prescription.prescriptionDate}</span>
+                <span className="text-slate-500">Date:</span>
+                <span className="ml-2 text-slate-900">{prescription.prescriptionDate}</span>
               </div>
               <div>
-                <span className="text-slate-400">Doctor:</span>
-                <span className="ml-2 text-white">{prescription.doctorName}</span>
+                <span className="text-slate-500">Doctor:</span>
+                <span className="ml-2 text-slate-900">{prescription.doctorName}</span>
               </div>
             </div>
           </div>
 
-          {/* Patient Information */}
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-xl">
-            <h3 className="text-lg font-semibold mb-4 flex items-center space-x-2">
-              <User className="w-5 h-5 text-blue-400" />
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+            <h3 className="text-lg font-semibold mb-4 flex items-center space-x-2 text-slate-900">
+              <User className="w-5 h-5 text-teal-600" />
               <span>Patient Information</span>
             </h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <span className="text-slate-400">Name:</span>
-                <span className="ml-2 text-white font-medium">{prescription.patientName}</span>
-              </div>
-              <div>
-                <span className="text-slate-400">Age:</span>
-                <span className="ml-2 text-white">{prescription.patientAge} years</span>
-              </div>
-              <div>
-                <span className="text-slate-400">Gender:</span>
-                <span className="ml-2 text-white">{prescription.patientGender}</span>
-              </div>
-              <div>
-                <span className="text-slate-400">Phone:</span>
-                <span className="ml-2 text-white">{prescription.patientPhone}</span>
-              </div>
-              <div className="md:col-span-2">
-                <span className="text-slate-400">Email:</span>
-                <span className="ml-2 text-white">{prescription.patientEmail}</span>
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-slate-700">
+              <div><span className="text-slate-500">Name:</span><span className="ml-2 text-slate-900">{prescription.patientName}</span></div>
+              <div><span className="text-slate-500">Age:</span><span className="ml-2 text-slate-900">{prescription.patientAge || 'N/A'} years</span></div>
+              <div><span className="text-slate-500">Gender:</span><span className="ml-2 text-slate-900">{prescription.patientGender || 'N/A'}</span></div>
+              <div><span className="text-slate-500">Phone:</span><span className="ml-2 text-slate-900">{prescription.patientPhone}</span></div>
+              <div className="md:col-span-2"><span className="text-slate-500">Email:</span><span className="ml-2 text-slate-900">{prescription.patientEmail}</span></div>
             </div>
           </div>
 
           {/* Diagnosis and Symptoms */}
           <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-xl">
             <h3 className="text-lg font-semibold mb-4 flex items-center space-x-2">
-              <AlertTriangle className="w-5 h-5 text-yellow-400" />
+              <AlertTriangle className="w-5 h-5 text-amber-400" />
               <span>Diagnosis & Symptoms</span>
             </h3>
-            
+
             <div className="space-y-4">
               {prescription.diagnosis && (
                 <div>
@@ -276,7 +258,7 @@ export default function ViewPrescription() {
                   <p className="text-white">{prescription.diagnosis}</p>
                 </div>
               )}
-              
+
               {prescription.symptoms && (
                 <div>
                   <h4 className="text-sm font-medium text-slate-300 mb-2">Symptoms:</h4>
@@ -289,10 +271,10 @@ export default function ViewPrescription() {
           {/* Medicines */}
           <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-xl">
             <h3 className="text-lg font-semibold mb-4 flex items-center space-x-2">
-              <Pill className="w-5 h-5 text-green-400" />
+              <Pill className="w-5 h-5 text-emerald-400" />
               <span>Prescribed Medicines ({prescription.medicines?.length || 0})</span>
             </h3>
-            
+
             <div className="space-y-4">
               {prescription.medicines?.map((medicine, index) => (
                 <div key={medicine.id || index} className="bg-white/5 border border-white/10 rounded-lg p-4">
@@ -303,7 +285,7 @@ export default function ViewPrescription() {
                     </div>
                     <span className="text-sm text-slate-400">#{index + 1}</span>
                   </div>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
                     <div>
                       <span className="text-slate-400">Dosage:</span>
@@ -322,7 +304,7 @@ export default function ViewPrescription() {
                       <span className="ml-2 text-white">{getTimingLabel(medicine.timing)}</span>
                     </div>
                   </div>
-                  
+
                   {medicine.specialInstructions && (
                     <div className="mt-3">
                       <span className="text-slate-400 text-sm">Special Instructions:</span>
@@ -337,10 +319,10 @@ export default function ViewPrescription() {
           {/* Instructions and Follow-up */}
           <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-xl">
             <h3 className="text-lg font-semibold mb-4 flex items-center space-x-2">
-              <CheckCircle className="w-5 h-5 text-blue-400" />
+              <CheckCircle className="w-5 h-5 text-teal-400" />
               <span>Instructions & Follow-up</span>
             </h3>
-            
+
             <div className="space-y-4">
               {prescription.instructions && (
                 <div>
@@ -348,14 +330,14 @@ export default function ViewPrescription() {
                   <p className="text-white">{prescription.instructions}</p>
                 </div>
               )}
-              
+
               {prescription.followUpDate && (
                 <div>
                   <h4 className="text-sm font-medium text-slate-300 mb-2">Follow-up Date:</h4>
                   <p className="text-white">{prescription.followUpDate}</p>
                 </div>
               )}
-              
+
               {prescription.notes && (
                 <div>
                   <h4 className="text-sm font-medium text-slate-300 mb-2">Additional Notes:</h4>
